@@ -157,5 +157,16 @@ class ArchARM(Arch):
         registers['r12'][0]
     }
 
+    lib_paths = ["/usr/arm-linux-gnueabi/"]
+    reloc_s_a = [2]
+    reloc_b_a = [21]
+    # R_ARM_TLS_DTPMOD32
+    reloc_tls_mod_id = [17]
+    # R_ARM_TLS_DTPOFF32 R_ARM_TLS_TPOFF32
+    reloc_tls_offset = [18,19]
+    got_section_name = '.got'
 
+class ArchARMHF(ArchARM):
+    name = 'ARMHF'
+    lib_paths = ["/usr/arm-linux-gnueabihf/"]
 

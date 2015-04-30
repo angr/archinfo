@@ -2,7 +2,11 @@
 
 import capstone as _capstone
 import struct as _struct
+import pyvex as _pyvex
 from elftools.elf.elffile import ELFFile as _ELFFile
+
+import logging
+l = logging.getLogger('arch.Arch')
 
 class Arch(object):
     def __init__(self, endness):
@@ -17,6 +21,14 @@ class Arch(object):
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
+    def __repr__(self):
+        return '<Arch %s>' % self.name
+
+    def __eq__(self, other):
+        return  self.name == other.name and \
+                self.bits == other.bits and \
+                self.memory_endness == other.memory_endness
+
     def gather_info_from_state(self, state):
         info = {}
         for reg in self.persistent_regs:
@@ -28,7 +40,7 @@ class Arch(object):
             # TODO: Only do this for PIC!
             for reg in self.persistent_regs:
                 if reg in info:
-                    state.set_reg(reg, info[reg])
+                    state.store_reg(reg, info[reg])
 
         return state
 
@@ -78,6 +90,23 @@ class Arch(object):
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
             self._cs.detail = True
         return self._cs
+
+    def translate_dynamic_tag(self, tag):
+        try:
+            return self.dynamic_tag_translation[tag]
+        except KeyError:
+            l.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
+            return tag
+
+    def translate_symbol_type(self, tag):
+        try:
+            return self.symbol_type_translation[tag]
+        except KeyError:
+            l.error("Please look up and add symbol type %#x for %s", tag, self.name)
+            return tag
+
+    def disassemble_vex(self, string, **kwargs):
+        return _pyvex.IRSB(bytes=string, arch=self, **kwargs)
 
     # various names
     name = None
@@ -131,7 +160,16 @@ class Arch(object):
     persistent_regs = [ ]
     concretize_unique_registers = set() # this is a list of registers that should be concretized, if unique, at the end of each block
 
-
+    lib_paths = []
+    reloc_s_a = []
+    reloc_b_a = []
+    reloc_s = []
+    reloc_copy = []
+    reloc_tls_mod_id = []
+    reloc_tls_offset = []
+    dynamic_tag_translation = {}
+    symbol_type_translation = {}
+    got_section_name = ''
 
 def arch_from_id(ident, endness='', bits=''):
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
@@ -163,6 +201,7 @@ def arch_from_id(ident, endness='', bits=''):
         endness = 'Iend_LE'
         endness_unsure = True
 
+    ident = ident.lower()
     if 'ppc64' in ident or 'powerpc64' in ident:
         if endness_unsure:
             endness = 'Iend_BE'
@@ -179,11 +218,13 @@ def arch_from_id(ident, endness='', bits=''):
         if endness_unsure:
             return ArchMIPS32('Iend_BE')
         return ArchMIPS32(endness)
+    elif 'armhf' in ident:
+        return ArchARMHF(endness)
     elif 'arm' in ident:
         return ArchARM(endness)
     elif 'amd64' in ident or ('x86' in ident and '64' in ident) or 'x64' in ident:
         return ArchAMD64('Iend_LE')
-    elif 'i386' in ident or 'x86' in ident or 'metapc' in ident:
+    elif '386' in ident or 'x86' in ident or 'metapc' in ident:
         if bits == 64:
             return ArchAMD64('Iend_LE')
         return ArchX86('Iend_LE')
@@ -193,6 +234,12 @@ def arch_from_id(ident, endness='', bits=''):
 def arch_from_binary(filename):
     try:
         reader = _ELFFile(open(filename))
+        if  reader.header.e_machine == 'EM_ARM' and \
+            reader.header.e_flags & 0x200:
+            return ArchARM('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
+        elif reader.header.e_machine == 'EM_ARM' and not \
+             reader.header.e_flags & 0x200:
+             return ArchARMHF('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
         return arch_from_id(reader.header.e_machine,
                             reader.header.e_ident.EI_DATA,
                             reader.header.e_ident.EI_CLASS)
@@ -209,7 +256,7 @@ def reverse_ends(string):
 
 from .arch_amd64    import ArchAMD64
 from .arch_x86      import ArchX86
-from .arch_arm      import ArchARM
+from .arch_arm      import ArchARM, ArchARMHF
 from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32

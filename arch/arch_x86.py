@@ -109,3 +109,12 @@ class ArchX86(Arch):
                            registers['ebp'][0],
                            registers['esi'][0],
                            registers['edi'][0] }
+
+    lib_paths = ['/lib32']
+    reloc_s_a = [1]
+    reloc_b_a = [8]
+    reloc_s = [6]
+    reloc_copy = [5]
+    reloc_tls_mod_id = [15]
+    reloc_tls_offset = [36,37] # wrong
+    got_section_name = '.got.plt'

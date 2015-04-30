@@ -17,6 +17,7 @@ class ArchMIPS32(Arch):
             self.function_epilogs = {
                 r"\x8f\xbf[\x00-\xff]{2}([\x00-\xff]{4}){0,4}\x03\xe0\x00\x08"      # lw ra, off(sp); ... ; jr ra
             }
+            self.lib_paths = ['/usr/mips-linux-gnu/']
 
     bits = 32
     vex_arch = "VexArchMIPS32"
@@ -164,3 +165,17 @@ class ArchMIPS32(Arch):
         registers['t9'][0]
     }
 
+    lib_paths = ['/usr/mipsel-linux-gnu/']
+    reloc_b_a = [3]  # ..?
+
+    dynamic_tag_translation = {
+        0x70000001: 'DT_MIPS_RLD_VERSION',
+        0x70000005: 'DT_MIPS_FLAGS',
+        0x70000006: 'DT_MIPS_BASE_ADDRESS',
+        0x7000000a: 'DT_MIPS_LOCAL_GOTNO',
+        0x70000011: 'DT_MIPS_SYMTABNO',
+        0x70000012: 'DT_MIPS_UNREFEXTNO',
+        0x70000013: 'DT_MIPS_GOTSYM',
+        0x70000016: 'DT_MIPS_RLD_MAP'
+    }
+    got_section_name = '.got'

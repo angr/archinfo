@@ -167,3 +167,9 @@ class ArchPPC32(Arch):
         registers['r30'],
         registers['r31'],
     }
+
+    lib_paths = ['/usr/powerpc-linux-gnu/']
+    reloc_s_a = [1,20]
+    reloc_b_a = [22]
+    reloc_s = [21]
+    got_section_name = '.plt'
