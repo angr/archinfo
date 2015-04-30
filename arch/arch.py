@@ -140,6 +140,7 @@ def arch_from_id(ident, endness, bits):
         bits = 32
 
     endness = endness.lower()
+    endness_unsure = False
     if 'lit' in endness:
         endness = 'Iend_LE'
     elif 'big' in endness:
@@ -154,18 +155,29 @@ def arch_from_id(ident, endness, bits):
         endness = 'Iend_BE'
     elif 'l' in endness:
         endness = 'Iend_LE'
+        endness_unsure = True
     elif 'b' in endness:
         endness = 'Iend_BE'
+        endness_unsure = True
     else:
         endness = 'Iend_LE'
+        endness_unsure = True
 
     if 'ppc64' in ident or 'powerpc64' in ident:
+        if endness_unsure:
+            endness = 'Iend_BE'
         return ArchPPC64(endness)
     elif 'ppc' in ident or 'powerpc' in ident:
+        if endness_unsure:
+            endness = 'Iend_BE'
         if bits == 64:
             return ArchPPC64(endness)
         return ArchPPC32(endness)
     elif 'mips' in ident:
+        if 'mipsel' in ident:
+            return ArchMIPS32('Iend_LE')
+        if endness_unsure:
+            return ArchMIPS32('Iend_BE')
         return ArchMIPS32(endness)
     elif 'arm' in ident:
         return ArchARM(endness)
