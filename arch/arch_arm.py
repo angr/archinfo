@@ -36,7 +36,7 @@ class ArchARM(Arch):
 
     bits = 32
     vex_arch = "VexArchARM"
-    name = "ARM"
+    name = "ARMEL"
     qemu_name = 'arm'
     ida_processor = 'armb'
     max_inst_bytes = 4

@@ -22,7 +22,7 @@ class Arch(object):
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
     def __repr__(self):
-        return '<Arch %s>' % self.name
+        return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
 
     def __eq__(self, other):
         return  self.name == other.name and \
@@ -261,3 +261,12 @@ from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
 from .archerror     import ArchError
+
+all_arches = [
+    ArchAMD64(), ArchX86(),
+    ArchARM('Iend_LE'), ArchARM('Iend_BE'),
+    ArchARMHF('Iend_LE'), ArchARMHF('Iend_BE'),
+    ArchPPC32('Iend_LE'), ArchPPC32('Iend_BE'),
+    ArchPPC64('Iend_LE'), ArchPPC64('Iend_BE'),
+    ArchMIPS32('Iend_LE'), ArchMIPS32('Iend_BE')
+]
