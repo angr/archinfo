@@ -133,7 +133,7 @@ class Arch(object):
 
 
 
-def arch_from_id(ident, endness, bits):
+def arch_from_id(ident, endness='', bits=''):
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
         bits = 64
     else:
