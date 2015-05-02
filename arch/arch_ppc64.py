@@ -15,12 +15,15 @@ class ArchPPC64(Arch):
             self.function_epilogs = {
                 r"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"    # mtlr reg; ... ; blr
             }
+            self.triplet = 'powerpc-linux-gnu'
 
     bits = 64
     vex_arch = "VexArchPPC64"
     name = "PPC64"
     qemu_name = 'ppc64'
     ida_processor = 'ppc64'
+    triplet = 'powerpc64le-linux-gnu'
+    linux_name = 'ppc750'
     max_inst_bytes = 4
     ip_offset = 1296
     sp_offset = 24
@@ -165,7 +168,6 @@ class ArchPPC64(Arch):
         registers['r31'],
     }
 
-    lib_paths = ['/usr/powerpc-linux-gnu/']
     reloc_s_a = [1,20]
     reloc_b_a = [22]
     reloc_s = [21]

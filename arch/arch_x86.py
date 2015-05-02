@@ -14,6 +14,8 @@ class ArchX86(Arch):
     name = "X86"
     qemu_name = 'i386'
     ida_processor = 'metapc'
+    linux_name = 'i386'
+    triplet = 'i386-linux-gnu'
     max_inst_bytes = 15
     call_sp_fix = -8
     ip_offset = 68

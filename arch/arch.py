@@ -3,7 +3,7 @@
 import capstone as _capstone
 import struct as _struct
 import pyvex as _pyvex
-from elftools.elf.elffile import ELFFile as _ELFFile
+from elftools.elf.elffile import ELFFile as _ELFFile, ELFError as _ELFError
 
 import logging
 l = logging.getLogger('arch.Arch')
@@ -95,24 +95,44 @@ class Arch(object):
         try:
             return self.dynamic_tag_translation[tag]
         except KeyError:
-            l.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
+            if isinstance(tag, (int, long)):
+                l.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
             return tag
 
     def translate_symbol_type(self, tag):
         try:
             return self.symbol_type_translation[tag]
         except KeyError:
-            l.error("Please look up and add symbol type %#x for %s", tag, self.name)
+            if isinstance(tag, (int, long)):
+                l.error("Please look up and add symbol type %#x for %s", tag, self.name)
             return tag
+
+    def translate_register_name(self, offset):
+        try:
+            return self.register_names[offset]
+        except KeyError:
+            return str(offset)
 
     def disassemble_vex(self, string, **kwargs):
         return _pyvex.IRSB(bytes=string, arch=self, **kwargs)
+
+    # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
+    def library_search_path(self, pedantic=False):
+        subfunc = lambda x: x.replace('${TRIPLET}', self.triplet).replace('${ARCH}', self.linux_name)
+        path = ['/lib/${TRIPLET}/', '/usr/lib/${TRIPLET}/', '/lib/', '/usr/lib', '/usr/${TRIPLET}/lib/']
+        if self.bits == 64:
+            path.append('/usr/${TRIPLET}/lib64/')
+        if pedantic:
+            path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
+        return map(subfunc, path)
 
     # various names
     name = None
     vex_arch = None
     qemu_name = None
     ida_processor = None
+    linux_name = None
+    triplet = None
 
     # instruction stuff
     max_inst_bytes = None
@@ -156,6 +176,7 @@ class Arch(object):
     entry_register_values = { }
     default_symbolic_registers = [ ]
     registers = { }
+    register_names = { }
     argument_registers = { }
     persistent_regs = [ ]
     concretize_unique_registers = set() # this is a list of registers that should be concretized, if unique, at the end of each block
@@ -218,8 +239,6 @@ def arch_from_id(ident, endness='', bits=''):
         if endness_unsure:
             return ArchMIPS32('Iend_BE')
         return ArchMIPS32(endness)
-    elif 'armhf' in ident:
-        return ArchARMHF(endness)
     elif 'arm' in ident:
         return ArchARM(endness)
     elif 'amd64' in ident or ('x86' in ident and '64' in ident) or 'x64' in ident:
@@ -236,14 +255,14 @@ def arch_from_binary(filename):
         reader = _ELFFile(open(filename))
         if  reader.header.e_machine == 'EM_ARM' and \
             reader.header.e_flags & 0x200:
-            return ArchARM('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
-        elif reader.header.e_machine == 'EM_ARM' and not \
-             reader.header.e_flags & 0x200:
+            return ArchARMEL('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
+        elif reader.header.e_machine == 'EM_ARM' and \
+             reader.header.e_flags & 0x400:
              return ArchARMHF('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
         return arch_from_id(reader.header.e_machine,
                             reader.header.e_ident.EI_DATA,
                             reader.header.e_ident.EI_CLASS)
-    except OSError:
+    except (OSError, IOError, _ELFError):
         pass
 
     raise ArchError("Could not determine architecture")
@@ -256,7 +275,7 @@ def reverse_ends(string):
 
 from .arch_amd64    import ArchAMD64
 from .arch_x86      import ArchX86
-from .arch_arm      import ArchARM, ArchARMHF
+from .arch_arm      import ArchARM, ArchARMHF, ArchARMEL
 from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
@@ -265,7 +284,6 @@ from .archerror     import ArchError
 all_arches = [
     ArchAMD64(), ArchX86(),
     ArchARM('Iend_LE'), ArchARM('Iend_BE'),
-    ArchARMHF('Iend_LE'), ArchARMHF('Iend_BE'),
     ArchPPC32('Iend_LE'), ArchPPC32('Iend_BE'),
     ArchPPC64('Iend_LE'), ArchPPC64('Iend_BE'),
     ArchMIPS32('Iend_LE'), ArchMIPS32('Iend_BE')

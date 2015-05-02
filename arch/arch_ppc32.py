@@ -24,6 +24,8 @@ class ArchPPC32(Arch):
     name = "PPC32"
     qemu_name = 'ppc'
     ida_processor = 'ppc'
+    linux_name = 'ppc750'   # ?
+    triplet = 'powerpc-linux-gnu'
     max_inst_bytes = 4
     ip_offset = 1160
     sp_offset = 20
@@ -168,7 +170,6 @@ class ArchPPC32(Arch):
         registers['r31'],
     }
 
-    lib_paths = ['/usr/powerpc-linux-gnu/']
     reloc_s_a = [1,20]
     reloc_b_a = [22]
     reloc_s = [21]

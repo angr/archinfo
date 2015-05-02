@@ -15,6 +15,8 @@ class ArchAMD64(Arch):
     name = "AMD64"
     qemu_name = 'x86_64'
     ida_processor = 'metapc'
+    linux_name = 'x86_64'
+    triplet = 'x86_64-linux-gnu'
     max_inst_bytes = 15
     ip_offset = 184
     sp_offset = 48
@@ -141,8 +143,6 @@ class ArchAMD64(Arch):
         registers['r14'][0],
         registers['r15'][0],
     }
-
-    lib_paths = ["/usr/lib/x86_64-linux-gnu/", "/lib/x86_64-linux-gnu/"]
 
     # R_X86_64_64, R_X86_64_32, R_X86_64_32S, R_X86_64_16, R_X86_64_8
     reloc_s_a = [1,10,11,12,14]

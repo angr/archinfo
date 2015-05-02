@@ -19,6 +19,18 @@ class ArchARM(Arch):
                 r"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
             }
 
+    # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
+    def __eq__(self, other):
+        if not isinstance(other, ArchARM):
+            return False
+        if self.memory_endness != other.memory_endness or self.bits != other.bits:
+            return False
+        if type(self) == type(other):
+            return True
+        if type(self) is ArchARM or type(other) is ArchARM:
+            return True
+        return False
+
     @property
     def capstone(self):
         if self._cs is None:
@@ -39,6 +51,8 @@ class ArchARM(Arch):
     name = "ARMEL"
     qemu_name = 'arm'
     ida_processor = 'armb'
+    linux_name = 'arm'
+    triplet = 'arm-linux-gnueabi'
     max_inst_bytes = 4
     ip_offset = 68
     sp_offset = 60
@@ -157,7 +171,6 @@ class ArchARM(Arch):
         registers['r12'][0]
     }
 
-    lib_paths = ["/usr/arm-linux-gnueabi/"]
     reloc_s_a = [2]
     reloc_b_a = [21]
     # R_ARM_TLS_DTPMOD32
@@ -168,5 +181,7 @@ class ArchARM(Arch):
 
 class ArchARMHF(ArchARM):
     name = 'ARMHF'
-    lib_paths = ["/usr/arm-linux-gnueabihf/"]
+    triplet = 'arm-linux-gnueabihf'
 
+class ArchARMEL(ArchARM):
+    pass
