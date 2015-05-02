@@ -52,7 +52,7 @@ class ArchARM(Arch):
     qemu_name = 'arm'
     ida_processor = 'armb'
     linux_name = 'arm'
-    triplet = 'arm-linux-gnueabi'
+    triplet = 'arm-linux-gnueabihf'
     max_inst_bytes = 4
     ip_offset = 68
     sp_offset = 60
@@ -184,4 +184,5 @@ class ArchARMHF(ArchARM):
     triplet = 'arm-linux-gnueabihf'
 
 class ArchARMEL(ArchARM):
-    pass
+    name = 'ARMEL'
+    triplet = 'arm-linux-gnueabi'
