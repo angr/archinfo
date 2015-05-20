@@ -86,6 +86,8 @@ class Arch(object):
 
     @property
     def capstone(self):
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
             self._cs.detail = True
@@ -114,6 +116,8 @@ class Arch(object):
             return str(offset)
 
     def disassemble_vex(self, string, **kwargs):
+        if self.vex_arch is None:
+            raise ArchError("Arch %s does not support VEX lifting" % self.name)
         return _pyvex.IRSB(bytes=string, arch=self, **kwargs)
 
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
