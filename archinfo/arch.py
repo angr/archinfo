@@ -254,23 +254,6 @@ def arch_from_id(ident, endness='', bits=''):
 
     raise ArchError("Could not parse out arch!")
 
-def arch_from_binary(filename):
-    try:
-        reader = _ELFFile(open(filename))
-        if  reader.header.e_machine == 'EM_ARM' and \
-            reader.header.e_flags & 0x200:
-            return ArchARMEL('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
-        elif reader.header.e_machine == 'EM_ARM' and \
-             reader.header.e_flags & 0x400:
-             return ArchARMHF('Iend_LE' if 'LSB' in reader.header.e_ident.EI_DATA else 'Iend_BE')
-        return arch_from_id(reader.header.e_machine,
-                            reader.header.e_ident.EI_DATA,
-                            reader.header.e_ident.EI_CLASS)
-    except (OSError, IOError, _ELFError):
-        pass
-
-    raise ArchError("Could not determine architecture")
-
 
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)
