@@ -248,7 +248,7 @@ def arch_from_id(ident, endness='', bits=''):
         if endness_unsure:
             return ArchMIPS32('Iend_BE')
         return ArchMIPS32(endness)
-    elif 'arm' in ident:
+    elif 'arm' in ident or 'thumb' in ident:
         return ArchARM(endness)
     elif 'amd64' in ident or ('x86' in ident and '64' in ident) or 'x64' in ident:
         return ArchAMD64('Iend_LE')
