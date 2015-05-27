@@ -29,6 +29,9 @@ class Arch(object):
                 self.bits == other.bits and \
                 self.memory_endness == other.memory_endness
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def gather_info_from_state(self, state):
         info = {}
         for reg in self.persistent_regs:
@@ -126,6 +129,8 @@ class Arch(object):
         path = ['/lib/${TRIPLET}/', '/usr/lib/${TRIPLET}/', '/lib/', '/usr/lib', '/usr/${TRIPLET}/lib/']
         if self.bits == 64:
             path.append('/usr/${TRIPLET}/lib64/')
+        elif self.bits == 32:
+            path.append('/usr/${TRIPLET}/lib32/')
         if pedantic:
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
         return map(subfunc, path)
