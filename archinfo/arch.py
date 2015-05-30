@@ -173,7 +173,7 @@ class Arch(object):
     cs_mode = None
     _cs = None
     call_pushes_ret = False
-    initial_sp = 0xffff0000
+    initial_sp = 0xbfff0000
 
     # Difference of the stack pointer after a call instruction (or its equivalent) is executed
     call_sp_fix = 0
