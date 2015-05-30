@@ -45,7 +45,8 @@ class ArchAMD64(Arch):
     default_register_values = [
         ( 'd', 1, False, None ),
         ( 'rsp', initial_sp, True, 'global' ),
-        ( 'fs', 0x9000000000000000, True, 'global')
+        ( 'fs', 0x9000000000000000, True, 'global'),
+        ( 'sseround', 0, False, None ),
     ]
     entry_register_values = {
         'rax': 0x1c,
@@ -87,6 +88,8 @@ class ArchAMD64(Arch):
         184: 'rip',
 
         208: 'fs',
+
+        216: 'sseround',
     }
 
     registers = {
@@ -124,7 +127,9 @@ class ArchAMD64(Arch):
         'pc': (184, 8),
         'ip': (184, 8),
 
-        'fs': (208, 8)
+        'fs': (208, 8),
+
+        'sseround': (216, 8),
     }
 
     argument_registers = {

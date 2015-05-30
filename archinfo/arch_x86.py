@@ -41,7 +41,9 @@ class ArchX86(Arch):
     nop_instruction = "\x90"
     instruction_alignment = 1
     default_register_values = [
-        ( 'esp', Arch.initial_sp, True, 'global' ) # the stack
+        ( 'esp', Arch.initial_sp, True, 'global' ), # the stack
+        ( 'fpround', 0, False, None ),
+        ( 'sseround', 0, False, None ),
     ]
     entry_register_values = {
         'eax': 0x1C,
@@ -72,6 +74,9 @@ class ArchX86(Arch):
 
         68: 'eip',
 
+        144: 'fpround',
+        156: 'sseround',
+
         296: 'gs',
     }
 
@@ -100,6 +105,9 @@ class ArchX86(Arch):
         'eip': (68, 4),
         'pc': (68, 4),
         'ip': (68, 4),
+
+        'fpround': (144, 4),
+        'sseround': (156, 4),
 
         'gs': (296, 2),
     }
