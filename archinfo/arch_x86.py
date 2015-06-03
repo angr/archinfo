@@ -74,10 +74,49 @@ class ArchX86(Arch):
 
         68: 'eip',
 
-        144: 'fpround',
-        156: 'sseround',
+        # fpu registers
+        72: 'fpu_r0',
+        80: 'fpu_r1',
+        88: 'fpu_r2',
+        96: 'fpu_r3',
+        104: 'fpu_r4',
+        112: 'fpu_r5',
+        120: 'fpu_r6',
+        128: 'fpu_r7',
 
+        # fpu tags
+        136: 'fpu_t0',
+        137: 'fpu_t1',
+        138: 'fpu_t2',
+        139: 'fpu_t3',
+        140: 'fpu_t4',
+        141: 'fpu_t5',
+        142: 'fpu_t6',
+        143: 'fpu_t7',
+
+        # fpu settings
+        144: 'fpround',
+        148: 'fc3210',
+        152: 'ftop',
+
+        # sse
+        156: 'sseround',
+        160: 'xmm0',
+        176: 'xmm1',
+        192: 'xmm2',
+        208: 'xmm3',
+        224: 'xmm4',
+        240: 'xmm5',
+        256: 'xmm6',
+        272: 'xmm7',
+
+        288: 'cs',
+        290: 'ds',
+        292: 'es',
+        294: 'fs',
         296: 'gs',
+        298: 'ldt',
+        306: 'gdt'
     }
 
     registers = {
@@ -106,10 +145,51 @@ class ArchX86(Arch):
         'pc': (68, 4),
         'ip': (68, 4),
 
-        'fpround': (144, 4),
-        'sseround': (156, 4),
+        # fpu registers
+        'fpu_regs': (72, 64),
+        'fpu_r0': (72, 8),
+        'fpu_r1': (80, 8),
+        'fpu_r2': (88, 8),
+        'fpu_r3': (96, 8),
+        'fpu_r4': (104, 8),
+        'fpu_r5': (112, 8),
+        'fpu_r6': (120, 8),
+        'fpu_r7': (128, 8),
 
+        # fpu tags
+        'fpu_tags': (136, 8),
+        'fpu_t0': (136, 1),
+        'fpu_t1': (137, 1),
+        'fpu_t2': (138, 1),
+        'fpu_t3': (139, 1),
+        'fpu_t4': (140, 1),
+        'fpu_t5': (141, 1),
+        'fpu_t6': (142, 1),
+        'fpu_t7': (143, 1),
+
+        # fpu settings
+        'fpround': (144, 4),
+        'fc3210': (148, 4),
+        'ftop': (152, 4),
+
+        # sse
+        'sseround': (156, 4),
+        'xmm0': (160, 16),
+        'xmm1': (176, 16),
+        'xmm2': (192, 16),
+        'xmm3': (208, 16),
+        'xmm4': (224, 16),
+        'xmm5': (240, 16),
+        'xmm6': (256, 16),
+        'xmm7': (272, 16),
+
+        'cs': (288, 2),
+        'ds': (290, 2),
+        'es': (292, 2),
+        'fs': (294, 2),
         'gs': (296, 2),
+        'ldt': (298, 8),
+        'gdt': (306, 8)
     }
 
     argument_registers = { registers['eax'][0],
