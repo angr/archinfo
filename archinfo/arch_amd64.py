@@ -47,6 +47,7 @@ class ArchAMD64(Arch):
         ( 'rsp', initial_sp, True, 'global' ),
         ( 'fs', 0x9000000000000000, True, 'global'),
         ( 'sseround', 0, False, None ),
+        ( 'fpround', 0, False, None ),
     ]
     entry_register_values = {
         'rax': 0x1c,
@@ -90,6 +91,7 @@ class ArchAMD64(Arch):
         208: 'fs',
 
         216: 'sseround',
+        884: 'fpround'
     }
 
     registers = {
@@ -130,6 +132,7 @@ class ArchAMD64(Arch):
         'fs': (208, 8),
 
         'sseround': (216, 8),
+        'fpround': (884, 8)
     }
 
     argument_registers = {
