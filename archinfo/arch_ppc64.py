@@ -172,3 +172,4 @@ class ArchPPC64(Arch):
     reloc_b_a = [22]
     reloc_s = [21]
     got_section_name = '.plt'
+    ld_linux_name = 'ld64.so.1'

@@ -181,3 +181,4 @@ class ArchMIPS32(Arch):
         0x70000016: 'DT_MIPS_RLD_MAP'
     }
     got_section_name = '.got'
+    ld_linux_name = 'ld.so.1'

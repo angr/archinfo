@@ -25,7 +25,7 @@ class ArchARM(Arch):
             return False
         if self.memory_endness != other.memory_endness or self.bits != other.bits:
             return False
-        if type(self) == type(other):
+        if type(self) is type(other):
             return True
         if type(self) is ArchARM or type(other) is ArchARM:
             return True
@@ -178,11 +178,14 @@ class ArchARM(Arch):
     # R_ARM_TLS_DTPOFF32 R_ARM_TLS_TPOFF32
     reloc_tls_offset = [18,19]
     got_section_name = '.got'
+    ld_linux_name = 'ld-linux.so.3'
 
 class ArchARMHF(ArchARM):
     name = 'ARMHF'
     triplet = 'arm-linux-gnueabihf'
+    ld_linux_name = 'ld-linux-armhf.so.3'
 
 class ArchARMEL(ArchARM):
     name = 'ARMEL'
     triplet = 'arm-linux-gnueabi'
+    ld_linux_name = 'ld-linux.so.3'

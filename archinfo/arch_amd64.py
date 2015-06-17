@@ -169,3 +169,4 @@ class ArchAMD64(Arch):
         'STT_LOOS': 'STT_GNU_IFUNC'
     }
     got_section_name = '.got.plt'
+    ld_linux_name = 'ld-linux-x86-64.so.2'
