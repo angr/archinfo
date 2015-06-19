@@ -3,7 +3,6 @@
 import capstone as _capstone
 import struct as _struct
 import pyvex as _pyvex
-from elftools.elf.elffile import ELFFile as _ELFFile, ELFError as _ELFError
 
 import logging
 l = logging.getLogger('arch.Arch')
@@ -30,7 +29,7 @@ class Arch(object):
                 self.memory_endness == other.memory_endness
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
     def gather_info_from_state(self, state):
         info = {}
@@ -249,7 +248,11 @@ def arch_from_id(ident, endness='', bits=''):
             return ArchMIPS32('Iend_BE')
         return ArchMIPS32(endness)
     elif 'arm' in ident or 'thumb' in ident:
+        if bits == 64:
+            return ArchAArch64(endness)
         return ArchARM(endness)
+    elif 'aarch' in ident:
+        return ArchAArch64(endness)
     elif 'amd64' in ident or ('x86' in ident and '64' in ident) or 'x64' in ident:
         return ArchAMD64('Iend_LE')
     elif '386' in ident or 'x86' in ident or 'metapc' in ident:
@@ -267,7 +270,8 @@ def reverse_ends(string):
 
 from .arch_amd64    import ArchAMD64
 from .arch_x86      import ArchX86
-from .arch_arm      import ArchARM, ArchARMHF, ArchARMEL
+from .arch_arm      import ArchARM
+from .arch_aarch64  import ArchAArch64
 from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
@@ -276,6 +280,7 @@ from .archerror     import ArchError
 all_arches = [
     ArchAMD64(), ArchX86(),
     ArchARM('Iend_LE'), ArchARM('Iend_BE'),
+    ArchAArch64('Iend_LE'), ArchAArch64('Iend_BE'),
     ArchPPC32('Iend_LE'), ArchPPC32('Iend_BE'),
     ArchPPC64('Iend_LE'), ArchPPC64('Iend_BE'),
     ArchMIPS32('Iend_LE'), ArchMIPS32('Iend_BE')
