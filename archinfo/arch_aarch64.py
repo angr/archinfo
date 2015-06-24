@@ -8,12 +8,12 @@ class ArchAArch64(Arch):
         if endness == 'Iend_BE':
             self.ida_processor = 'armb'
             self.cs_mode = _capstone.CS_MODE_BIG_ENDIAN
-            self.function_prologs = {
+            self.function_prologs = set((
                 # TODO
-            }
-            self.function_epilogs = {
+            ))
+            self.function_epilogs = set((
                 # TODO
-            }
+            ))
 
     bits = 64
     vex_arch = "VexArchARM64"
@@ -37,13 +37,13 @@ class ArchAArch64(Arch):
 
     ret_instruction = "\xC0\x03\x5F\xD6"    # ret
     nop_instruction = "\x1F\x20\x03\xD5"    # nop
-    function_prologs = {
+    function_prologs = set((
         #r"\xFD\x7B\xBE\xA9\xFD\x03\x00\x91"
         # TODO
-    }
-    function_epilogs = {
+    ))
+    function_epilogs = set((
         # TODO
-    }
+    ))
     instruction_alignment = 4
     concretize_unique_registers = set()
     default_register_values = [

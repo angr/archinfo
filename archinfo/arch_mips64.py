@@ -7,12 +7,12 @@ class ArchMIPS64(Arch):
         super(ArchMIPS64, self).__init__(endness)
         if endness == 'Iend_BE':
 
-            self.function_prologs = {
+            self.function_prologs = set((
                 # TODO
-            }
-            self.function_epilogs = {
+            ))
+            self.function_epilogs = set((
                 # TODO
-            }
+            ))
             self.triplet = 'mips64-linux-gnu'
             self.linux_name = 'mips64'
             self.ida_name = 'mips64b'
@@ -33,12 +33,12 @@ class ArchMIPS64(Arch):
     stack_change = -8
     cs_arch = _capstone.CS_ARCH_MIPS
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
-    function_prologs = {
+    function_prologs = set((
         # TODO
-    }
-    function_epilogs = {
+    ))
+    function_epilogs = set((
         # TODO
-    }
+    ))
 
     ret_instruction = "\x08\x00\xE0\x03" + "\x25\x08\x20\x00"
     nop_instruction = "\x00\x00\x00\x00"
