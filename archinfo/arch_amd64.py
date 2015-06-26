@@ -159,10 +159,12 @@ class ArchAMD64(Arch):
     # R_X86_64_GOT32
     reloc_s = [3,6,7]
     reloc_copy = [5]
-    # R_X86_64_DTPMod64
+    # R_X86_64_DTPMOD64
     reloc_tls_mod_id = [16]
-    # R_X86_64_DTPOFF64, R_X86_64_TPOFF64
-    reloc_tls_offset = [17, 18]
+    # R_X86_64_DTPOFF64
+    reloc_tls_doffset = [17]
+    # R_X86_64_TPOFF64
+    reloc_tls_offset = [18]
 
     symbol_type_translation = {
         10: 'STT_GNU_IFUNC',

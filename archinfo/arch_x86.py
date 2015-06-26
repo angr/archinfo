@@ -214,7 +214,8 @@ class ArchX86(Arch):
     reloc_b_a = [8]
     reloc_s = [6]
     reloc_copy = [5]
-    reloc_tls_mod_id = [15]
-    reloc_tls_offset = [36,37] # wrong
+    reloc_tls_mod_id = [35]
+    reloc_tls_doffset = [36]
+    reloc_tls_offset = [14]
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux.so.2'

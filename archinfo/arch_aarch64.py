@@ -231,7 +231,8 @@ class ArchAArch64(Arch):
     reloc_copy = [1024]
     reloc_s_a = [257, 1025, 1026]
     reloc_b_a = [1027]
-    reloc_tls_mod_id = []
-    reloc_tls_offset = []
+    reloc_tls_mod_id = [1029]
+    reloc_tls_doffset = [1028]
+    reloc_tls_offset = [1030]
     got_section_name = '.got'
     ld_linux_name = 'ld-linux-aarch64.so.1'

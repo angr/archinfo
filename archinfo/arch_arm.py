@@ -175,8 +175,11 @@ class ArchARM(Arch):
     reloc_b_a = [21]
     # R_ARM_TLS_DTPMOD32
     reloc_tls_mod_id = [17]
-    # R_ARM_TLS_DTPOFF32 R_ARM_TLS_TPOFF32
-    reloc_tls_offset = [18,19]
+    # R_ARM_TLS_DTPOFF32
+    reloc_tls_doffset = [18]
+    # R_ARM_TLS_TPOFF32
+    reloc_tls_offset = [19]
+
     got_section_name = '.got'
     ld_linux_name = 'ld-linux.so.3'
 

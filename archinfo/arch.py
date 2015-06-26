@@ -195,6 +195,7 @@ class Arch(object):
     reloc_s = []
     reloc_copy = []
     reloc_tls_mod_id = []
+    reloc_tls_doffset = []
     reloc_tls_offset = []
     dynamic_tag_translation = {}
     symbol_type_translation = {}

@@ -170,8 +170,12 @@ class ArchPPC32(Arch):
         registers['r31'],
     }
 
+    # http://www.polyomino.org.uk/publications/2011/Power-Arch-32-bit-ABI-supp-1.0-Unified.pdf
     reloc_s_a = [1,20]
     reloc_b_a = [22]
     reloc_s = [21]
+    reloc_tls_mod_id = [68]
+    reloc_tls_doffset = [78]
+    reloc_tls_offset = [73]
     got_section_name = '.plt'
     ld_linux_name = 'ld.so.1'
