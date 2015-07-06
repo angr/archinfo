@@ -35,7 +35,7 @@ class Arch(object):
     def gather_info_from_state(self, state):
         info = {}
         for reg in self.persistent_regs:
-            info[reg] = state.reg_expr(reg)
+            info[reg] = state.registers.load(reg)
         return info
 
     def prepare_state(self, state, info=None):
@@ -43,7 +43,7 @@ class Arch(object):
             # TODO: Only do this for PIC!
             for reg in self.persistent_regs:
                 if reg in info:
-                    state.store_reg(reg, info[reg])
+                    state.registers.store(reg, info[reg])
 
         return state
 
