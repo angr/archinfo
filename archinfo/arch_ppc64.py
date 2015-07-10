@@ -169,7 +169,8 @@ class ArchPPC64(Arch):
     }
 
     # http://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.pdf
-    reloc_s_a = [1,20]
+    # TODO: R_PPC64_JMP_IREL: https://sourceware.org/ml/binutils/2009-07/msg00350.html
+    reloc_s_a = [20, 38]
     reloc_b_a = [22]
     reloc_s = [21]
     reloc_tls_mod_id = [68]
