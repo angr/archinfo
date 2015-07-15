@@ -115,8 +115,10 @@ class ArchX86(Arch):
         292: 'es',
         294: 'fs',
         296: 'gs',
-        298: 'ldt',
-        306: 'gdt'
+        298: 'ss',
+
+        304: 'ldt',
+        312: 'gdt'
     }
 
     registers = {
@@ -197,8 +199,8 @@ class ArchX86(Arch):
         'fs': (294, 2),
         'gs': (296, 2),
         'ss': (298, 2),
-        'ldt': (300, 8),
-        'gdt': (308, 8)
+        'ldt': (304, 8),
+        'gdt': (312, 8)
     }
 
     argument_registers = { registers['eax'][0],
@@ -212,9 +214,10 @@ class ArchX86(Arch):
     lib_paths = ['/lib32']
     reloc_s_a = [1]
     reloc_b_a = [8]
-    reloc_s = [6]
+    reloc_s = [6, 7]
     reloc_copy = [5]
-    reloc_tls_mod_id = [15]
-    reloc_tls_offset = [36,37] # wrong
+    reloc_tls_mod_id = [35]
+    reloc_tls_doffset = [36]
+    reloc_tls_offset = [14]
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux.so.2'

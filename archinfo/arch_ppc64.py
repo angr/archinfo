@@ -168,8 +168,13 @@ class ArchPPC64(Arch):
         registers['r31'],
     }
 
-    reloc_s_a = [1,20]
+    # http://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.pdf
+    # TODO: R_PPC64_JMP_IREL: https://sourceware.org/ml/binutils/2009-07/msg00350.html
+    reloc_s_a = [20, 38]
     reloc_b_a = [22]
     reloc_s = [21]
+    reloc_tls_mod_id = [68]
+    reloc_tls_doffset = [78]
+    reloc_tls_offset = [73]
     got_section_name = '.plt'
     ld_linux_name = 'ld64.so.1'

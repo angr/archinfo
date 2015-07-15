@@ -171,12 +171,17 @@ class ArchARM(Arch):
         registers['r12'][0]
     }
 
-    reloc_s_a = [2]
-    reloc_b_a = [21]
+    # http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044e/IHI0044E_aaelf.pdf
+    reloc_copy = [20]
+    reloc_s_a = [2, 21, 22]
+    reloc_b_a = [23]
     # R_ARM_TLS_DTPMOD32
     reloc_tls_mod_id = [17]
-    # R_ARM_TLS_DTPOFF32 R_ARM_TLS_TPOFF32
-    reloc_tls_offset = [18,19]
+    # R_ARM_TLS_DTPOFF32
+    reloc_tls_doffset = [18]
+    # R_ARM_TLS_TPOFF32
+    reloc_tls_offset = [19]
+
     got_section_name = '.got'
     ld_linux_name = 'ld-linux.so.3'
 
