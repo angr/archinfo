@@ -21,6 +21,7 @@ class ArchARM(Arch):
 
     # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
     def __eq__(self, other):
+        # pylint: disable=unidiomatic-typecheck
         if not isinstance(other, ArchARM):
             return False
         if self.memory_endness != other.memory_endness or self.bits != other.bits:
@@ -116,7 +117,56 @@ class ArchARM(Arch):
         72: 'cc_op',
         76: 'cc_dep1',
         80: 'cc_dep2',
-        84: 'cc_ndep'
+        84: 'cc_ndep',
+
+        88: 'qflag32',
+        92: 'geflag0',
+        96: 'geflag1',
+        100: 'geflag2',
+        104: 'geflag3',
+
+        108: 'emnote',
+        112: 'cmstart',
+        116: 'cmlen',
+        120: 'nraddr',
+        124: 'ip_at_syscall',
+
+        128: 'd0',
+        136: 'd1',
+        144: 'd2',
+        152: 'd3',
+        160: 'd4',
+        168: 'd5',
+        176: 'd6',
+        184: 'd7',
+        192: 'd8',
+        200: 'd9',
+        208: 'd10',
+        216: 'd11',
+        224: 'd12',
+        232: 'd13',
+        240: 'd14',
+        248: 'd15',
+        256: 'd16',
+        264: 'd17',
+        272: 'd18',
+        280: 'd19',
+        288: 'd20',
+        296: 'd21',
+        304: 'd22',
+        312: 'd23',
+        320: 'd24',
+        328: 'd25',
+        336: 'd26',
+        344: 'd27',
+        352: 'd28',
+        360: 'd29',
+        368: 'd30',
+        376: 'd31',
+
+        380: 'fpscr',
+        384: 'tpidruro',
+        388: 'itstate'
     }
 
     registers = {
@@ -152,7 +202,56 @@ class ArchARM(Arch):
         'cc_op': (72, 4),
         'cc_dep1': (76, 4),
         'cc_dep2': (80, 4),
-        'cc_ndep': (84, 4)
+        'cc_ndep': (84, 4),
+
+        'qflag32': (88, 4),
+        'geflag0': (92, 4),
+        'geflag1': (96, 4),
+        'geflag2': (100, 4),
+        'geflag3': (104, 4),
+
+        'emnote': (108, 4),
+        'cmstart': (112, 4),
+        'cmlen': (116, 4),
+        'nraddr': (120, 4),
+        'ip_at_syscall': (124, 4),
+
+        'd0': (128, 8),
+        'd1': (136, 8),
+        'd2': (144, 8),
+        'd3': (152, 8),
+        'd4': (160, 8),
+        'd5': (168, 8),
+        'd6': (176, 8),
+        'd7': (184, 8),
+        'd8': (192, 8),
+        'd9': (200, 8),
+        'd10': (208, 8),
+        'd11': (216, 8),
+        'd12': (224, 8),
+        'd13': (232, 8),
+        'd14': (240, 8),
+        'd15': (248, 8),
+        'd16': (256, 8),
+        'd17': (264, 8),
+        'd18': (272, 8),
+        'd19': (280, 8),
+        'd20': (288, 8),
+        'd21': (296, 8),
+        'd22': (304, 8),
+        'd23': (312, 8),
+        'd24': (320, 8),
+        'd25': (328, 8),
+        'd26': (336, 8),
+        'd27': (344, 8),
+        'd28': (352, 8),
+        'd29': (360, 8),
+        'd30': (368, 8),
+        'd31': (376, 8),
+
+        'fpscr': (380, 4),
+        'tpidruro': (384, 4),
+        'itstate': (388, 4)
     }
 
     argument_registers = {
