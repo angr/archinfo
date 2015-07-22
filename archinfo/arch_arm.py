@@ -164,9 +164,9 @@ class ArchARM(Arch):
         368: 'd30',
         376: 'd31',
 
-        380: 'fpscr',
-        384: 'tpidruro',
-        388: 'itstate'
+        384: 'fpscr',
+        388: 'tpidruro',
+        392: 'itstate'
     }
 
     registers = {
@@ -249,9 +249,9 @@ class ArchARM(Arch):
         'd30': (368, 8),
         'd31': (376, 8),
 
-        'fpscr': (380, 4),
-        'tpidruro': (384, 4),
-        'itstate': (388, 4)
+        'fpscr': (384, 4),
+        'tpidruro': (388, 4),
+        'itstate': (392, 4)
     }
 
     argument_registers = {
