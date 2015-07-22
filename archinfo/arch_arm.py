@@ -81,7 +81,7 @@ class ArchARM(Arch):
     concretize_unique_registers = {64}
     default_register_values = [
         ( 'sp', Arch.initial_sp, True, 'global' ),      # the stack
-        ( 0x188, 0x00000000, False, None )              # part of the thumb conditional flags
+        ( 'itstate', 0x00000000, False, None )              # part of the thumb conditional flags
     ]
     entry_register_values = {
         'r0': 'ld_destructor'
