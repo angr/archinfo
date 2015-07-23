@@ -32,6 +32,14 @@ class ArchARM(Arch):
             return True
         return False
 
+    def __getstate__(self):
+        self._cs = None
+        self._cs_thumb = None
+        return self.__dict__
+
+    def __setstate__(self, data):
+        self.__dict__.update(data)
+
     @property
     def capstone(self):
         if self._cs is None:

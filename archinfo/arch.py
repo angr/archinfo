@@ -31,6 +31,13 @@ class Arch(object):
     def __ne__(self, other):
         return not self == other
 
+    def __getstate__(self):
+        self._cs = None
+        return self.__dict__
+
+    def __setstate__(self, data):
+        self.__dict__.update(data)
+
     def gather_info_from_state(self, state):
         info = {}
         for reg in self.persistent_regs:
