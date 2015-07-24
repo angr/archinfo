@@ -132,7 +132,7 @@ class ArchAMD64(Arch):
         'fs': (208, 8),
 
         'sseround': (216, 8),
-        'fpround': (884, 8)
+        'fpround': (848, 8)
     }
 
     argument_registers = {
