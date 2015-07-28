@@ -25,10 +25,10 @@ class ArchMIPS64(Arch):
     linux_name = 'mips64el' # ???
     triplet = 'mips64el-linux-gnu'
     max_inst_bytes = 4
-    ip_offset = 128
-    sp_offset = 116
-    bp_offset = 120
-    ret_offset = 8
+    ip_offset = 256
+    sp_offset = 232
+    bp_offset = 240
+    ret_offset = 16
     call_pushes_ret = False
     stack_change = -8
     cs_arch = _capstone.CS_ARCH_MIPS

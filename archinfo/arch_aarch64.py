@@ -7,7 +7,6 @@ class ArchAArch64(Arch):
         super(ArchAArch64, self).__init__(endness)
         if endness == 'Iend_BE':
             self.ida_processor = 'armb'
-            self.cs_mode = _capstone.CS_MODE_BIG_ENDIAN
             self.function_prologs = set((
                 # TODO
             ))
@@ -31,8 +30,8 @@ class ArchAArch64(Arch):
     stack_change = -8
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
-    cs_arch = _capstone.CS_ARCH_ARM
-    cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN + _capstone.CS_MODE_64
+    cs_arch = _capstone.CS_ARCH_ARM64
+    cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     initial_sp = 0x7ffffffffff0000
 
     ret_instruction = "\xC0\x03\x5F\xD6"    # ret
