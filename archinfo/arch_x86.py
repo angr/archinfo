@@ -44,6 +44,8 @@ class ArchX86(Arch):
         ( 'esp', Arch.initial_sp, True, 'global' ), # the stack
         ( 'fpround', 0, False, None ),
         ( 'sseround', 0, False, None ),
+        ( 'gdt', 0, False, None ),
+        ( 'ldt', 0, False, None )
     ]
     entry_register_values = {
         'eax': 0x1C,
