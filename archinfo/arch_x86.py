@@ -8,6 +8,7 @@ class ArchX86(Arch):
         if endness != 'Iend_LE':
             raise ArchError('Arch i386 must be little endian')
         super(ArchX86, self).__init__(endness)
+        self.vex_archinfo['x86_cr0'] = 0xFFFFFFFF
 
     bits = 32
     vex_arch = "VexArchX86"
