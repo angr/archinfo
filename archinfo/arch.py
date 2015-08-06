@@ -22,6 +22,12 @@ class Arch(object):
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
+    def copy(self):
+        new_arch = type(self)(self.memory_endness)
+        new_arch.vex_archinfo = self.vex_archinfo.copy()
+
+        return new_arch
+
     def __repr__(self):
         return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
 
