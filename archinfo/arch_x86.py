@@ -42,6 +42,7 @@ class ArchX86(Arch):
     instruction_alignment = 1
     default_register_values = [
         ( 'esp', Arch.initial_sp, True, 'global' ), # the stack
+        ( 'd', 1, False, None ),
         ( 'fpround', 0, False, None ),
         ( 'sseround', 0, False, None ),
         ( 'gdt', 0, False, None ),
