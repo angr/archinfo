@@ -94,6 +94,13 @@ class Arch(object):
         return self.bits/8
 
     @property
+    def int_bits(self):
+        """
+        Return the size (in bits) of an 'int' type in C standard
+        """
+        return min(self.bits, 32)
+
+    @property
     def capstone(self):
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
