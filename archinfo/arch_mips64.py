@@ -216,8 +216,8 @@ class ArchMIPS64(Arch):
         'cmstart': (576, 8),
         'cmlen': (584, 8),
         'nraddr': (592, 8),
-        'host_evc_failaddr': (600, 8),
-        'host_evc_counter': (608, 4),
+        'evc_failaddr': (600, 8),
+        'evc_counter': (608, 4),
         'cond': (612, 4)
     }
 
