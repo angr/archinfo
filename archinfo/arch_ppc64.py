@@ -27,8 +27,8 @@ class ArchPPC64(Arch):
     max_inst_bytes = 4
     ip_offset = 1296
     sp_offset = 24
-    bp_offset = 136
-    ret_offset = 8
+    bp_offset = 264
+    ret_offset = 40
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0xffffffffff000000
@@ -90,7 +90,7 @@ class ArchPPC64(Arch):
         240: 'r28',
         248: 'r29',
         256: 'r30',
-        260: 'r31',
+        264: 'r31',
 
         1296: 'pc',
         1302: 'lr'

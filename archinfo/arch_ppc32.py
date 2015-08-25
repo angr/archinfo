@@ -29,8 +29,10 @@ class ArchPPC32(Arch):
     max_inst_bytes = 4
     ip_offset = 1160
     sp_offset = 20
-    bp_offset = 76 # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
-    ret_offset = 8
+    bp_offset = 140
+    # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
+    # claims that r15 is the base pointer but that is NOT what I see in practice
+    ret_offset = 28
     call_pushes_ret = False
     stack_change = -4
     cs_arch = _capstone.CS_ARCH_PPC
