@@ -33,6 +33,7 @@ class ArchPPC32(Arch):
     # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
     # claims that r15 is the base pointer but that is NOT what I see in practice
     ret_offset = 28
+    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
     cs_arch = _capstone.CS_ARCH_PPC
@@ -171,8 +172,6 @@ class ArchPPC32(Arch):
         registers['r30'],
         registers['r31'],
     }
-
-    syscall_num_register = registers['r0'][0]
 
     # http://www.polyomino.org.uk/publications/2011/Power-Arch-32-bit-ABI-supp-1.0-Unified.pdf
     reloc_s_a = [1,20]

@@ -67,6 +67,7 @@ class ArchARM(Arch):
     sp_offset = 60
     bp_offset = 60
     ret_offset = 8
+    syscall_num_offset = 36
     call_pushes_ret = False
     stack_change = -4
     memory_endness = 'Iend_LE'
@@ -277,8 +278,6 @@ class ArchARM(Arch):
         registers['r11'][0],
         registers['r12'][0]
     }
-
-    syscall_num_register = registers['r7'][0]
 
     # http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044e/IHI0044E_aaelf.pdf
     reloc_copy = [20]

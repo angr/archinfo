@@ -32,6 +32,7 @@ class ArchMIPS32(Arch):
     sp_offset = 116
     bp_offset = 120
     ret_offset = 8
+    syscall_num_offset = 8
     call_pushes_ret = False
     stack_change = -4
     cs_arch = _capstone.CS_ARCH_MIPS
@@ -269,8 +270,6 @@ class ArchMIPS32(Arch):
         registers['t8'][0],
         registers['t9'][0]
     }
-
-    syscall_num_register = registers['v0'][0]
 
     reloc_s_a = [2]
     reloc_b_a = [3]  # ..?

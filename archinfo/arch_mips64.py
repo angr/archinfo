@@ -29,6 +29,7 @@ class ArchMIPS64(Arch):
     sp_offset = 232
     bp_offset = 240
     ret_offset = 16
+    syscall_register_offset = 16
     call_pushes_ret = False
     stack_change = -8
     cs_arch = _capstone.CS_ARCH_MIPS
@@ -245,8 +246,6 @@ class ArchMIPS64(Arch):
         registers['t8'][0],
         registers['t9'][0]
     }
-
-    syscall_register_num = registers['v0'][0]
 
     # https://dmz-portal.mips.com/wiki/MIPS_relocation_types
     reloc_b_a = [3]
