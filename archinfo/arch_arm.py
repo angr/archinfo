@@ -278,6 +278,8 @@ class ArchARM(Arch):
         registers['r12'][0]
     }
 
+    syscall_num_register = registers['r7'][0]
+
     # http://infocenter.arm.com/help/topic/com.arm.doc.ihi0044e/IHI0044E_aaelf.pdf
     reloc_copy = [20]
     reloc_s_a = [2, 21, 22]

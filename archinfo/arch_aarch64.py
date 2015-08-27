@@ -226,6 +226,8 @@ class ArchAArch64(Arch):
         registers['x7'][0]
     }
 
+    syscall_num_register = registers['x8'][0]
+
     # http://infocenter.arm.com/help/topic/com.arm.doc.ihi0056b/IHI0056B_aaelf64.pdf
     reloc_copy = [1024]
     reloc_s_a = [257, 1025, 1026]

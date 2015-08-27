@@ -246,6 +246,8 @@ class ArchMIPS64(Arch):
         registers['t9'][0]
     }
 
+    syscall_register_num = registers['v0'][0]
+
     # https://dmz-portal.mips.com/wiki/MIPS_relocation_types
     reloc_b_a = [3]
     reloc_s_a = [18]

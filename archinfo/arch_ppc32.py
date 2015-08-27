@@ -170,6 +170,8 @@ class ArchPPC32(Arch):
         registers['r31'],
     }
 
+    syscall_num_register = registers['r0'][0]
+
     # http://www.polyomino.org.uk/publications/2011/Power-Arch-32-bit-ABI-supp-1.0-Unified.pdf
     reloc_s_a = [1,20]
     reloc_b_a = [22]
