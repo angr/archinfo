@@ -214,6 +214,8 @@ class ArchX86(Arch):
                            registers['esi'][0],
                            registers['edi'][0] }
 
+    syscall_num_register = registers['eax'][0]
+
     lib_paths = ['/lib32']
     reloc_s_a = [1]
     reloc_b_a = [8]

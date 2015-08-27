@@ -270,6 +270,8 @@ class ArchMIPS32(Arch):
         registers['t9'][0]
     }
 
+    syscall_num_register = registers['v0'][0]
+
     reloc_s_a = [2]
     reloc_b_a = [3]  # ..?
     reloc_tls_mod_id = [38]
