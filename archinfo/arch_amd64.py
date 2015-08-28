@@ -22,6 +22,7 @@ class ArchAMD64(Arch):
     sp_offset = 48
     bp_offset = 56
     ret_offset = 16
+    syscall_num_offset = 16
     call_pushes_ret = True
     stack_change = -8
     initial_sp = 0x7ffffffffff0000
@@ -151,8 +152,6 @@ class ArchAMD64(Arch):
         registers['r14'][0],
         registers['r15'][0],
     }
-
-    syscall_num_register = registers['rax'][0]
 
     # R_X86_64_64, R_X86_64_32, R_X86_64_32S, R_X86_64_16, R_X86_64_8
     reloc_s_a = [1,10,11,12,14]

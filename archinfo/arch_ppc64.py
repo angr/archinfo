@@ -29,6 +29,7 @@ class ArchPPC64(Arch):
     sp_offset = 24
     bp_offset = 264
     ret_offset = 40
+    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0xffffffffff000000
@@ -167,8 +168,6 @@ class ArchPPC64(Arch):
         registers['r30'],
         registers['r31'],
     }
-
-    syscall_num_register = registers['r0'][0]
 
     # http://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi-1.9.pdf
     # TODO: R_PPC64_JMP_IREL: https://sourceware.org/ml/binutils/2009-07/msg00350.html
