@@ -5,7 +5,8 @@ import struct as _struct
 import pyvex as _pyvex
 
 import logging
-l = logging.getLogger('arch.Arch')
+l = logging.getLogger('archinfo.arch')
+l.addHandler(logging.NullHandler())
 
 class Arch(object):
     def __init__(self, endness):
