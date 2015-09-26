@@ -215,13 +215,6 @@ class ArchX86(Arch):
                            registers['esi'][0],
                            registers['edi'][0] }
 
-    lib_paths = ['/lib32']
-    reloc_s_a = [1]
-    reloc_b_a = [8]
-    reloc_s = [6, 7]
-    reloc_copy = [5]
-    reloc_tls_mod_id = [35]
-    reloc_tls_doffset = [36]
-    reloc_tls_offset = [14]
+    lib_paths = ['/lib32', '/usr/lib32']
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux.so.2'

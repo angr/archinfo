@@ -247,15 +247,6 @@ class ArchMIPS64(Arch):
         registers['t9'][0]
     }
 
-    # https://dmz-portal.mips.com/wiki/MIPS_relocation_types
-    reloc_b_a = [3]
-    reloc_s_a = [18]
-    reloc_copy = [126]
-    # http://www.linux-mips.org/wiki/NPTL
-    reloc_tls_mod_id = [40]
-    reloc_tls_doffset = [41]
-    reloc_tls_offset = [48]
-
     # http://techpubs.sgi.com/library/manuals/4000/007-4658-001/pdf/007-4658-001.pdf
     dynamic_tag_translation = {
         0x70000001: 'DT_MIPS_RLD_VERSION',
