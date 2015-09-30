@@ -271,11 +271,6 @@ class ArchMIPS32(Arch):
         registers['t9'][0]
     }
 
-    reloc_s_a = [2]
-    reloc_b_a = [3]  # ..?
-    reloc_tls_mod_id = [38]
-    reloc_tls_offset = [47]
-
     dynamic_tag_translation = {
         0x70000001: 'DT_MIPS_RLD_VERSION',
         0x70000005: 'DT_MIPS_FLAGS',
