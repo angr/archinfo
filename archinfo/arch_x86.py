@@ -47,7 +47,9 @@ class ArchX86(Arch):
         ( 'fpround', 0, False, None ),
         ( 'sseround', 0, False, None ),
         ( 'gdt', 0, False, None ),
-        ( 'ldt', 0, False, None )
+        ( 'ldt', 0, False, None ),
+        ( 'id', 1, False, None ),
+        ( 'ac', 0, False, None )
     ]
     entry_register_values = {
         'eax': 0x1C,
@@ -75,6 +77,10 @@ class ArchX86(Arch):
 
         # this determines which direction SSE instructions go
         56: 'd',
+
+        # separately-stored bits of eflags
+        60: 'id',
+        64: 'ac',
 
         68: 'eip',
 
@@ -146,6 +152,10 @@ class ArchX86(Arch):
 
         # this determines which direction SSE instructions go
         'd': (56, 4),
+
+        # separately-stored bits of eflags
+        'id': (60, 4),
+        'ac': (64, 4),
 
         'eip': (68, 4),
         'pc': (68, 4),
