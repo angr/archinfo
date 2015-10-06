@@ -12,14 +12,21 @@ class Arch(object):
     def __init__(self, endness):
         if endness not in ('Iend_LE', 'Iend_BE'):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
+        self.vex_archinfo = self.vex_archinfo.copy()
         if endness == 'Iend_BE':
-            self.vex_endness = "VexEndnessBE"
+            self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = 'Iend_BE'
             self.register_endness = 'Iend_BE'
             self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
             self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
+
+    def copy(self):
+        new_arch = type(self)(self.memory_endness)
+        new_arch.vex_archinfo = self.vex_archinfo.copy()
+
+        return new_arch
 
     def __repr__(self):
         return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
@@ -171,7 +178,6 @@ class Arch(object):
 
     # memory stuff
     bits = None
-    vex_endness = 'VexEndnessLE'
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
     stack_change = None
@@ -215,6 +221,8 @@ class Arch(object):
     dynamic_tag_translation = {}
     symbol_type_translation = {}
     got_section_name = ''
+
+    vex_archinfo = _pyvex.default_vex_archinfo()
 
 def arch_from_id(ident, endness='', bits=''):
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
