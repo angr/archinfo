@@ -1,3 +1,2 @@
 capstone
 pyelftools
-pyvex

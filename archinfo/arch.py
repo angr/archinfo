@@ -2,7 +2,11 @@
 
 import capstone as _capstone
 import struct as _struct
-import pyvex as _pyvex
+
+try:
+    import pyvex as _pyvex
+except ImportError:
+    _pyvex = None
 
 import logging
 l = logging.getLogger('archinfo.arch')
@@ -14,7 +18,8 @@ class Arch(object):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
         self.vex_archinfo = self.vex_archinfo.copy()
         if endness == 'Iend_BE':
-            self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
+            if _pyvex:
+                self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = 'Iend_BE'
             self.register_endness = 'Iend_BE'
             self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
@@ -139,11 +144,6 @@ class Arch(object):
         except KeyError:
             return str(offset)
 
-    def disassemble_vex(self, string, **kwargs):
-        if self.vex_arch is None:
-            raise ArchError("Arch %s does not support VEX lifting" % self.name)
-        return _pyvex.IRSB(bytes=string, arch=self, **kwargs)
-
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
     def library_search_path(self, pedantic=False):
         subfunc = lambda x: x.replace('${TRIPLET}', self.triplet).replace('${ARCH}', self.linux_name)
@@ -222,7 +222,10 @@ class Arch(object):
     symbol_type_translation = {}
     got_section_name = ''
 
-    vex_archinfo = _pyvex.default_vex_archinfo()
+    if _pyvex:
+        vex_archinfo = _pyvex.default_vex_archinfo()
+    else:
+        vex_archinfo = None
 
 def arch_from_id(ident, endness='', bits=''):
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
