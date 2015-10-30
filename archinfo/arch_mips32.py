@@ -279,7 +279,8 @@ class ArchMIPS32(Arch):
         0x70000011: 'DT_MIPS_SYMTABNO',
         0x70000012: 'DT_MIPS_UNREFEXTNO',
         0x70000013: 'DT_MIPS_GOTSYM',
-        0x70000016: 'DT_MIPS_RLD_MAP'
+        0x70000016: 'DT_MIPS_RLD_MAP',
+        0x70000032: 'DT_MIPS_PLTGOT'
     }
     got_section_name = '.got'
     ld_linux_name = 'ld.so.1'
