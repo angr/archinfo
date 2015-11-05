@@ -17,14 +17,15 @@ class ArchMIPS32(Arch):
             self.function_epilogs = {
                 r"\x8f\xbf[\x00-\xff]{2}([\x00-\xff]{4}){0,4}\x03\xe0\x00\x08"      # lw ra, off(sp); ... ; jr ra
             }
+            self.qemu_name = 'mips'
             self.triplet = 'mips-linux-gnu'
             self.linux_name = 'mips'
 
     bits = 32
     vex_arch = "VexArchMIPS32"
     name = "MIPS32"
-    qemu_name = 'mips'
     ida_processor = 'mipsb'
+    qemu_name = 'mipsel'
     linux_name = 'mipsel' # ???
     triplet = 'mipsel-linux-gnu'
     max_inst_bytes = 4
