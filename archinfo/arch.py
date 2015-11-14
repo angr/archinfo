@@ -16,9 +16,10 @@ class Arch(object):
     def __init__(self, endness):
         if endness not in ('Iend_LE', 'Iend_BE'):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
-        self.vex_archinfo = self.vex_archinfo.copy()
+        if self.vex_archinfo:
+            self.vex_archinfo = self.vex_archinfo.copy()
         if endness == 'Iend_BE':
-            if _pyvex:
+            if self.vex_archinfo:
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = 'Iend_BE'
             self.register_endness = 'Iend_BE'
