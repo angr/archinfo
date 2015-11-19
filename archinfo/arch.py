@@ -16,8 +16,9 @@ class Arch(object):
     def __init__(self, endness):
         if endness not in ('Iend_LE', 'Iend_BE'):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
-        if self.vex_archinfo:
-            self.vex_archinfo = self.vex_archinfo.copy()
+
+        if _pyvex:
+            self.vex_archinfo = _pyvex.default_vex_archinfo()
         if endness == 'Iend_BE':
             if self.vex_archinfo:
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
@@ -223,10 +224,7 @@ class Arch(object):
     symbol_type_translation = {}
     got_section_name = ''
 
-    if _pyvex:
-        vex_archinfo = _pyvex.default_vex_archinfo()
-    else:
-        vex_archinfo = None
+    vex_archinfo = None
 
 def arch_from_id(ident, endness='', bits=''):
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
