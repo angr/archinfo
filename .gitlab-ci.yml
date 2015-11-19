@@ -1,0 +1,27 @@
+before_script:
+    - angr-test sync hard
+
+angr:
+    script: "angr-test angr"
+    tags:
+        - "angr"
+
+cle:
+    script: "angr-test cle"
+    tags:
+        - "angr"
+
+driller:
+    script: "angr-test driller"
+    tags:
+        - "angr"
+
+simuvex:
+    script: "angr-test simuvex"
+    tags:
+        - "angr"
+
+archinfo_lint:
+    script: "angr-test lint"
+    tags:
+        - "angr"
