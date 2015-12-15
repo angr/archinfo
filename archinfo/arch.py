@@ -152,8 +152,11 @@ class Arch(object):
         path = ['/lib/${TRIPLET}/', '/usr/lib/${TRIPLET}/', '/lib/', '/usr/lib', '/usr/${TRIPLET}/lib/']
         if self.bits == 64:
             path.append('/usr/${TRIPLET}/lib64/')
+            path.append('/usr/lib64/')
         elif self.bits == 32:
             path.append('/usr/${TRIPLET}/lib32/')
+            path.append('/usr/lib32/')
+
         if pedantic:
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
         return map(subfunc, path)
