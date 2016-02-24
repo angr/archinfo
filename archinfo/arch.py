@@ -153,6 +153,7 @@ class Arch(object):
         if self.bits == 64:
             path.append('/usr/${TRIPLET}/lib64/')
             path.append('/usr/lib64/')
+            path.append('/lib64/')
         elif self.bits == 32:
             path.append('/usr/${TRIPLET}/lib32/')
             path.append('/usr/lib32/')
