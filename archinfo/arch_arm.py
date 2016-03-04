@@ -96,7 +96,8 @@ class ArchARM(Arch):
         'r0': 'ld_destructor'
     }
 
-    default_symbolic_registers = [ 'r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc' ]
+    default_symbolic_registers = [ 'r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12',
+                                   'sp', 'lr', 'pc' ]
 
     register_names = {
         8: 'r0',

@@ -1,5 +1,3 @@
-''' This class is responsible for architecture-specific things such as call emulation and so forth. '''
-
 import capstone as _capstone
 import struct as _struct
 
@@ -13,6 +11,13 @@ l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
 
 class Arch(object):
+    """
+    Represent an architecture. This class is responsible for architecture-specific things such as call emulation.
+
+    :ivar name: The name of the architecture.
+    :type name: str
+
+    """
     def __init__(self, endness):
         if endness not in ('Iend_LE', 'Iend_BE'):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
@@ -106,12 +111,15 @@ class Arch(object):
 
     @property
     def bytes(self):
+        """
+        Return the size in bytes of an ``int`` type as defined by the C standard.
+        """
         return self.bits/8
 
     @property
     def int_bits(self):
         """
-        Return the size (in bits) of an 'int' type in C standard
+        Return the size in bits of an ``int`` type as defined by the C standard.
         """
         return min(self.bits, 32)
 
