@@ -292,6 +292,11 @@ def arch_from_id(ident, endness='', bits=''):
             return ArchMIPS64(endness)
         return ArchMIPS32(endness)
     elif 'arm' in ident or 'thumb' in ident:
+        if endness_unsure:
+            if 'l' in ident or 'le' in ident:
+                endness = 'Iend_LE'
+            elif 'b' in ident or 'be' in ident:
+                endness = 'Iend_BE'
         if bits == 64:
             return ArchAArch64(endness)
         return ArchARM(endness)
