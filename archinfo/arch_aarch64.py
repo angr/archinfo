@@ -1,5 +1,10 @@
 import capstone as _capstone
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 from .arch import Arch
 
 class ArchAArch64(Arch):
@@ -33,6 +38,8 @@ class ArchAArch64(Arch):
     register_endness = 'Iend_LE'
     cs_arch = _capstone.CS_ARCH_ARM64
     cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_ARM64
+    uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN
     initial_sp = 0x7ffffffffff0000
 
     ret_instruction = "\xC0\x03\x5F\xD6"    # ret

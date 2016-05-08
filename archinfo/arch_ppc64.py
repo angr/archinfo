@@ -1,5 +1,10 @@
 import capstone as _capstone
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 from .arch import Arch
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
@@ -35,6 +40,8 @@ class ArchPPC64(Arch):
     initial_sp = 0xffffffffff000000
     cs_arch = _capstone.CS_ARCH_PPC
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_PPC
+    uc_mode = _unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN
     ret_instruction = "\x20\x00\x80\x4e"
     nop_instruction = "\x00\x00\x00\x60"
     instruction_alignment = 4

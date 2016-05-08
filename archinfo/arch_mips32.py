@@ -1,5 +1,10 @@
 import capstone as _capstone
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 from .arch import Arch
 
 # FIXME: Tell fish to fix whatever he was storing in info['current_function']
@@ -38,6 +43,8 @@ class ArchMIPS32(Arch):
     stack_change = -4
     cs_arch = _capstone.CS_ARCH_MIPS
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_MIPS
+    uc_mode = _unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN
     function_prologs = {
         r"[\x00-\xff]\xff\xbd\x27",                                         # addiu $sp, xxx
         r"[\x00-\xff][\x00-\xff]\x1c\x3c[\x00-\xff][\x00-\xff]\x9c\x27"     # lui $gp, xxx; addiu $gp, $gp, xxxx
