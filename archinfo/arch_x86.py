@@ -1,5 +1,10 @@
 import capstone as _capstone
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 from .arch import Arch
 from .archerror import ArchError
 
@@ -31,6 +36,8 @@ class ArchX86(Arch):
     register_endness = "Iend_LE"
     cs_arch = _capstone.CS_ARCH_X86
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
+    uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     function_prologs = {
         r"\x55\x8b\xec", # push ebp; mov ebp, esp
         r"\x55\x89\xe5",  # push ebp; mov ebp, esp
