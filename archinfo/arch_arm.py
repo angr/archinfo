@@ -87,8 +87,8 @@ class ArchARM(Arch):
     cs_arch = _capstone.CS_ARCH_ARM
     cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     _cs_thumb = None
-    uc_arch = _unicorn.UC_ARCH_ARM
-    uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
+    uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     #self.ret_instruction = "\x0E\xF0\xA0\xE1" # this is mov pc, lr
     ret_instruction = "\x1E\xFF\x2F\xE1" # this is bx lr
     nop_instruction = "\x00\x00\x00\x00"

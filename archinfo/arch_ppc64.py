@@ -40,8 +40,8 @@ class ArchPPC64(Arch):
     initial_sp = 0xffffffffff000000
     cs_arch = _capstone.CS_ARCH_PPC
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
-    uc_arch = _unicorn.UC_ARCH_PPC
-    uc_mode = _unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
+    uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     ret_instruction = "\x20\x00\x80\x4e"
     nop_instruction = "\x00\x00\x00\x60"
     instruction_alignment = 4
