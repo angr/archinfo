@@ -6,6 +6,11 @@ try:
 except ImportError:
     _pyvex = None
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 import logging
 l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
@@ -31,6 +36,10 @@ class Arch(object):
             self.register_endness = 'Iend_BE'
             self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
             self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
+            if _unicorn:
+                self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
+                self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
+
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
@@ -132,6 +141,13 @@ class Arch(object):
             self._cs.detail = True
         return self._cs
 
+    @property
+    def unicorn(self):
+        if _unicorn is None or self.uc_arch is None:
+            raise ArchError("Arch %s does not support with unicorn" % self.name)
+        # always create a new unicorn instance
+        return _unicorn.Uc(self.uc_arch, self.uc_mode)
+
     def translate_dynamic_tag(self, tag):
         try:
             return self.dynamic_tag_translation[tag]
@@ -206,6 +222,11 @@ class Arch(object):
     cs_arch = None
     cs_mode = None
     _cs = None
+
+    # Unicorn stuff
+    uc_arch = None
+    uc_mode = None
+
     call_pushes_ret = False
     initial_sp = 0x7fff0000
 

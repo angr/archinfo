@@ -1,5 +1,10 @@
 import capstone as _capstone
 
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
 from .arch import Arch
 
 class ArchMIPS64(Arch):
@@ -34,6 +39,8 @@ class ArchMIPS64(Arch):
     stack_change = -8
     cs_arch = _capstone.CS_ARCH_MIPS
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
+    uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     function_prologs = set((
         # TODO
     ))
