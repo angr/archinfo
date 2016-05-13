@@ -34,6 +34,7 @@ class ArchX86(Arch):
     stack_change = -4
     memory_endness = "Iend_LE"
     register_endness = "Iend_LE"
+    sizeof = {'int': 32, 'long': 32, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_X86
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None

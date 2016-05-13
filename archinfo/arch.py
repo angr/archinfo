@@ -53,6 +53,8 @@ class Arch(object):
         return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
 
     def __eq__(self, other):
+        if not isinstance(other, Arch):
+            return False
         return  self.name == other.name and \
                 self.bits == other.bits and \
                 self.memory_endness == other.memory_endness
@@ -121,16 +123,12 @@ class Arch(object):
     @property
     def bytes(self):
         """
-        Return the size in bytes of an ``int`` type as defined by the C standard.
+        Return the standard word size in bytes
         """
         return self.bits/8
 
-    @property
-    def int_bits(self):
-        """
-        Return the size in bits of an ``int`` type as defined by the C standard.
-        """
-        return min(self.bits, 32)
+    # e.g. sizeof['int'] = 4
+    sizeof = {}
 
     @property
     def capstone(self):
