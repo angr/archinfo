@@ -84,6 +84,7 @@ class ArchARM(Arch):
     stack_change = -4
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
+    sizeof = {'int': 32, 'long': 32, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_ARM
     cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     _cs_thumb = None

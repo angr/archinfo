@@ -38,6 +38,7 @@ class ArchPPC64(Arch):
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0xffffffffff000000
+    sizeof = {'int': 32, 'long': 64, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_PPC
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
