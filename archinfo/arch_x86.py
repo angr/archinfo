@@ -59,7 +59,9 @@ class ArchX86(Arch):
         ( 'gdt', 0, False, None ),
         ( 'ldt', 0, False, None ),
         ( 'id', 1, False, None ),
-        ( 'ac', 0, False, None )
+        ( 'ac', 0, False, None ),
+        ( 'ftop', 0, False, None ),
+        ( 'fpu_tags', 0, False, None)
     ]
     entry_register_values = {
         'eax': 0x1C,
@@ -95,14 +97,14 @@ class ArchX86(Arch):
         68: 'eip',
 
         # fpu registers
-        72: 'st0',
-        80: 'st1',
-        88: 'st2',
-        96: 'st2',
-        104: 'st4',
-        112: 'st5',
-        120: 'st6',
-        128: 'st7',
+        72: 'st7',
+        80: 'st6',
+        88: 'st5',
+        96: 'st4',
+        104: 'st3',
+        112: 'st2',
+        120: 'st1',
+        128: 'st0',
 
         # fpu tags
         136: 'fpu_t0',
@@ -173,14 +175,14 @@ class ArchX86(Arch):
 
         # fpu registers and mmx aliases
         'fpu_regs': (72, 64),
-        'st0': (72, 8),
-        'st1': (80, 8),
-        'st2': (88, 8),
-        'st3': (96, 8),
-        'st4': (104, 8),
-        'st5': (112, 8),
-        'st6': (120, 8),
-        'st7': (128, 8),
+        'st7': (72, 8),
+        'st6': (80, 8),
+        'st5': (88, 8),
+        'st4': (96, 8),
+        'st3': (104, 8),
+        'st2': (112, 8),
+        'st1': (120, 8),
+        'st0': (128, 8),
         'mm0': (72, 8),
         'mm1': (80, 8),
         'mm2': (88, 8),
