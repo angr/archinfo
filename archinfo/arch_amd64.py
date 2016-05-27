@@ -225,7 +225,7 @@ class ArchAMD64(Arch):
         'cmlen': (880, 8),
         'nraddr': (888, 8),
         'sc_class': (896, 8),
-        'gs_const': (904, 8),
+        'gs_const': (904, 8), 'gs': (904, 8),
         'ip_at_syscall': (912, 8),
         'pad3': (920, 8)
     }
