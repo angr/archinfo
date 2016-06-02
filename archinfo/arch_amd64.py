@@ -39,6 +39,8 @@ class ArchAMD64(Arch):
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
+    uc_const = _unicorn.x86_const if _unicorn else None
+    uc_prefix = "UC_X86_" if _unicorn else None
     function_prologs = {
         r"\x55\x48\x89\xe5", # push rbp; mov rbp, rsp
         r"\x48[\x83,\x81]\xec[\x00-\xff]", # sub rsp, xxx

@@ -41,6 +41,8 @@ class ArchAArch64(Arch):
     cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_ARM64 if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
+    uc_const = _unicorn.arm64_const if _unicorn else None
+    uc_prefix = "UC_ARM64_" if _unicorn else None
     initial_sp = 0x7ffffffffff0000
 
     ret_instruction = "\xC0\x03\x5F\xD6"    # ret

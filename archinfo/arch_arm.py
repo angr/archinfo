@@ -90,6 +90,8 @@ class ArchARM(Arch):
     _cs_thumb = None
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
+    uc_const = _unicorn.arm_const if _unicorn else None
+    uc_prefix = "UC_ARM_" if _unicorn else None
     #self.ret_instruction = "\x0E\xF0\xA0\xE1" # this is mov pc, lr
     ret_instruction = "\x1E\xFF\x2F\xE1" # this is bx lr
     nop_instruction = "\x00\x00\x00\x00"

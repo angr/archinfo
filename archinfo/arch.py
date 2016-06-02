@@ -36,12 +36,20 @@ class Arch(object):
             self.register_endness = 'Iend_BE'
             self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
             self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
-            if _unicorn:
-                self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
-                self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
-
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
+
+        # unicorn specific stuff
+        if self.uc_mode is not None:
+            if endness == 'Iend_BE':
+                self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
+                self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
+            self.uc_regs = { }
+            # map register names to unicorn const
+            for r in self.register_names.itervalues():
+                reg_name = self.uc_prefix + 'REG_' + r.upper()
+                if hasattr(self.uc_const, reg_name):
+                    self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
     def copy(self):
         new_arch = type(self)(self.memory_endness)
@@ -224,6 +232,9 @@ class Arch(object):
     # Unicorn stuff
     uc_arch = None
     uc_mode = None
+    uc_const = None
+    uc_prefix = None
+    uc_regs = None
 
     call_pushes_ret = False
     initial_sp = 0x7fff0000
