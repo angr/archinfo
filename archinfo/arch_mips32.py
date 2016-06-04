@@ -46,6 +46,8 @@ class ArchMIPS32(Arch):
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
+    uc_const = _unicorn.mips_const if _unicorn else None
+    uc_prefix = "UC_MIPS_" if _unicorn else None
     function_prologs = {
         r"[\x00-\xff]\xff\xbd\x27",                                         # addiu $sp, xxx
         r"[\x00-\xff][\x00-\xff]\x1c\x3c[\x00-\xff][\x00-\xff]\x9c\x27"     # lui $gp, xxx; addiu $gp, $gp, xxxx
