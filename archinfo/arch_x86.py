@@ -29,6 +29,7 @@ class ArchX86(Arch):
     sp_offset = 24
     bp_offset = 28
     ret_offset = 8
+    vex_conditional_helpers = True
     syscall_num_offset = 8
     call_pushes_ret = True
     stack_change = -4

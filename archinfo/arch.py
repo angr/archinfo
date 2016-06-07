@@ -212,6 +212,9 @@ class Arch(object):
     bp_offset = None
     ret_offset = None
 
+    # whether or not VEX has ccall handlers for conditionals for this arch
+    vex_conditional_helpers = False
+
     # memory stuff
     bits = None
     memory_endness = 'Iend_LE'

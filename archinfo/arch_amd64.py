@@ -27,6 +27,7 @@ class ArchAMD64(Arch):
     sp_offset = 48
     bp_offset = 56
     ret_offset = 16
+    vex_conditional_helpers = True
     syscall_num_offset = 16
     call_pushes_ret = True
     stack_change = -8
