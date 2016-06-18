@@ -143,7 +143,15 @@ class ArchX86(Arch):
         298: 'ss',
 
         304: 'ldt',
-        312: 'gdt'
+        312: 'gdt',
+
+        316: 'emnote',
+        320: 'cmstart',
+        324: 'cmlen',
+        328: 'nraddr',
+        332: 'sc_class',
+        336: 'ip_at_syscall',
+        340: 'padding1'
     }
 
     registers = {
@@ -229,7 +237,15 @@ class ArchX86(Arch):
         'gs': (296, 2),
         'ss': (298, 2),
         'ldt': (304, 8),
-        'gdt': (312, 8)
+        'gdt': (312, 8),
+
+        'emnote': (316, 4),
+        'cmstart': (320, 4),
+        'cmlen': (324, 4),
+        'nraddr': (328, 4),
+        'sc_class': (332, 4),
+        'ip_at_syscall':(336, 4),
+        'padding1': (340, 4)
     }
 
     argument_registers = { registers['eax'][0],

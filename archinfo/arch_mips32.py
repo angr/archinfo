@@ -161,7 +161,8 @@ class ArchMIPS32(Arch):
         456: 'ac0',
         464: 'ac1',
         472: 'ac2',
-        480: 'ac3'
+        480: 'ac3',
+        488: 'ip_at_syscall'
     }
 
     registers = {
@@ -259,7 +260,8 @@ class ArchMIPS32(Arch):
         'ac0': (456, 8),
         'ac1': (464, 8),
         'ac2': (472, 8),
-        'ac3': (480, 8)
+        'ac3': (480, 8),
+        'ip_at_syscall': (488, 4)
     }
 
     argument_registers = {

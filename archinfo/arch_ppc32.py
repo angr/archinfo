@@ -108,7 +108,8 @@ class ArchPPC32(Arch):
         140: 'r31',
 
         1168: 'pc',
-        1172: 'lr'
+        1172: 'lr',
+        1348: 'ip_at_syscall'
     }
 
     registers = {
@@ -147,7 +148,9 @@ class ArchPPC32(Arch):
 
         'ip': (1168, 4),
         'pc': (1168, 4),
-        'lr': (1172, 4)
+        'lr': (1172, 4),
+
+        'ip_at_syscall': (1348, 4)
     }
 
     argument_registers = {

@@ -103,7 +103,8 @@ class ArchPPC64(Arch):
         264: 'r31',
 
         1296: 'pc',
-        1302: 'lr'
+        1302: 'lr',
+        1640: 'ip_at_syscall'
     }
 
     registers = {
@@ -141,7 +142,8 @@ class ArchPPC64(Arch):
         'r31': (260, 8),
 
         'ip': (1296, 8), 'pc': (1296, 8),
-        'lr': (1304, 8)
+        'lr': (1304, 8),
+        'ip_at_syscall': (1640, 8)
     }
 
     argument_registers = {

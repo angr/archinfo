@@ -148,7 +148,8 @@ class ArchMIPS64(Arch):
         592: 'nraddr',
         600: 'evc_failaddr',
         608: 'evc_counter',
-        612: 'cond'
+        612: 'cond',
+        616: 'ip_at_syscall'
     }
 
     registers = {
@@ -231,7 +232,8 @@ class ArchMIPS64(Arch):
         'nraddr': (592, 8),
         'evc_failaddr': (600, 8),
         'evc_counter': (608, 4),
-        'cond': (612, 4)
+        'cond': (612, 4),
+        'ip_at_syscall': (616, 8)
     }
 
     argument_registers = {
