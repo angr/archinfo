@@ -42,10 +42,11 @@ class ArchX86(Arch):
     uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.x86_const if _unicorn else None
     uc_prefix = "UC_X86_" if _unicorn else None
-    function_prologs = {
+    function_prologs = [
+        r"\x8b\xff\x55\x8b\xec", # mov edi, edi; push ebp; mov ebp, esp
         r"\x55\x8b\xec", # push ebp; mov ebp, esp
         r"\x55\x89\xe5",  # push ebp; mov ebp, esp
-    }
+    ]
     function_epilogs = {
         r"\xc9\xc3", # leave; ret
         r"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; ret
