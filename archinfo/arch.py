@@ -27,8 +27,6 @@ class Arch(object):
         if endness not in ('Iend_LE', 'Iend_BE'):
             raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
 
-        self._x86_syntax = None # Set it to 'att' in order to use AT&T syntax for x86
-
         if _pyvex:
             self.vex_archinfo = _pyvex.default_vex_archinfo()
         if endness == 'Iend_BE':
@@ -146,39 +144,8 @@ class Arch(object):
             raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
-            self._cs.syntax = _capstone.CS_OPT_SYNTAX_ATT if self._x86_syntax == 'at&t' else _capstone.CS_OPT_SYNTAX_INTEL
             self._cs.detail = True
         return self._cs
-
-    @property
-    def capstone_x86_syntax(self):
-        """
-        Get the current syntax capstone uses for x86. It can be 'intel' or 'at&t'
-
-        :return: Capstone's current x86 syntax
-        :rtype: str
-        """
-
-        return self._x86_syntax
-
-    @capstone_x86_syntax.setter
-    def capstone_x86_syntax(self, new_syntax):
-        """
-        Set the syntax that capstone outputs for x86.
-        """
-
-        if self.name == 'X86':
-
-            if new_syntax not in ('intel', 'at&t'):
-                raise ArchError('Unsupported Capstone x86 syntax. It must be either "intel" or "at&t".')
-
-            if new_syntax != self._x86_syntax:
-                # clear the existing capstone instance
-                self._cs = None
-                self._x86_syntax = new_syntax
-
-        else:
-            raise ArchError('Cannot set x86 syntax for Capstone. The architecture must be x86.')
 
     @property
     def unicorn(self):

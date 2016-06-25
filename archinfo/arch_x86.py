@@ -16,6 +16,41 @@ class ArchX86(Arch):
         if self.vex_archinfo:
             self.vex_archinfo['x86_cr0'] = 0xFFFFFFFF
 
+    @property
+    def capstone(self):
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
+        if self._cs is None:
+            self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
+            self._cs.syntax = _capstone.CS_OPT_SYNTAX_ATT if self._x86_syntax == 'at&t' else _capstone.CS_OPT_SYNTAX_INTEL
+            self._cs.detail = True
+        return self._cs
+
+    @property
+    def capstone_x86_syntax(self):
+        """
+        Get the current syntax capstone uses for x86. It can be 'intel' or 'at&t'
+
+        :return: Capstone's current x86 syntax
+        :rtype: str
+        """
+
+        return self._x86_syntax
+
+    @capstone_x86_syntax.setter
+    def capstone_x86_syntax(self, new_syntax):
+        """
+        Set the syntax that capstone outputs for x86.
+        """
+
+        if new_syntax not in ('intel', 'at&t'):
+            raise ArchError('Unsupported Capstone x86 syntax. It must be either "intel" or "at&t".')
+
+        if new_syntax != self._x86_syntax:
+            # clear the existing capstone instance
+            self._cs = None
+            self._x86_syntax = new_syntax
+
     bits = 32
     vex_arch = "VexArchX86"
     name = "X86"
@@ -38,6 +73,7 @@ class ArchX86(Arch):
     sizeof = {'int': 32, 'long': 32, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_X86
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
+    _x86_syntax = None # Set it to 'att' in order to use AT&T syntax for x86
     uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.x86_const if _unicorn else None
