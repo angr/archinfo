@@ -133,16 +133,16 @@ class ArchX86(Arch):
         296: 'gs',
         298: 'ss',
 
-        304: 'ldt',
+        304: 'ldt', # THESE ARE REALLY TRICKY since their size depends on your host word size :(
         312: 'gdt',
 
-        316: 'emnote',
-        320: 'cmstart',
-        324: 'cmlen',
-        328: 'nraddr',
-        332: 'sc_class',
-        336: 'ip_at_syscall',
-        340: 'padding1'
+        320: 'emnote',
+        324: 'cmstart',
+        328: 'cmlen',
+        332: 'nraddr',
+        336: 'sc_class',
+        340: 'ip_at_syscall',
+        344: 'padding1'
     }
 
     registers = {
@@ -212,13 +212,13 @@ class ArchX86(Arch):
         'ldt': (304, 8),
         'gdt': (312, 8),
 
-        'emnote': (316, 4),
-        'cmstart': (320, 4),
-        'cmlen': (324, 4),
-        'nraddr': (328, 4),
-        'sc_class': (332, 4),
-        'ip_at_syscall':(336, 4),
-        'padding1': (340, 4)
+        'emnote': (320, 4),
+        'cmstart': (324, 4),
+        'cmlen': (328, 4),
+        'nraddr': (332, 4),
+        'sc_class': (336, 4),
+        'ip_at_syscall':(340, 4),
+        'padding1': (344, 4)
     }
 
     argument_registers = { registers['eax'][0],
