@@ -108,11 +108,7 @@ class ArchX86(Arch):
     entry_register_values = {
         'eax': 0x1C,
         'edx': 'ld_destructor',
-        'ebp': 0,
-        'cc_op': 0,
-        'cc_dep1': 0,
-        'cc_dep2': 0,
-        'cc_ndep': 0,
+        'ebp': 0
     }
     default_symbolic_registers = [ 'eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi', 'eip' ]
     register_names = {
