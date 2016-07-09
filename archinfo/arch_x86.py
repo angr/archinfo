@@ -103,14 +103,16 @@ class ArchX86(Arch):
         ( 'id', 1, False, None ),
         ( 'ac', 0, False, None ),
         ( 'ftop', 0, False, None ),
-        ( 'fpu_tags', 0, False, None)
+        ( 'fpu_tags', 0, False, None),
+        ( 'fs', 0, False, None),
+        ( 'gs', 0, False, None)
     ]
     entry_register_values = {
         'eax': 0x1C,
         'edx': 'ld_destructor',
         'ebp': 0
     }
-    default_symbolic_registers = [ 'eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi', 'eip' ]
+    default_symbolic_registers = [ 'eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi' ]
     register_names = {
         8: 'eax',
         12: 'ecx',
