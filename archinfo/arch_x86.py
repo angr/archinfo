@@ -83,7 +83,7 @@ class ArchX86(Arch):
         r"\x55\x8b\xec", # push ebp; mov ebp, esp
         r"\x55\x89\xe5",  # push ebp; mov ebp, esp
         r"\x55\x57\x56",  # push ebp; push edi; push esi
-        r"(\x81|\x83)\x3c",  # sub xxx %esp
+        r"(\x81|\x83)\xec",  # sub xxx %esp
     ]
     function_epilogs = {
         r"\xc9\xc3", # leave; ret
