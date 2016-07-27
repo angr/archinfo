@@ -83,6 +83,12 @@ class ArchX86(Arch):
         r"\x55\x8b\xec", # push ebp; mov ebp, esp
         r"\x55\x89\xe5",  # push ebp; mov ebp, esp
         r"\x55\x57\x56",  # push ebp; push edi; push esi
+        # mov eax, 0x000000??; (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
+        r"\xb8[\x00-\xff]\x00\x00\x00[\x50\x51\x52\x53\x55\x56\x57]{0,7}\x8b[\x00-\xff]{2}",
+        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
+        r"[\x50\x51\x52\x53\x55\x56\x57]{0,7}\x83\xec[\x00-\xff]{2,4}",
+        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) mov xxx, xxx
+        r"[\x50\x51\x52\x53\x55\x56\x57]{0,7}\x8b[\x00-\xff]{2}",
         r"(\x81|\x83)\xec",  # sub xxx %esp
     ]
     function_epilogs = {
