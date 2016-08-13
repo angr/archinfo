@@ -39,6 +39,13 @@ class Arch(object):
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
+        # generate regitster mapping (offset, size): name
+        self.register_size_names = {}
+        for k, v in self.registers.iteritems():
+            if v in self.register_size_names and k not in self.register_names:
+                continue
+            self.register_size_names[v] = k
+
         # unicorn specific stuff
         if self.uc_mode is not None:
             if endness == 'Iend_BE':
@@ -170,7 +177,13 @@ class Arch(object):
                 l.error("Please look up and add symbol type %#x for %s", tag, self.name)
             return tag
 
-    def translate_register_name(self, offset):
+    def translate_register_name(self, offset, size=None):
+        if size is not None:
+            try:
+                return self.register_size_names[(offset, size)]
+            except KeyError:
+                pass
+
         try:
             return self.register_names[offset]
         except KeyError:
