@@ -70,7 +70,7 @@ class ArchAMD64(Arch):
     call_sp_fix = -8
     memory_endness = "Iend_LE"
     register_endness = "Iend_LE"
-    sizeof = {'int': 32, 'long': 64, 'long long': 64}
+    sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_X86
     cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     _x86_syntax = None # Set it to 'att' in order to use AT&T syntax for x86

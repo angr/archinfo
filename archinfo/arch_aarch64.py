@@ -37,7 +37,7 @@ class ArchAArch64(Arch):
     stack_change = -8
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
-    sizeof = {'int': 32, 'long': 64, 'long long': 64}
+    sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_ARM64
     cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_ARM64 if _unicorn else None

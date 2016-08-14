@@ -41,7 +41,7 @@ class ArchMIPS32(Arch):
     syscall_num_offset = 8
     call_pushes_ret = False
     stack_change = -4
-    sizeof = {'int': 32, 'long': 32, 'long long': 64}
+    sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
     cs_arch = _capstone.CS_ARCH_MIPS
     cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
