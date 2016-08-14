@@ -1,5 +1,6 @@
 import capstone as _capstone
 import struct as _struct
+import platform as _platform
 
 try:
     import pyvex as _pyvex
@@ -361,6 +362,9 @@ def arch_from_id(ident, endness='', bits=''):
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
+
+def get_host_arch():
+    return arch_from_id(_platform.machine())
 
 # pylint: disable=unused-import
 from .arch_amd64    import ArchAMD64
