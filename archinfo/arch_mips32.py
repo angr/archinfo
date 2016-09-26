@@ -6,6 +6,7 @@ except ImportError:
     _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 
 # FIXME: Tell fish to fix whatever he was storing in info['current_function']
 # TODO: Only persist t9 in PIC programs
@@ -302,3 +303,4 @@ class ArchMIPS32(Arch):
     }
     got_section_name = '.got'
     ld_linux_name = 'ld.so.1'
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0x7000, 0x8000)

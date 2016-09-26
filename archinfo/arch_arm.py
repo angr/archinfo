@@ -6,6 +6,7 @@ except ImportError:
     _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
 # TODO: handle multiple return registers?
@@ -300,6 +301,9 @@ class ArchARM(Arch):
 
     got_section_name = '.got'
     ld_linux_name = 'ld-linux.so.3'
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
+    #elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
+    # that line was lying in the original CLE code and I have no clue why it's different
 
 class ArchARMHF(ArchARM):
     name = 'ARMHF'
@@ -310,3 +314,4 @@ class ArchARMEL(ArchARM):
     name = 'ARMEL'
     triplet = 'arm-linux-gnueabi'
     ld_linux_name = 'ld-linux.so.3'
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)

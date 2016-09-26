@@ -6,6 +6,7 @@ except ImportError:
     _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 from .archerror import ArchError
 
 class ArchX86(Arch):
@@ -278,3 +279,4 @@ class ArchX86(Arch):
     lib_paths = ['/lib32', '/usr/lib32']
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux.so.2'
+    elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0)

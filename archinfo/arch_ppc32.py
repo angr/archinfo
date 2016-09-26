@@ -6,6 +6,7 @@ import capstone as _capstone
 #   _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # PowerPC doesn't have stack base pointer, so bp_offset is set to -1 below
@@ -403,3 +404,4 @@ class ArchPPC32(Arch):
 
     got_section_name = '.plt'
     ld_linux_name = 'ld.so.1'
+    elf_tls = TLSArchInfo(1, 52, [], [48], [], 0x7000, 0x8000)

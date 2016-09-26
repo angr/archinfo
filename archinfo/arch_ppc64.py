@@ -6,6 +6,7 @@ import capstone as _capstone
 #    _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # Normally r1 is used as stack pointer
@@ -404,3 +405,4 @@ class ArchPPC64(Arch):
 
     got_section_name = '.plt'
     ld_linux_name = 'ld64.so.1'
+    elf_tls = TLSArchInfo(1, 92, [], [84], [], 0x7000, 0x8000)

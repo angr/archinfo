@@ -6,6 +6,7 @@ except ImportError:
     _unicorn = None
 
 from .arch import Arch
+from .tls import TLSArchInfo
 
 class ArchMIPS64(Arch):
     def __init__(self, endness="Iend_LE"):
@@ -274,3 +275,4 @@ class ArchMIPS64(Arch):
     }
     got_section_name = '.got'
     ld_linux_name = 'ld.so.1'
+    elf_tls = TLSArchInfo(1, 16, [], [0], [], 0x7000, 0x8000)
