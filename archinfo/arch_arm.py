@@ -80,6 +80,7 @@ class ArchARM(Arch):
     sp_offset = 60
     bp_offset = 60
     ret_offset = 8
+    lr_offset = 64
     vex_conditional_helpers = True
     syscall_num_offset = 36
     call_pushes_ret = False

@@ -39,6 +39,7 @@ class ArchPPC32(Arch):
     # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
     # claims that r15 is the base pointer but that is NOT what I see in practice
     ret_offset = 28
+    lr_offset = 1172
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4

@@ -35,6 +35,7 @@ class ArchPPC64(Arch):
     sp_offset = 24
     bp_offset = 264
     ret_offset = 40
+    lr_offset = 1304
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8

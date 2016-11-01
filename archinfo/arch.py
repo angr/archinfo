@@ -225,6 +225,7 @@ class Arch(object):
     sp_offset = None
     bp_offset = None
     ret_offset = None
+    lr_offset = None
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False

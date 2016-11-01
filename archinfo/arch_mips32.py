@@ -39,6 +39,7 @@ class ArchMIPS32(Arch):
     sp_offset = 116
     bp_offset = 120
     ret_offset = 8
+    lr_offset = 124
     syscall_num_offset = 8
     call_pushes_ret = False
     stack_change = -4

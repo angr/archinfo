@@ -35,6 +35,7 @@ class ArchMIPS64(Arch):
     sp_offset = 232
     bp_offset = 240
     ret_offset = 16
+    lr_offset = 248
     syscall_register_offset = 16
     call_pushes_ret = False
     stack_change = -8

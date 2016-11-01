@@ -32,6 +32,7 @@ class ArchAArch64(Arch):
     sp_offset = 264
     bp_offset = 248
     ret_offset = 16
+    lr_offset = 256
     vex_conditional_helpers = True
     syscall_num_offset = 80
     call_pushes_ret = False
