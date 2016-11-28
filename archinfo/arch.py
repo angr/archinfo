@@ -239,6 +239,8 @@ class Arch(object):
     # is it safe to cache IRSBs?
     cache_irsb = True
 
+    branch_delay_slot = False
+
     function_prologs = set()
     function_epilogs = set()
 
