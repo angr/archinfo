@@ -11,5 +11,5 @@ setup(
     name='archinfo',
     version='5.6.12.3',
     packages=packages,
-    install_requires=[ 'capstone', 'pyelftools' ]
+    install_requires=[ 'pyelftools' ]
 )

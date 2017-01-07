@@ -35,8 +35,13 @@ class Arch(object):
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = 'Iend_BE'
             self.register_endness = 'Iend_BE'
-            self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
-            self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
+
+            try:
+                self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
+                self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
+            except TypeError:
+                pass
+
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
@@ -378,14 +383,16 @@ from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
 from .arch_mips64   import ArchMIPS64
+from .arch_avr      import ArchAVR
 from .archerror     import ArchError
 
 all_arches = [
-    ArchAMD64(), ArchX86(),
-    ArchARM('Iend_LE'), ArchARM('Iend_BE'),
+    ArchAMD64(),            ArchX86(),
+    ArchARM('Iend_LE'),     ArchARM('Iend_BE'),
     ArchAArch64('Iend_LE'), ArchAArch64('Iend_BE'),
-    ArchPPC32('Iend_LE'), ArchPPC32('Iend_BE'),
-    ArchPPC64('Iend_LE'), ArchPPC64('Iend_BE'),
-    ArchMIPS32('Iend_LE'), ArchMIPS32('Iend_BE'),
-    ArchMIPS64('Iend_LE'), ArchMIPS64('Iend_BE')
+    ArchPPC32('Iend_LE'),   ArchPPC32('Iend_BE'),
+    ArchPPC64('Iend_LE'),   ArchPPC64('Iend_BE'),
+    ArchMIPS32('Iend_LE'),  ArchMIPS32('Iend_BE'),
+    ArchMIPS64('Iend_LE'),  ArchMIPS64('Iend_BE'),
+    ArchAVR('Iend_LE'),     ArchAVR('Iend_BE'),
 ]
