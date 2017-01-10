@@ -106,7 +106,7 @@ class ArchARM(Arch):
         r"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         r"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
     }
-    instruction_alignment = 4
+    instruction_alignment = 2  # cuz there is also thumb mode
     concretize_unique_registers = {64}
     default_register_values = [
         ( 'sp', Arch.initial_sp, True, 'global' ),      # the stack
