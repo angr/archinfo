@@ -1,4 +1,7 @@
-import capstone as _capstone
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 try:
     import unicorn as _unicorn
@@ -40,8 +43,9 @@ class ArchMIPS64(Arch):
     call_pushes_ret = False
     stack_change = -8
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
-    cs_arch = _capstone.CS_ARCH_MIPS
-    cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_MIPS
+        cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.mips_const if _unicorn else None
