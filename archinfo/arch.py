@@ -384,6 +384,7 @@ from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
 from .arch_mips64   import ArchMIPS64
 from .arch_avr      import ArchAVR
+from .arch_bf       import ArchBF
 from .archerror     import ArchError
 
 all_arches = [
@@ -395,4 +396,5 @@ all_arches = [
     ArchMIPS32('Iend_LE'),  ArchMIPS32('Iend_BE'),
     ArchMIPS64('Iend_LE'),  ArchMIPS64('Iend_BE'),
     ArchAVR('Iend_LE'),     ArchAVR('Iend_BE'),
+    ArchBF()
 ]
