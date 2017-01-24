@@ -279,4 +279,4 @@ class ArchMIPS64(Arch):
     elf_tls = TLSArchInfo(1, 16, [], [0], [], 0x7000, 0x8000)
 
 register_arch([r'.*mipsel.*|.*mips64el|.*mipsel64'], 64, 'Iend_LE', ArchMIPS64)
-register_arch([r'.*mips64.*|.*mips\w.*'], 64, 'any', ArchMIPS64)
+register_arch([r'.*mips64.*|.*mips.*'], 64, 'any', ArchMIPS64)

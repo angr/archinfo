@@ -246,4 +246,4 @@ class ArchAArch64(Arch):
     ld_linux_name = 'ld-linux-aarch64.so.1'
     elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
 
-register_arch([r'arm64.*|aarch64*'], 64, 'any', ArchAArch64)
+register_arch([r'.*arm64.*|.*aarch64*'], 64, 'any', ArchAArch64)
