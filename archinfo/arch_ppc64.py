@@ -408,4 +408,4 @@ class ArchPPC64(Arch):
     ld_linux_name = 'ld64.so.1'
     elf_tls = TLSArchInfo(1, 92, [], [84], [], 0x7000, 0x8000)
 
-register_arch([r'p\w*pc.*'], 64, 'any', ArchPPC64)
+register_arch([r'.*p\w*pc.*'], 64, 'any', ArchPPC64)

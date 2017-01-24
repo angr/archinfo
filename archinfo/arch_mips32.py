@@ -308,4 +308,4 @@ class ArchMIPS32(Arch):
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0x7000, 0x8000)
 
 register_arch([r'mipsel|mipsle'], 32, 'Iend_LE' , ArchMIPS32)
-register_arch([r'mips.*'], 32, 'any' , ArchMIPS32)
+register_arch([r'.*mips.*'], 32, 'any' , ArchMIPS32)
