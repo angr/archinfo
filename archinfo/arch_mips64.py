@@ -5,11 +5,11 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch
+from .arch import Arch, register_arch
 from .tls import TLSArchInfo
 
 class ArchMIPS64(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness="Iend_BE"):
         super(ArchMIPS64, self).__init__(endness)
         if endness == 'Iend_BE':
 
@@ -277,3 +277,6 @@ class ArchMIPS64(Arch):
     got_section_name = '.got'
     ld_linux_name = 'ld.so.1'
     elf_tls = TLSArchInfo(1, 16, [], [0], [], 0x7000, 0x8000)
+
+register_arch([r'mipsel.*|mips64el|mipsel64'], 64, 'Iend_LE', ArchMIPS64)
+register_arch([r'mips64.*|mips\w*'], 64, 'any', ArchMIPS64)

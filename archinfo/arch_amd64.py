@@ -5,7 +5,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch
+from .arch import Arch, register_arch
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
@@ -282,3 +282,6 @@ class ArchAMD64(Arch):
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux-x86-64.so.2'
     elf_tls = TLSArchInfo(2, 704, [16], [8], [0], 0, 0)
+
+
+register_arch([r'amd64|x64|x86_64|metapc'], 64, 'Iend_LE', ArchAMD64)

@@ -406,3 +406,6 @@ class ArchPPC32(Arch):
     got_section_name = '.plt'
     ld_linux_name = 'ld.so.1'
     elf_tls = TLSArchInfo(1, 52, [], [48], [], 0x7000, 0x8000)
+
+from arch import register_arch
+register_arch([r'p\w*pc.*'], 32, 'any', ArchPPC32)

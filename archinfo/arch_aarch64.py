@@ -5,7 +5,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch
+from .arch import Arch, register_arch
 from .tls import TLSArchInfo
 
 class ArchAArch64(Arch):
@@ -245,3 +245,5 @@ class ArchAArch64(Arch):
     got_section_name = '.got'
     ld_linux_name = 'ld-linux-aarch64.so.1'
     elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
+
+register_arch([r'arm64.*|aarch64*'], 64, 'any', ArchAArch64)

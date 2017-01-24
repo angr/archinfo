@@ -1,6 +1,7 @@
 import capstone as _capstone
 import struct as _struct
 import platform as _platform
+import re
 
 try:
     import pyvex as _pyvex
@@ -293,14 +294,53 @@ class Arch(object):
 
     vex_archinfo = None
 
-def arch_from_id(ident, endness='', bits=''):
+
+arch_id_map = []
+
+def register_arch(regexes, bits, endness, my_arch):
+    """
+    Register a new architecture.
+    Architectures are loaded by their string name using arch_from_id(), and
+    this defines the mapping it uses to figure it out
+    Takes a list of regular expressions, and an Arch class as input
+
+    :param regexes: List of regular expressions (str or SRE_Pattern)
+    :type regexes: list
+    :param bits: The canonical "bits" of this architecture, ex. 32 or 64
+    :type bits: int
+    :param endness: The "endness" of this architecture.  Use "Iend_LE", "Iend_BE", or "any"
+    :type endness: str
+    :param my_arch:
+    :type my_arch: Arch
+    :return: None
+    """
+    if not isinstance(regexes, list):
+        raise TypeError("regexes must be a list")
+    for rx in regexes:
+        if not isinstance(rx, str) and not isinstance(rx,re._pattern_type):
+            raise TypeError("Each regex must be a string or compiled regular expression")
+    #if not isinstance(my_arch,Arch):
+    #    raise TypeError("Arch must be a subclass of archinfo.Arch")
+    if not isinstance(bits, int):
+        raise TypeError("Bits must be an int")
+    if not isinstance(endness,str):
+        if endness != "Iend_BE" and endness != "Iend_LE" and endness != "any":
+            raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', or 'any'")
+    arch_id_map.append((regexes, bits, endness, my_arch))
+
+
+def arch_from_id(ident, endness='any', bits=''):
+
     if bits == 64 or (isinstance(bits, str) and '64' in bits):
         bits = 64
-    else:
+    elif isinstance(bits,str) and '32' in bits:
+        bits = 32
+    elif not bits and '64' in ident:
+        bits = 64
+    elif not bits and '32' in ident:
         bits = 32
 
     endness = endness.lower()
-    endness_unsure = False
     if 'lit' in endness:
         endness = 'Iend_LE'
     elif 'big' in endness:
@@ -314,58 +354,38 @@ def arch_from_id(ident, endness='', bits=''):
     elif 'be' in endness:
         endness = 'Iend_BE'
     elif 'l' in endness:
-        endness = 'Iend_LE'
-        endness_unsure = True
+        endness = 'unsure'
     elif 'b' in endness:
-        endness = 'Iend_BE'
-        endness_unsure = True
+        endness = 'unsure'
     else:
-        endness = 'Iend_LE'
-        endness_unsure = True
-
+        endness = 'unsure'
     ident = ident.lower()
-    if 'ppc64' in ident or 'powerpc64' in ident:
-        if endness_unsure:
-            endness = 'Iend_BE'
-        return ArchPPC64(endness)
-    elif 'ppc' in ident or 'powerpc' in ident:
-        if endness_unsure:
-            endness = 'Iend_BE'
-        if bits == 64:
-            return ArchPPC64(endness)
-        return ArchPPC32(endness)
-    elif 'mips' in ident:
-        if 'mipsel' in ident:
-            if bits == 64:
-                return ArchMIPS64('Iend_LE')
-            return ArchMIPS32('Iend_LE')
-        if endness_unsure:
-            if bits == 64:
-                return ArchMIPS64('Iend_BE')
-            return ArchMIPS32('Iend_BE')
-        if bits == 64:
-            return ArchMIPS64(endness)
-        return ArchMIPS32(endness)
-    elif 'arm' in ident or 'thumb' in ident:
-        if endness_unsure:
-            if 'l' in ident or 'le' in ident:
-                endness = 'Iend_LE'
-            elif 'b' in ident or 'be' in ident:
-                endness = 'Iend_BE'
-        if bits == 64:
-            return ArchAArch64(endness)
-        return ArchARM(endness)
-    elif 'aarch' in ident:
-        return ArchAArch64(endness)
-    elif 'amd64' in ident or ('x86' in ident and '64' in ident) or 'x64' in ident:
-        return ArchAMD64('Iend_LE')
-    elif '386' in ident or 'x86' in ident or 'metapc' in ident:
-        if bits == 64:
-            return ArchAMD64('Iend_LE')
-        return ArchX86('Iend_LE')
-
-    raise ArchError("Could not parse out arch!")
-
+    cls = None
+    for arxs, abits, aendness, acls in arch_id_map:
+        found_it = False
+        for rx in arxs:
+            if re.match(rx, ident):
+                found_it = True
+                break
+        if not found_it:
+            continue
+        if bits and bits != abits:
+            continue
+        if aendness == 'any' or endness == aendness or endness == 'unsure':
+            cls = acls
+            break
+    if not cls:
+        raise RuntimeError("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
+    if endness == 'unsure':
+        if aendness == 'any':
+            # We really don't care, use default
+            return cls()
+        else:
+            # We're expecting the ident to pick the endness.
+            # ex. 'armeb' means obviously this is Iend_BE
+            return cls(aendness)
+    else:
+        return cls(endness)
 
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)

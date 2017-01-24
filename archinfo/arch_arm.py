@@ -5,7 +5,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch
+from .arch import Arch, register_arch
 from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
@@ -316,3 +316,8 @@ class ArchARMEL(ArchARM):
     triplet = 'arm-linux-gnueabi'
     ld_linux_name = 'ld-linux.so.3'
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
+
+register_arch([r'armhf.*'], 32, 'any', ArchARMHF)
+register_arch([r'armeb|armbe'], 32, 'Iend_BE', ArchARM)
+register_arch([r'armel|arm.*'], 32, 'Iend_LE', ArchARMEL)
+register_arch([r'arm.*|thumb*'], 32, 'any', ArchARM)

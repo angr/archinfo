@@ -1,4 +1,4 @@
-from .arch import Arch
+from .arch import Arch, register_arch
 
 class ArchAVR(Arch):
     def __init__(self, endness="Iend_LE"):
@@ -123,3 +123,5 @@ class ArchAVR(Arch):
         self.register_names[self.registers['pc'][0]] = 'pc'
 
         self.ip_offset = self.registers["pc"][0]
+
+register_arch(['avr.*|atiny.*|atmega.*|atmel.*'], 8, 'Iend_LE', ArchAVR)
