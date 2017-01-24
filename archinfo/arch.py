@@ -297,6 +297,8 @@ class Arch(object):
 
 arch_id_map = []
 
+all_arches = []
+
 def register_arch(regexes, bits, endness, my_arch):
     """
     Register a new architecture.
@@ -327,6 +329,11 @@ def register_arch(regexes, bits, endness, my_arch):
         if endness != "Iend_BE" and endness != "Iend_LE" and endness != "any":
             raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
+    if endness == 'any':
+        all_arches.append(my_arch('Iend_BE'))
+        all_arches.append(my_arch('Iend_LE'))
+    else:
+        all_arches.append(my_arch(endness))
 
 
 def arch_from_id(ident, endness='any', bits=''):
@@ -393,28 +400,3 @@ def reverse_ends(string):
 
 def get_host_arch():
     return arch_from_id(_platform.machine())
-
-# pylint: disable=unused-import
-from .arch_amd64    import ArchAMD64
-from .arch_x86      import ArchX86
-from .arch_arm      import ArchARM, ArchARMEL, ArchARMHF
-from .arch_aarch64  import ArchAArch64
-from .arch_ppc32    import ArchPPC32
-from .arch_ppc64    import ArchPPC64
-from .arch_mips32   import ArchMIPS32
-from .arch_mips64   import ArchMIPS64
-from .arch_avr      import ArchAVR
-from .arch_bf       import ArchBF
-from .archerror     import ArchError
-
-all_arches = [
-    ArchAMD64(),            ArchX86(),
-    ArchARM('Iend_LE'),     ArchARM('Iend_BE'),
-    ArchAArch64('Iend_LE'), ArchAArch64('Iend_BE'),
-    ArchPPC32('Iend_LE'),   ArchPPC32('Iend_BE'),
-    ArchPPC64('Iend_LE'),   ArchPPC64('Iend_BE'),
-    ArchMIPS32('Iend_LE'),  ArchMIPS32('Iend_BE'),
-    ArchMIPS64('Iend_LE'),  ArchMIPS64('Iend_BE'),
-    ArchAVR('Iend_LE'),     ArchAVR('Iend_BE'),
-    ArchBF()
-]
