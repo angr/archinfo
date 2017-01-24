@@ -2,6 +2,7 @@ import capstone as _capstone
 import struct as _struct
 import platform as _platform
 import re
+from archerror import ArchError
 
 try:
     import pyvex as _pyvex
@@ -372,6 +373,7 @@ def arch_from_id(ident, endness='any', bits=''):
         endness = 'unsure'
     ident = ident.lower()
     cls = None
+    aendness = ""
     for arxs, abits, aendness, acls in arch_id_map:
         found_it = False
         for rx in arxs:
