@@ -284,4 +284,4 @@ class ArchAMD64(Arch):
     elf_tls = TLSArchInfo(2, 704, [16], [8], [0], 0, 0)
 
 
-register_arch([r'.*amd64|.*x64|*x86_64|.*metapc'], 64, 'Iend_LE', ArchAMD64)
+register_arch([r'.*amd64|.*x64|.*x86_64|.*metapc'], 64, 'Iend_LE', ArchAMD64)

@@ -321,6 +321,10 @@ def register_arch(regexes, bits, endness, my_arch):
     for rx in regexes:
         if not isinstance(rx, str) and not isinstance(rx,re._pattern_type):
             raise TypeError("Each regex must be a string or compiled regular expression")
+        try:
+            re.compile(rx)
+        except:
+            raise ValueError('Invalid Regular Expression %s' % rx)
     #if not isinstance(my_arch,Arch):
     #    raise TypeError("Arch must be a subclass of archinfo.Arch")
     if not isinstance(bits, int):
