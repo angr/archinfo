@@ -9,7 +9,6 @@ except ImportError:
 
 setup(
     name='archinfo',
-    version='5.6.12.3',
-    packages=packages,
-    install_requires=[ 'pyelftools' ]
+    version='6.7.1.13',
+    packages=packages
 )

@@ -1,4 +1,7 @@
-import capstone as _capstone
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 try:
     import unicorn as _unicorn
@@ -72,8 +75,9 @@ class ArchAMD64(Arch):
     memory_endness = "Iend_LE"
     register_endness = "Iend_LE"
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
-    cs_arch = _capstone.CS_ARCH_X86
-    cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_X86
+        cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     _x86_syntax = None # Set it to 'att' in order to use AT&T syntax for x86
     uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None

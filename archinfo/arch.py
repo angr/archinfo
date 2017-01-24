@@ -1,4 +1,3 @@
-import capstone as _capstone
 import struct as _struct
 import platform as _platform
 import re
@@ -13,6 +12,11 @@ try:
     import unicorn as _unicorn
 except ImportError:
     _unicorn = None
+
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 import logging
 l = logging.getLogger('archinfo.arch')
@@ -37,13 +41,9 @@ class Arch(object):
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = 'Iend_BE'
             self.register_endness = 'Iend_BE'
-
-            try:
+            if _capstone:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
-            except TypeError:
-                pass
-
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 

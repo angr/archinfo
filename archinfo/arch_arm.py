@@ -1,4 +1,7 @@
-import capstone as _capstone
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 try:
     import unicorn as _unicorn
@@ -48,6 +51,8 @@ class ArchARM(Arch):
 
     @property
     def capstone(self):
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_ARM)
             self._cs.detail = True
@@ -55,6 +60,8 @@ class ArchARM(Arch):
 
     @property
     def capstone_thumb(self):
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
         if self._cs_thumb is None:
             self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
             self._cs_thumb.detail = True
@@ -88,8 +95,9 @@ class ArchARM(Arch):
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
-    cs_arch = _capstone.CS_ARCH_ARM
-    cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_ARM
+        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     _cs_thumb = None
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
@@ -106,7 +114,7 @@ class ArchARM(Arch):
         r"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         r"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
     }
-    instruction_alignment = 4
+    instruction_alignment = 2  # cuz there is also thumb mode
     concretize_unique_registers = {64}
     default_register_values = [
         ( 'sp', Arch.initial_sp, True, 'global' ),      # the stack

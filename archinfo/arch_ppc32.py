@@ -1,4 +1,7 @@
-import capstone as _capstone
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 #try:
 #   import unicorn as _unicorn
@@ -44,8 +47,9 @@ class ArchPPC32(Arch):
     call_pushes_ret = False
     stack_change = -4
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
-    cs_arch = _capstone.CS_ARCH_PPC
-    cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_PPC
+        cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
     # unicorn not supported
     #uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     #uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None

@@ -1,4 +1,7 @@
-import capstone as _capstone
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
 
 try:
     import unicorn as _unicorn
@@ -40,8 +43,9 @@ class ArchAArch64(Arch):
     memory_endness = 'Iend_LE'
     register_endness = 'Iend_LE'
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
-    cs_arch = _capstone.CS_ARCH_ARM64
-    cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_ARM64
+        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_ARM64 if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_const = _unicorn.arm64_const if _unicorn else None
