@@ -1,7 +1,7 @@
 import struct as _struct
 import platform as _platform
 import re
-from archerror import ArchError
+from archinfo.archerror import ArchError
 
 try:
     import pyvex as _pyvex
