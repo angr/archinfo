@@ -129,29 +129,18 @@ class ArchX86(Arch):
         12: 'ecx',
         16: 'edx',
         20: 'ebx',
-
         24: 'esp',
-
         28: 'ebp',
         32: 'esi',
         36: 'edi',
-
-        # condition stuff
         40: 'cc_op',
         44: 'cc_dep1',
         48: 'cc_dep2',
         52: 'cc_ndep',
-
-        # this determines which direction SSE instructions go
         56: 'd',
-
-        # separately-stored bits of eflags
         60: 'id',
         64: 'ac',
-
         68: 'eip',
-
-        # fpu registers
         72: 'mm0',
         80: 'mm1',
         88: 'mm2',
@@ -161,13 +150,9 @@ class ArchX86(Arch):
         120: 'mm6',
         128: 'mm7',
         136: 'fpu_tags',
-
-        # fpu settings
         144: 'fpround',
         148: 'fc3210',
         152: 'ftop',
-
-        # sse
         156: 'sseround',
         160: 'xmm0',
         176: 'xmm1',
@@ -177,17 +162,14 @@ class ArchX86(Arch):
         240: 'xmm5',
         256: 'xmm6',
         272: 'xmm7',
-
         288: 'cs',
         290: 'ds',
         292: 'es',
         294: 'fs',
         296: 'gs',
         298: 'ss',
-
-        304: 'ldt', # THESE ARE REALLY TRICKY since their size depends on your host word size :(
+        304: 'ldt',
         312: 'gdt',
-
         320: 'emnote',
         324: 'cmstart',
         328: 'cmlen',
@@ -197,52 +179,62 @@ class ArchX86(Arch):
     }
 
     registers = {
-        'eax': (8, 4), 'ax': (8, 2), 'al': (8, 1), 'ah': (9, 1),
-        'ecx': (12, 4), 'cx': (12, 2), 'cl': (12, 1), 'ch': (13, 1),
-        'edx': (16, 4), 'dx': (16, 2), 'dl': (16, 1), 'dh': (17, 1),
-        'ebx': (20, 4), 'bx': (20, 2), 'bl': (20, 1), 'bh': (21, 1),
-
-        'esp': (24, 4), 'sp': (24, 4),
-        'ebp': (28, 4), 'bp': (28, 4),
-
-        'esi': (32, 4), 'si': (32, 2), 'sil': (32, 1), 'sih': (33, 1),
-        'edi': (36, 4), 'di': (36, 2), 'dil': (36, 1), 'dih': (37, 1),
-
-        # condition stuff
+        'ah': (8, 1),
+        'al': (8, 1),
+        'ax': (8, 2),
+        'eax': (8, 4),
+        'ch': (12, 1),
+        'cl': (12, 1),
+        'cx': (12, 2),
+        'ecx': (12, 4),
+        'dh': (16, 1),
+        'dl': (16, 1),
+        'dx': (16, 2),
+        'edx': (16, 4),
+        'bh': (20, 1),
+        'bl': (20, 1),
+        'bx': (20, 2),
+        'ebx': (20, 4),
+        'esp': (24, 4),
+        'sp': (24, 4),
+        'bp': (28, 4),
+        'ebp': (28, 4),
+        'sih': (32, 1),
+        'sil': (32, 1),
+        'si': (32, 2),
+        'esi': (32, 4),
+        'dih': (36, 1),
+        'dil': (36, 1),
+        'di': (36, 2),
+        'edi': (36, 4),
         'cc_op': (40, 4),
         'cc_dep1': (44, 4),
         'cc_dep2': (48, 4),
         'cc_ndep': (52, 4),
-
-        # this determines which direction SSE instructions go
-        'd': (56, 4), 'dflag': (56, 4),
-
-        # separately-stored bits of eflags
-        'id': (60, 4), 'idflag': (60, 4),
-        'ac': (64, 4), 'acflag': (64, 4),
-
+        'd': (56, 4),
+        'dflag': (56, 4),
+        'id': (60, 4),
+        'idflag': (60, 4),
+        'ac': (64, 4),
+        'acflag': (64, 4),
         'eip': (68, 4),
-        'pc': (68, 4),
         'ip': (68, 4),
-
-        # fpu registers
-        'fpu_regs': (72, 64), 'fpreg': (72, 64),
+        'pc': (68, 4),
         'mm0': (72, 8),
-        'mm1': (80, 8),
-        'mm2': (88, 8),
-        'mm3': (96, 8),
-        'mm4': (104, 8),
-        'mm5': (112, 8),
-        'mm6': (120, 8),
-        'mm7': (128, 8),
-        'fpu_tags': (136, 8), 'fptag': (136, 8),
-
-        # fpu settings
+        'mm1': (72, 8),
+        'mm2': (72, 8),
+        'mm3': (72, 8),
+        'mm4': (72, 8),
+        'mm5': (72, 8),
+        'mm6': (72, 8),
+        'mm7': (72, 8),
+        'fpreg': (72, 64),
+        'fpu_regs': (72, 64),
+        'fptag': (136, 8),
+        'fpu_tags': (136, 8),
         'fpround': (144, 4),
         'fc3210': (148, 4),
         'ftop': (152, 4),
-
-        # sse
         'sseround': (156, 4),
         'xmm0': (160, 16),
         'xmm1': (176, 16),
@@ -252,7 +244,6 @@ class ArchX86(Arch):
         'xmm5': (240, 16),
         'xmm6': (256, 16),
         'xmm7': (272, 16),
-
         'cs': (288, 2),
         'ds': (290, 2),
         'es': (292, 2),
@@ -261,13 +252,12 @@ class ArchX86(Arch):
         'ss': (298, 2),
         'ldt': (304, 8),
         'gdt': (312, 8),
-
         'emnote': (320, 4),
         'cmstart': (324, 4),
         'cmlen': (328, 4),
         'nraddr': (332, 4),
         'sc_class': (336, 4),
-        'ip_at_syscall':(340, 4),
+        'ip_at_syscall': (340, 4),
     }
 
     argument_registers = { registers['eax'][0],

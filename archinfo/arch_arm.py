@@ -141,34 +141,23 @@ class ArchARM(Arch):
         48: 'r10',
         52: 'r11',
         56: 'r12',
-
-        # stack pointer
         60: 'sp',
-
-        # link register
         64: 'lr',
-
-        # program counter
         68: 'pc',
-
-        # condition stuff
         72: 'cc_op',
         76: 'cc_dep1',
         80: 'cc_dep2',
         84: 'cc_ndep',
-
         88: 'qflag32',
         92: 'geflag0',
         96: 'geflag1',
         100: 'geflag2',
         104: 'geflag3',
-
         108: 'emnote',
         112: 'cmstart',
         116: 'cmlen',
         120: 'nraddr',
         124: 'ip_at_syscall',
-
         128: 'd0',
         136: 'd1',
         144: 'd2',
@@ -201,14 +190,12 @@ class ArchARM(Arch):
         360: 'd29',
         368: 'd30',
         376: 'd31',
-
         384: 'fpscr',
         388: 'tpidruro',
-        392: 'itstate'
+        392: 'itstate',
     }
 
     registers = {
-        # GPRs
         'r0': (8, 4),
         'r1': (12, 4),
         'r2': (16, 4),
@@ -222,39 +209,29 @@ class ArchARM(Arch):
         'r10': (48, 4),
         'r11': (52, 4),
         'r12': (56, 4),
-
-        # stack pointer
-        'sp': (60, 4), 'bp': (60, 4),
+        'bp': (60, 4),
         'r13': (60, 4),
-
-        # link register
-        'r14': (64, 4),
+        'sp': (60, 4),
         'lr': (64, 4),
-
-        # program counter
+        'r14': (64, 4),
+        'ip': (68, 4),
+        'pc': (68, 4),
         'r15': (68, 4),
         'r15t': (68, 4),
-        'pc': (68, 4),
-        'ip': (68, 4),
-
-        # condition stuff
         'cc_op': (72, 4),
         'cc_dep1': (76, 4),
         'cc_dep2': (80, 4),
         'cc_ndep': (84, 4),
-
         'qflag32': (88, 4),
         'geflag0': (92, 4),
         'geflag1': (96, 4),
         'geflag2': (100, 4),
         'geflag3': (104, 4),
-
         'emnote': (108, 4),
         'cmstart': (112, 4),
         'cmlen': (116, 4),
         'nraddr': (120, 4),
         'ip_at_syscall': (124, 4),
-
         'd0': (128, 8),
         'd1': (136, 8),
         'd2': (144, 8),
@@ -287,10 +264,9 @@ class ArchARM(Arch):
         'd29': (360, 8),
         'd30': (368, 8),
         'd31': (376, 8),
-
         'fpscr': (384, 4),
         'tpidruro': (388, 4),
-        'itstate': (392, 4)
+        'itstate': (392, 4),
     }
 
     argument_registers = {
