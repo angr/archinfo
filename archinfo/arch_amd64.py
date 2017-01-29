@@ -113,9 +113,6 @@ class ArchAMD64(Arch):
                                    'r12', 'r13', 'r14', 'r15', 'rip' ]
 
     register_names = {
-        0: 'host_evc_failaddr',
-        8: 'host_evc_counter',
-        12: 'pad0',
         16: 'rax',
         24: 'rcx',
         32: 'rdx',
@@ -160,7 +157,6 @@ class ArchAMD64(Arch):
         704: 'ymm15',
         736: 'ymm16',
         768: 'ftop',
-        772: 'pad1',
         776: 'mm0',
         784: 'mm1',
         792: 'mm2',
@@ -173,21 +169,15 @@ class ArchAMD64(Arch):
         848: 'fpround',
         856: 'fc3210',
         864: 'emnote',
-        868: 'pad2',
         872: 'cmstart',
         880: 'cmlen',
         888: 'nraddr',
         896: 'sc_class',
         904: 'gs_const',
         912: 'ip_at_syscall',
-        920: 'pad3'
     }
 
     registers = {
-        'host_evc_failaddr': (0, 8),
-        'host_evc_counter': (8, 4),
-        'pad0': (12, 4),
-
         'rax': (16, 8), 'eax': (16, 4), 'ax': (16, 2), 'al': (16, 1), 'ah': (17, 1),
         'rcx': (24, 8), 'ecx': (24, 4), 'cx': (24, 2), 'cl': (24, 1), 'ch': (25, 1),
         'rdx': (32, 8), 'edx': (32, 4), 'dx': (32, 2), 'dl': (32, 1), 'dh': (33, 1),
@@ -236,9 +226,8 @@ class ArchAMD64(Arch):
         'ymm16': (736, 32), 'xmm16': (736, 32),
 
         'ftop': (768, 4),
-        'pad1': (772, 4),
 
-        'fpu_regs': (776, 64),
+        'fpu_regs': (776, 64), 'fpreg': (776, 64),
         'mm0': (776, 8),
         'mm1': (784, 8),
         'mm2': (792, 8),
@@ -247,19 +236,17 @@ class ArchAMD64(Arch):
         'mm5': (816, 8),
         'mm6': (824, 8),
         'mm7': (832, 8),
-        'fpu_tags': (840, 8),
+        'fpu_tags': (840, 8), 'fptag': (840, 8),
 
         'fpround': (848, 8),
         'fc3210': (856, 8),
         'emnote': (864, 4),
-        'pad2': (868, 4),
         'cmstart': (872, 8),
         'cmlen': (880, 8),
         'nraddr': (888, 8),
         'sc_class': (896, 8),
         'gs_const': (904, 8), 'gs': (904, 8),
         'ip_at_syscall': (912, 8),
-        'pad3': (920, 8)
     }
 
     argument_registers = {

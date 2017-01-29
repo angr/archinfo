@@ -233,6 +233,7 @@ class ArchARM(Arch):
 
         # program counter
         'r15': (68, 4),
+        'r15t': (68, 4),
         'pc': (68, 4),
         'ip': (68, 4),
 

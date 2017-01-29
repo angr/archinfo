@@ -152,8 +152,6 @@ class ArchMIPS64(Arch):
         576: 'cmstart',
         584: 'cmlen',
         592: 'nraddr',
-        600: 'evc_failaddr',
-        608: 'evc_counter',
         612: 'cond',
         616: 'ip_at_syscall'
     }
@@ -236,8 +234,6 @@ class ArchMIPS64(Arch):
         'cmstart': (576, 8),
         'cmlen': (584, 8),
         'nraddr': (592, 8),
-        'evc_failaddr': (600, 8),
-        'evc_counter': (608, 4),
         'cond': (612, 4),
         'ip_at_syscall': (616, 8)
     }

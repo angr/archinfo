@@ -194,7 +194,6 @@ class ArchX86(Arch):
         332: 'nraddr',
         336: 'sc_class',
         340: 'ip_at_syscall',
-        344: 'padding1'
     }
 
     registers = {
@@ -216,18 +215,18 @@ class ArchX86(Arch):
         'cc_ndep': (52, 4),
 
         # this determines which direction SSE instructions go
-        'd': (56, 4),
+        'd': (56, 4), 'dflag': (56, 4),
 
         # separately-stored bits of eflags
-        'id': (60, 4),
-        'ac': (64, 4),
+        'id': (60, 4), 'idflag': (60, 4),
+        'ac': (64, 4), 'acflag': (64, 4),
 
         'eip': (68, 4),
         'pc': (68, 4),
         'ip': (68, 4),
 
         # fpu registers
-        'fpu_regs': (72, 64),
+        'fpu_regs': (72, 64), 'fpreg': (72, 64),
         'mm0': (72, 8),
         'mm1': (80, 8),
         'mm2': (88, 8),
@@ -236,7 +235,7 @@ class ArchX86(Arch):
         'mm5': (112, 8),
         'mm6': (120, 8),
         'mm7': (128, 8),
-        'fpu_tags': (136, 8),
+        'fpu_tags': (136, 8), 'fptag': (136, 8),
 
         # fpu settings
         'fpround': (144, 4),
@@ -269,7 +268,6 @@ class ArchX86(Arch):
         'nraddr': (332, 4),
         'sc_class': (336, 4),
         'ip_at_syscall':(340, 4),
-        'padding1': (344, 4)
     }
 
     argument_registers = { registers['eax'][0],

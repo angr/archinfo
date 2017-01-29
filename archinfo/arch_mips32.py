@@ -38,12 +38,12 @@ class ArchMIPS32(Arch):
     linux_name = 'mipsel' # ???
     triplet = 'mipsel-linux-gnu'
     max_inst_bytes = 4
-    ip_offset = 128
-    sp_offset = 116
-    bp_offset = 120
-    ret_offset = 8
-    lr_offset = 124
-    syscall_num_offset = 8
+    ip_offset = 136
+    sp_offset = 124
+    bp_offset = 128
+    ret_offset = 16
+    lr_offset = 132
+    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
     branch_delay_slot = True
@@ -161,8 +161,6 @@ class ArchMIPS32(Arch):
         428: 'cmstart',
         432: 'cmlen',
         436: 'nraddr',
-        440: 'evc_failaddr',
-        444: 'evc_counter',
         448: 'cond',
         452: 'dspcontrol',
         456: 'ac0',
@@ -260,8 +258,6 @@ class ArchMIPS32(Arch):
         'cmstart': (428, 4),
         'cmlen': (432, 4),
         'nraddr': (436, 4),
-        'evc_failaddr': (440, 4),
-        'evc_counter': (444, 4),
         'cond': (448, 4),
         'dspcontrol': (452, 4),
         'ac0': (456, 8),
