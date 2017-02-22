@@ -20,6 +20,8 @@ class ArchPPC64(Arch):
         if endness == 'Iend_BE':
             self.function_prologs = {
                 r"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6",                        # stwu r1, -off(r1); mflr r0
+                r"(?!\x94\x21[\x00-\xff]{2})\x7c\x08\x02\xa6",                    # mflr r0
+                r"\xf8\x61[\x00-\xff]{2}",                                        # std r3, -off(r1)
             }
             self.function_epilogs = {
                 r"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"    # mtlr reg; ... ; blr
