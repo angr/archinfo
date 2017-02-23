@@ -387,6 +387,44 @@ class ArchPPC64(Arch):
         registers['r10']
     }
 
+    argument_register_positions = {
+        registers['r3']: 0,
+        registers['r4']: 1,
+        registers['r5']: 2,
+        registers['r6']: 3,
+        registers['r7']: 4,
+        registers['r8']: 5,
+        registers['r9']: 6,
+        registers['r10']: 7,
+        # fp registers
+        registers['vsr1']: 0,
+        registers['vsr2']: 1,
+        registers['vsr3']: 2,
+        registers['vsr4']: 3,
+        registers['vsr5']: 4,
+        registers['vsr6']: 5,
+        registers['vsr7']: 6,
+        registers['vsr8']: 7,
+        registers['vsr9']: 8,
+        registers['vsr10']: 9,
+        registers['vsr11']: 10,
+        registers['vsr12']: 11,
+        registers['vsr13']: 12,
+        # vector registers
+        registers['vsr2']: 0,
+        registers['vsr3']: 1,
+        registers['vsr4']: 2,
+        registers['vsr5']: 3,
+        registers['vsr6']: 4,
+        registers['vsr7']: 5,
+        registers['vsr8']: 6,
+        registers['vsr9']: 7,
+        registers['vsr10']: 8,
+        registers['vsr11']: 9,
+        registers['vsr12']: 10,
+        registers['vsr13']: 11,
+    }
+    
     got_section_name = '.plt'
     ld_linux_name = 'ld64.so.1'
     elf_tls = TLSArchInfo(1, 92, [], [84], [], 0x7000, 0x8000)
