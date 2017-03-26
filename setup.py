@@ -9,6 +9,6 @@ except ImportError:
 
 setup(
     name='archinfo',
-    version='6.7.1.13',
+    version='6.7.3.26',
     packages=packages
 )
