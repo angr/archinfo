@@ -67,7 +67,7 @@ def canon_name(archh, offseth):
 for archname in arch_data:
     try:
         arch = archinfo.arch_from_id(archname)
-    except archinfo.ArchError:
+    except (archinfo.ArchError, RuntimeError):
         print 'Skipping', archname
         continue
 
@@ -88,7 +88,7 @@ for archname in arch_data:
                 new_sub_offset = new_offset + (sub_offset - a_offset)
                 if new_sub_offset not in new_registers_reverse:
                     new_registers_reverse[new_sub_offset] = []
-                new_registers_reverse[new_offset].append((sub_size, alt_name))
+                new_registers_reverse[new_sub_offset].append((sub_size, alt_name))
 
     for misso, miss in misses:
         for dlist in new_registers_reverse.itervalues():

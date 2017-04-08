@@ -96,6 +96,11 @@ class Arch(object):
         # generate regitster mapping (offset, size): name
         self.register_size_names = {}
         for k, v in self.registers.iteritems():
+
+            # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
+            if self.name in {'X86', 'AMD64'} and k in {'bp', 'sp', 'ip'}:
+                continue
+
             if v in self.register_size_names and k not in self.register_names:
                 continue
             self.register_size_names[v] = k
