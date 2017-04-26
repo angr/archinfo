@@ -466,25 +466,25 @@ class ArchPPC32(Arch):
     }
 
     argument_registers = {
-        registers['r3'],
-        registers['r4'],
-        registers['r5'],
-        registers['r6'],
-        registers['r7'],
-        registers['r8'],
-        registers['r9'],
-        registers['r10'],
+        registers['r3'][0],
+        registers['r4'][0],
+        registers['r5'][0],
+        registers['r6'][0],
+        registers['r7'][0],
+        registers['r8'][0],
+        registers['r9'][0],
+        registers['r10'][0],
     }
 
     argument_register_positions = {
-        registers['r3']: 0,
-        registers['r4']: 1,
-        registers['r5']: 2,
-        registers['r6']: 3,
-        registers['r7']: 4,
-        registers['r8']: 5,
-        registers['r9']: 6,
-        registers['r10']: 7,
+        registers['r3'][0]: 0,
+        registers['r4'][0]: 1,
+        registers['r5'][0]: 2,
+        registers['r6'][0]: 3,
+        registers['r7'][0]: 4,
+        registers['r8'][0]: 5,
+        registers['r9'][0]: 6,
+        registers['r10'][0]: 7,
     }
 
     got_section_name = '.plt'
