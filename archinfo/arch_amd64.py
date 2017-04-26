@@ -294,22 +294,34 @@ class ArchAMD64(Arch):
     }
 
     argument_registers = {
-        registers['rax'][0],
-        registers['rcx'][0],
-        registers['rdx'][0],
-        registers['rbx'][0],
-        registers['rsi'][0],
-        registers['rdi'][0],
-        registers['r8'][0],
-        registers['r9'][0],
-        registers['r10'][0],
-        registers['r11'][0],
-        registers['r12'][0],
-        registers['r13'][0],
-        registers['r14'][0],
-        registers['r15'][0],
+        registers['rcx'],
+        registers['rdx'],
+        registers['rsi'],
+        registers['rdi'],
+        registers['r8'],
+        registers['r9'],
+        registers['r10']
     }
 
+    argument_register_positions = {
+        registers['rdi']: 0,
+        registers['rsi']: 1,
+        registers['rdx']: 2,
+        registers['rcx']: 3,  # Used for user calls
+        registers['r10']: 3,  # Used for Linux kernel calls
+        registers['r8']: 4,
+        registers['r9']: 5,
+        # fp registers
+        registers['xmm0']: 0,
+        registers['xmm1']: 1,
+        registers['xmm2']: 2,
+        registers['xmm3']: 3,
+        registers['xmm4']: 4,
+        registers['xmm5']: 5,
+        registers['xmm6']: 6,
+        registers['xmm7']: 7
+    }
+    
     symbol_type_translation = {
         10: 'STT_GNU_IFUNC',
         'STT_LOOS': 'STT_GNU_IFUNC'
