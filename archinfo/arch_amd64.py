@@ -294,32 +294,32 @@ class ArchAMD64(Arch):
     }
 
     argument_registers = {
-        registers['rcx'],
-        registers['rdx'],
-        registers['rsi'],
-        registers['rdi'],
-        registers['r8'],
-        registers['r9'],
-        registers['r10']
+        registers['rcx'][0],
+        registers['rdx'][0],
+        registers['rsi'][0],
+        registers['rdi'][0],
+        registers['r8'][0],
+        registers['r9'][0],
+        registers['r10'][0]
     }
 
     argument_register_positions = {
-        registers['rdi']: 0,
-        registers['rsi']: 1,
-        registers['rdx']: 2,
-        registers['rcx']: 3,  # Used for user calls
-        registers['r10']: 3,  # Used for Linux kernel calls
-        registers['r8']: 4,
-        registers['r9']: 5,
+        registers['rdi'][0]: 0,
+        registers['rsi'][0]: 1,
+        registers['rdx'][0]: 2,
+        registers['rcx'][0]: 3,  # Used for user calls
+        registers['r10'][0]: 3,  # Used for Linux kernel calls
+        registers['r8'][0]: 4,
+        registers['r9'][0]: 5,
         # fp registers
-        registers['xmm0']: 0,
-        registers['xmm1']: 1,
-        registers['xmm2']: 2,
-        registers['xmm3']: 3,
-        registers['xmm4']: 4,
-        registers['xmm5']: 5,
-        registers['xmm6']: 6,
-        registers['xmm7']: 7
+        registers['xmm0'][0]: 0,
+        registers['xmm1'][0]: 1,
+        registers['xmm2'][0]: 2,
+        registers['xmm3'][0]: 3,
+        registers['xmm4'][0]: 4,
+        registers['xmm5'][0]: 5,
+        registers['xmm6'][0]: 6,
+        registers['xmm7'][0]: 7
     }
     
     symbol_type_translation = {
