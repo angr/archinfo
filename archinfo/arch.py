@@ -202,6 +202,12 @@ class Arch(object):
 
         return fmt
 
+    def pack(self, val):
+        return struct.pack(self.struct_fmt(), val)
+
+    def unpack(self, s):
+        return struct.unpack(self.struct_fmt(), s)[0]
+
     @property
     def bytes(self):
         """
