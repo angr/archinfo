@@ -15,3 +15,5 @@ from .arch_mips32   import ArchMIPS32
 from .arch_mips64   import ArchMIPS64
 from .arch_avr      import ArchAVR
 from .archerror     import ArchError
+
+BYTE_BITS = 9
