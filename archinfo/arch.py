@@ -92,6 +92,9 @@ class Arch(object):
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
+        elif endness == 'Iend_ME':
+            self.memory_endness = 'Iend_ME'
+            self.register_endness = 'Iend_ME'
 
         # generate regitster mapping (offset, size): name
         self.register_size_names = {}
@@ -203,10 +206,10 @@ class Arch(object):
         return fmt
 
     def pack(self, val):
-        return struct.pack(self.struct_fmt(), val)
+        return _struct.pack(self.struct_fmt(), val)
 
     def unpack(self, s):
-        return struct.unpack(self.struct_fmt(), s)[0]
+        return _struct.unpack(self.struct_fmt(), s)[0]
 
     @property
     def bytes(self):
@@ -404,8 +407,8 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if not isinstance(endness,str):
-        if endness != "Iend_BE" and endness != "Iend_LE" and endness != "any":
-            raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', or 'any'")
+        if endness != "Iend_BE" and endness != "Iend_LE" and endness != "Iend_ME" and endness != "any":
+            raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', 'Iend_ME', or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
         all_arches.append(my_arch('Iend_BE'))
