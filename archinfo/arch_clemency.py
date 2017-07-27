@@ -9,7 +9,7 @@ class ArchClemency(Arch):
     Each byte is 9 bits long.
     """
 
-    def __init__(self):
+    def __init__(self, endness="Iend_ME"):
         super(ArchClemency, self).__init__("Iend_ME")
         # TODO: Define function prologs
         self.qemu_name = 'clemency'
@@ -44,17 +44,28 @@ class ArchClemency(Arch):
 
     default_symbolic_registers = [ ]
 
-    register_names = {(3*x) : 'r' + str(x) for x in range(32)}
+    register_names = {0 : 'r' + str(x) for x in range(32)}
     register_names[3 * 31] = 'pc'
     register_names[3 * 30] = 'ra'
     register_names[3 * 29] = 'st'
 
-    registers = {(3*x, 3) : 'r' + str(x) for x in range(32)}
+    registers = dict(('r' + str(x), (3*x, 3)) for x in range(32))
     registers['pc'] = (3 * 31, 3)
     registers['ra'] = (3 * 30, 3)
     registers['st'] = (3 * 29, 3)
 
-    argument_registers = {registers['r' + str(x)][0] for x in range(9)}
+    argument_registers = {
+        registers['r0'][0],
+        registers['r1'][0],
+        registers['r2'][0],
+        registers['r3'][0],
+        registers['r4'][0],
+        registers['r5'][0],
+        registers['r6'][0],
+        registers['r7'][0],
+        registers['r8'][0],
+        registers['r9'][0],
+    }
 
     # EDG: Can you even use PIC here? I don't think so
     dynamic_tag_translation = {}

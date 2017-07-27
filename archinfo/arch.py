@@ -77,8 +77,8 @@ class Arch(object):
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
     def __init__(self, endness):
-        if endness not in ('Iend_LE', 'Iend_BE'):
-            raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
+        if endness not in ('Iend_LE', 'Iend_BE', 'Iend_ME'):
+            raise ArchError('Must pass a valid VEX endness: "Iend_LE", "Iend_BE", or "Iend_ME".')
 
         if _pyvex:
             self.vex_archinfo = _pyvex.default_vex_archinfo()
