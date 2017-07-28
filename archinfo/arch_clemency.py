@@ -52,13 +52,15 @@ class ArchClemency(Arch):
     registers['ra'] = (3 * 30, 3)
     registers['st'] = (3 * 29, 3)
     registers['sp'] = (3 * 29, 3)
+    registers['fl'] = (3 * 32, 3)
 
     default_register_values = [
         ( 'sp', 0x3fffc00, True, 'global' ),     # the stack
     ]
-    entry_register_values = [ ( 'r%d'%r, 0, False, 'global' ) for r in range(28) ] + [
-        ( 'sp', 0, True, 'global' ), ( 'ra', 0, True, 'global' ), ('fl', 0, True, 'global')
-    ]
+    entry_register_values = { 'r%d'%r: 0 for r in range(29) }
+    entry_register_values['sp'] = 0
+    entry_register_values['ra'] = 0
+    entry_register_values['fl'] = 0
 
     argument_registers = {
         registers['r0'][0],
