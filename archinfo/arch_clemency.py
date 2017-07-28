@@ -40,14 +40,18 @@ class ArchClemency(Arch):
 
     register_names = {0 : 'r' + str(x) for x in range(32)}
     register_names[3 * 31] = 'pc'
+    register_names[3 * 31] = 'ip'
     register_names[3 * 30] = 'ra'
     register_names[3 * 29] = 'st'
+    register_names[3 * 29] = 'sp'
     register_names[3 * 32] = 'fl'
 
     registers = dict(('r' + str(x), (3*x, 3)) for x in range(32))
     registers['pc'] = (3 * 31, 3)
+    registers['ip'] = (3 * 31, 3)
     registers['ra'] = (3 * 30, 3)
     registers['st'] = (3 * 29, 3)
+    registers['sp'] = (3 * 29, 3)
 
     default_register_values = [
         ( 'sp', 0x3fffc00, True, 'global' ),     # the stack
