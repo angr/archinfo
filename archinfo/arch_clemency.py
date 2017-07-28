@@ -38,13 +38,46 @@ class ArchClemency(Arch):
 
     default_symbolic_registers = [ ]
 
-    register_names = {0 : 'r' + str(x) for x in range(32)}
+    register_names = {
+        0 : 'r0',
+        3 * 1: 'r1',
+        3 * 2: 'r2',
+        3 * 3: 'r3',
+        3 * 4: 'r4',
+        3 * 5: 'r5',
+        3 * 6: 'r6',
+        3 * 7: 'r7',
+        3 * 8: 'r8',
+        3 * 9: 'r9',
+        3 * 10: 'r10',
+        3 * 11: 'r11',
+        3 * 12: 'r12',
+        3 * 13: 'r13',
+        3 * 14: 'r14',
+        3 * 15: 'r15',
+        3 * 16: 'r16',
+        3 * 17: 'r17',
+        3 * 18: 'r18',
+        3 * 19: 'r19',
+        3 * 20: 'r20',
+        3 * 21: 'r21',
+        3 * 22: 'r22',
+        3 * 23: 'r23',
+        3 * 24: 'r24',
+        3 * 25: 'r25',
+        3 * 26: 'r26',
+        3 * 27: 'r27',
+        3 * 28: 'r28',
+        3 * 29: 'r29',
+    }
     register_names[3 * 31] = 'pc'
     register_names[3 * 31] = 'ip'
     register_names[3 * 30] = 'ra'
-    register_names[3 * 29] = 'st'
     register_names[3 * 29] = 'sp'
-    register_names[3 * 32] = 'fl'
+    register_names[3 * 41] = 'sf'
+    register_names[3 * 42] = 'of'
+    register_names[3 * 43] = 'cf'
+    register_names[3 * 44] = 'zf'
 
     registers = dict(('r' + str(x), (3*x, 3)) for x in range(32))
     registers['pc'] = (3 * 31, 3)
@@ -52,7 +85,19 @@ class ArchClemency(Arch):
     registers['ra'] = (3 * 30, 3)
     registers['st'] = (3 * 29, 3)
     registers['sp'] = (3 * 29, 3)
-    registers['fl'] = (3 * 32, 3)
+    # Data Sent Interrupt Enabled: 3 * 32
+    # Data Received Interrupt Enabled: 3 * 33
+    # Memory Exception Enabled: 3 * 34
+    # Divide by 0 Exception Enabled: 3 * 35
+    # Invalid Instruction Exception Enabled: 3 * 36
+    # Timer4 Interrupt Enabled: 3 * 37
+    # Timer3 Interrupt Enabled: 3 * 38
+    # Timer2 Interrupt Enabled: 3 * 39
+    # Timer1 Interrupt Enabled: 3 * 40
+    registers['sf'] = (3 * 41, 3)
+    registers['of'] = (3 * 42, 3)
+    registers['cf'] = (3 * 43, 3)
+    registers['zf'] = (3 * 44, 3)
 
     default_register_values = [
         ( 'sp', 0x3fffc00, True, 'global' ),     # the stack
