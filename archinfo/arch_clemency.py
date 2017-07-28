@@ -14,7 +14,7 @@ class ArchClemency(Arch):
         # TODO: Define function prologs
         self.qemu_name = 'clemency'
         self.bits = 27
-        self.name = "Clemency"
+        self.name = "clemency"
         self.ida_processor = 'clemency'
         self.max_inst_bytes = 6
         ip_offset = 93
@@ -36,23 +36,25 @@ class ArchClemency(Arch):
     # instruction_alignment = 4
     persistent_regs = [ ]
 
-    default_register_values = [
-        ( 'sp', Arch.initial_sp, True, 'global' ),   # the stack
-    ]
-    entry_register_values = {
-    }
-
     default_symbolic_registers = [ ]
 
     register_names = {0 : 'r' + str(x) for x in range(32)}
     register_names[3 * 31] = 'pc'
     register_names[3 * 30] = 'ra'
     register_names[3 * 29] = 'st'
+    register_names[3 * 32] = 'fl'
 
     registers = dict(('r' + str(x), (3*x, 3)) for x in range(32))
     registers['pc'] = (3 * 31, 3)
     registers['ra'] = (3 * 30, 3)
     registers['st'] = (3 * 29, 3)
+
+    default_register_values = [
+        ( 'sp', 0x3fffc00, True, 'global' ),     # the stack
+    ]
+    entry_register_values = [ ( 'r%d'%r, 0, False, 'global' ) for r in range(28) ] + [
+        ( 'sp', 0, True, 'global' ), ( 'ra', 0, True, 'global' ), ('fl', 0, True, 'global')
+    ]
 
     argument_registers = {
         registers['r0'][0],
