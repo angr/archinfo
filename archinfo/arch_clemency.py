@@ -105,7 +105,6 @@ class ArchClemency(Arch):
     entry_register_values = { 'r%d'%r: 0 for r in range(29) }
     entry_register_values['sp'] = 0
     entry_register_values['ra'] = 0
-    entry_register_values['fl'] = 0
 
     argument_registers = {
         registers['r0'][0],
