@@ -103,6 +103,7 @@ class ArchAMD64(Arch):
         ( 'fpround', 0, False, None ),
         ( 'ftop', 0, False, None ),
         ( 'fpu_tags', 0, False, None ),
+        ('cc_op', 0, False, None),  # Set cc_op to OP_COPY by default making cc_dep1 effectively the flags register
     ]
     entry_register_values = {
         'rax': 0x1c,
