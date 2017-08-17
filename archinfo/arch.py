@@ -471,6 +471,16 @@ def arch_from_id(ident, endness='any', bits=''):
     else:
         return cls(endness)
 
+
+class Endness:
+    """ Endness specifies the byte order for integer values
+
+    :cvar LE:      little endian, least significant byte is stored at lowest address
+    :cvar BE:      big endian, most significant byte is stored at lowest address 
+    """
+    LE = "Iend_LE"
+    BE = "Iend_BE"
+
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
