@@ -36,7 +36,7 @@ class ArchPPC32(Arch):
     linux_name = 'ppc750'   # ?
     triplet = 'powerpc-linux-gnu'
     max_inst_bytes = 4
-    ip_offset = 1160
+    ip_offset = 1168
     sp_offset = 20
     bp_offset = 140
     # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
