@@ -8,13 +8,13 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
 class ArchAMD64(Arch):
-    def __init__(self, endness='Iend_LE'):
-        if endness != 'Iend_LE':
+    def __init__(self, endness=Endness.LE):
+        if endness != Endness.LE:
             raise ArchError('Arch AMD64 must be little endian')
         super(ArchAMD64, self).__init__(endness)
 
@@ -72,8 +72,8 @@ class ArchAMD64(Arch):
     stack_change = -8
     initial_sp = 0x7ffffffffff0000
     call_sp_fix = -8
-    memory_endness = "Iend_LE"
-    register_endness = "Iend_LE"
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_X86
@@ -334,4 +334,4 @@ class ArchAMD64(Arch):
     elf_tls = TLSArchInfo(2, 704, [16], [8], [0], 0, 0)
 
 
-register_arch([r'.*amd64|.*x64|.*x86_64|.*metapc'], 64, 'Iend_LE', ArchAMD64)
+register_arch([r'.*amd64|.*x64|.*x86_64|.*metapc'], 64, Endness.LE, ArchAMD64)

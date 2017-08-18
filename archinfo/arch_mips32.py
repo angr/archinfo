@@ -8,16 +8,16 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 # FIXME: Tell fish to fix whatever he was storing in info['current_function']
 # TODO: Only persist t9 in PIC programs
 
 class ArchMIPS32(Arch):
-    def __init__(self, endness="Iend_BE"):
+    def __init__(self, endness=Endness.BE):
         super(ArchMIPS32, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
 
             self.function_prologs = {
                 r"\x27\xbd\xff[\x00-\xff]"                                          # addiu $sp, xxx
@@ -367,5 +367,5 @@ class ArchMIPS32(Arch):
     ld_linux_name = 'ld.so.1'
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0x7000, 0x8000)
 
-register_arch([r'mipsel|mipsle'], 32, 'Iend_LE' , ArchMIPS32)
+register_arch([r'mipsel|mipsle'], 32, Endness.LE , ArchMIPS32)
 register_arch([r'.*mips.*'], 32, 'any' , ArchMIPS32)

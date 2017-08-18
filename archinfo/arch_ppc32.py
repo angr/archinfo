@@ -8,7 +8,7 @@ except ImportError:
 #except ImportError:
 #   _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
@@ -16,9 +16,9 @@ from .tls import TLSArchInfo
 # Normally r1 is used as stack pointer
 
 class ArchPPC32(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchPPC32, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             self.function_prologs = {
                 # stwu r1, -off(r1); mflr r0
                 r"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6"
