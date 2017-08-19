@@ -22,6 +22,15 @@ import logging
 l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
 
+class Endness:
+    """ Endness specifies the byte order for integer values
+
+    :cvar LE:      little endian, least significant byte is stored at lowest address
+    :cvar BE:      big endian, most significant byte is stored at lowest address 
+    """
+    LE = "Iend_LE"
+    BE = "Iend_BE"
+
 class Arch(object):
     """
     A collection of information about a given architecture. This class should be subclasses for each different
@@ -471,15 +480,6 @@ def arch_from_id(ident, endness='any', bits=''):
     else:
         return cls(endness)
 
-
-class Endness:
-    """ Endness specifies the byte order for integer values
-
-    :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address 
-    """
-    LE = Endness.LE
-    BE = Endness.BE
 
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)
