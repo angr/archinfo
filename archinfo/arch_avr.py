@@ -1,7 +1,7 @@
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 
 class ArchAVR(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchAVR, self).__init__(endness)
 
         self.bits = 16
@@ -9,7 +9,7 @@ class ArchAVR(Arch):
         self.name = "AVR"
 
         # Things I did not want to include but were necessary unfortunately :-(
-        # self.cs_mode = capstone.CS_MODE_LITTLE_ENDIAN if endness == 'Iend_LE' else capstone.CS_MODE_BIG_ENDIAN
+        # self.cs_mode = capstone.CS_MODE_LITTLE_ENDIAN if endness == Endness.LE else capstone.CS_MODE_BIG_ENDIAN
         # END
 
         self.registers = {}
@@ -124,4 +124,4 @@ class ArchAVR(Arch):
 
         self.ip_offset = self.registers["pc"][0]
 
-register_arch(['avr.*|atiny.*|atmega.*|atmel.*'], 8, 'Iend_LE', ArchAVR)
+register_arch(['avr.*|atiny.*|atmega.*|atmel.*'], 8, Endness.LE, ArchAVR)

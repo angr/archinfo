@@ -22,6 +22,15 @@ import logging
 l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
 
+class Endness:
+    """ Endness specifies the byte order for integer values
+
+    :cvar LE:      little endian, least significant byte is stored at lowest address
+    :cvar BE:      big endian, most significant byte is stored at lowest address 
+    """
+    LE = "Iend_LE"
+    BE = "Iend_BE"
+
 class Arch(object):
     """
     A collection of information about a given architecture. This class should be subclasses for each different
@@ -77,16 +86,16 @@ class Arch(object):
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
     def __init__(self, endness):
-        if endness not in ('Iend_LE', 'Iend_BE'):
-            raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
+        if endness not in (Endness.LE, Endness.BE):
+            raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
 
         if _pyvex:
             self.vex_archinfo = _pyvex.default_vex_archinfo()
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             if self.vex_archinfo:
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
-            self.memory_endness = 'Iend_BE'
-            self.register_endness = 'Iend_BE'
+            self.memory_endness = Endness.BE
+            self.register_endness = Endness.BE
             if _capstone:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
@@ -107,7 +116,7 @@ class Arch(object):
 
         # unicorn specific stuff
         if self.uc_mode is not None:
-            if endness == 'Iend_BE':
+            if endness == Endness.BE:
                 self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
                 self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
             self.uc_regs = { }
@@ -184,7 +193,7 @@ class Arch(object):
         if size is None:
             size = self.bits
 
-        if self.memory_endness == "Iend_BE":
+        if self.memory_endness == Endness.BE:
             fmt += ">"
         else:
             fmt += "<"
@@ -307,8 +316,8 @@ class Arch(object):
 
     # memory stuff
     bits = None
-    memory_endness = 'Iend_LE'
-    register_endness = 'Iend_LE'
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     stack_change = None
 
     # is it safe to cache IRSBs?
@@ -379,7 +388,7 @@ def register_arch(regexes, bits, endness, my_arch):
     :type regexes: list
     :param bits: The canonical "bits" of this architecture, ex. 32 or 64
     :type bits: int
-    :param endness: The "endness" of this architecture.  Use "Iend_LE", "Iend_BE", or "any"
+    :param endness: The "endness" of this architecture.  Use Endness.LE, Endness.BE, or "any"
     :type endness: str
     :param Arch my_arch:
     :return: None
@@ -398,12 +407,12 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if not isinstance(endness,str):
-        if endness != "Iend_BE" and endness != "Iend_LE" and endness != "any":
-            raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', or 'any'")
+        if endness != Endness.BE and endness != Endness.LE and endness != "any":
+            raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
-        all_arches.append(my_arch('Iend_BE'))
-        all_arches.append(my_arch('Iend_LE'))
+        all_arches.append(my_arch(Endness.BE))
+        all_arches.append(my_arch(Endness.LE))
     else:
         all_arches.append(my_arch(endness))
 
@@ -425,17 +434,17 @@ def arch_from_id(ident, endness='any', bits=''):
 
     endness = endness.lower()
     if 'lit' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'big' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'lsb' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'msb' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'le' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'be' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'l' in endness:
         endness = 'unsure'
     elif 'b' in endness:
@@ -471,15 +480,6 @@ def arch_from_id(ident, endness='any', bits=''):
     else:
         return cls(endness)
 
-
-class Endness:
-    """ Endness specifies the byte order for integer values
-
-    :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address 
-    """
-    LE = "Iend_LE"
-    BE = "Iend_BE"
 
 def reverse_ends(string):
     ise = 'I'*(len(string)/4)
