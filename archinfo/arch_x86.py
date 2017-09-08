@@ -8,13 +8,13 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
 class ArchX86(Arch):
-    def __init__(self, endness='Iend_LE'):
-        if endness != 'Iend_LE':
+    def __init__(self, endness=Endness.LE):
+        if endness != Endness.LE:
             raise ArchError('Arch i386 must be little endian')
         super(ArchX86, self).__init__(endness)
         if self.vex_archinfo:
@@ -72,8 +72,8 @@ class ArchX86(Arch):
     syscall_num_offset = 8
     call_pushes_ret = True
     stack_change = -4
-    memory_endness = "Iend_LE"
-    register_endness = "Iend_LE"
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_X86
@@ -274,4 +274,4 @@ class ArchX86(Arch):
     ld_linux_name = 'ld-linux.so.2'
     elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0)
 
-register_arch([r'.*i?\d86|.*x32|.*x86|.*metapc'], 32, 'Iend_LE', ArchX86)
+register_arch([r'.*i?\d86|.*x32|.*x86|.*metapc'], 32, Endness.LE, ArchX86)

@@ -8,7 +8,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
@@ -16,9 +16,9 @@ from .tls import TLSArchInfo
 # TODO: which endianness should be default?
 
 class ArchARM(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchARM, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             self.function_prologs = {
                 r"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
                 r"\xe5\x2d\xe0\x04",                        # push {lr}
@@ -92,8 +92,8 @@ class ArchARM(Arch):
     syscall_num_offset = 36
     call_pushes_ret = False
     stack_change = -4
-    memory_endness = 'Iend_LE'
-    register_endness = 'Iend_LE'
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_ARM
@@ -307,6 +307,6 @@ class ArchARMEL(ArchARM):
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
 
 register_arch([r'.*armhf.*'], 32, 'any', ArchARMHF)
-register_arch([r'.*armeb|.*armbe'], 32, 'Iend_BE', ArchARM)
-register_arch([r'.*armel|arm.*'], 32, 'Iend_LE', ArchARMEL)
+register_arch([r'.*armeb|.*armbe'], 32, Endness.BE, ArchARM)
+register_arch([r'.*armel|arm.*'], 32, Endness.LE, ArchARMEL)
 register_arch([r'.*arm.*|.*thumb.*'], 32, 'any', ArchARM)
