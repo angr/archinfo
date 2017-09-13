@@ -104,7 +104,8 @@ class Arch(object):
 
         # generate regitster mapping (offset, size): name
         self.register_size_names = {}
-        for k, v in self.registers.iteritems():
+        for k in self.registers:
+            v = self.registers[k]
 
             # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
             if self.name in {'X86', 'AMD64'} and k in {'bp', 'sp', 'ip'}:
@@ -121,7 +122,7 @@ class Arch(object):
                 self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
             self.uc_regs = { }
             # map register names to unicorn const
-            for r in self.register_names.itervalues():
+            for r in self.register_names.values():
                 reg_name = self.uc_prefix + 'REG_' + r.upper()
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
@@ -216,7 +217,7 @@ class Arch(object):
         """
         The standard word size in bytes, calculated from the ``bits`` field
         """
-        return self.bits/8
+        return self.bits//8
 
     # e.g. sizeof['int'] = 4
     sizeof = {}
@@ -300,8 +301,8 @@ class Arch(object):
 
     # instruction stuff
     max_inst_bytes = None
-    ret_instruction = ''
-    nop_instruction = ''
+    ret_instruction = b''
+    nop_instruction = b''
     instruction_alignment = None
 
     # register ofsets
@@ -482,7 +483,7 @@ def arch_from_id(ident, endness='any', bits=''):
 
 
 def reverse_ends(string):
-    ise = 'I'*(len(string)/4)
+    ise = 'I'*(len(string)//4)
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
 
 def get_host_arch():

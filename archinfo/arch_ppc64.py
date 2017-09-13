@@ -52,8 +52,8 @@ class ArchPPC64(Arch):
     # unicorn not supported
     #uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     #uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
-    ret_instruction = "\x20\x00\x80\x4e"
-    nop_instruction = "\x00\x00\x00\x60"
+    ret_instruction = b"\x20\x00\x80\x4e"
+    nop_instruction = b"\x00\x00\x00\x60"
     instruction_alignment = 4
     persistent_regs = [ 'r2' ]
 
