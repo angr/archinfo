@@ -278,6 +278,12 @@ class Arch(object):
         except KeyError:
             return str(offset)
 
+    def get_register_offset(self, name):
+        try:
+            return self.registers[name][0]
+        except:
+            raise ValueError("Register %s does not exist!" % name)
+
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
     def library_search_path(self, pedantic=False):
         """
