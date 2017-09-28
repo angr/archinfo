@@ -85,9 +85,11 @@ class Arch(object):
     :ivar list lib_paths: A listing of common locations where shared libraries for this architecture may be found
     :ivar str got_section_name: The name of the GOT section in ELFs
     :ivar str ld_linux_name: The name of the linux dynamic loader program
-    :ivar int byte_width: the number of bits in a byte.
+    :cvar int byte_width: the number of bits in a byte.
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
+    byte_width = 8
+
     def __init__(self, endness):
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
             raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
@@ -130,7 +132,6 @@ class Arch(object):
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
-        self.byte_width = 8
 
     def copy(self):
         """
