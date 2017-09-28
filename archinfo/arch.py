@@ -27,9 +27,11 @@ class Endness:
 
     :cvar LE:      little endian, least significant byte is stored at lowest address
     :cvar BE:      big endian, most significant byte is stored at lowest address 
+    :cvar ME:      Middle-endian. Yep.
     """
     LE = "Iend_LE"
     BE = "Iend_BE"
+    ME = 'Iend_ME'
 
 class Arch(object):
     """
@@ -83,10 +85,13 @@ class Arch(object):
     :ivar list lib_paths: A listing of common locations where shared libraries for this architecture may be found
     :ivar str got_section_name: The name of the GOT section in ELFs
     :ivar str ld_linux_name: The name of the linux dynamic loader program
+    :cvar int byte_width: the number of bits in a byte.
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
+    byte_width = 8
+
     def __init__(self, endness):
-        if endness not in (Endness.LE, Endness.BE):
+        if endness not in (Endness.LE, Endness.BE, Endness.ME):
             raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
 
         if _pyvex:
@@ -126,6 +131,7 @@ class Arch(object):
                 reg_name = self.uc_prefix + 'REG_' + r.upper()
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
+
 
     def copy(self):
         """
@@ -212,12 +218,14 @@ class Arch(object):
 
         return fmt
 
+
+
     @property
     def bytes(self):
         """
         The standard word size in bytes, calculated from the ``bits`` field
         """
-        return self.bits//8
+        return self.bits // self.byte_width
 
     # e.g. sizeof['int'] = 4
     sizeof = {}
@@ -271,6 +279,12 @@ class Arch(object):
             return self.register_names[offset]
         except KeyError:
             return str(offset)
+
+    def get_register_offset(self, name):
+        try:
+            return self.registers[name][0]
+        except:
+            raise ValueError("Register %s does not exist!" % name)
 
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
     def library_search_path(self, pedantic=False):
