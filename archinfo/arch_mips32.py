@@ -24,7 +24,7 @@ class ArchMIPS32(Arch):
                 r"\x3c\x1c[\x00-\xff][\x00-\xff]\x9c\x27[\x00-\xff][\x00-\xff]"     # lui $gp, xxx; addiu $gp, $gp, xxxx
             }
             self.function_epilogs = {
-                r"\x8f\xbf[\x00-\xff]{2}([\x00-\xff]{4}){0,4}\x03\xe0\x00\x08"      # lw ra, off(sp); ... ; jr ra
+                br"\x8f\xbf[\x00-\xff]{2}([\x00-\xff]{4}){0,4}\x03\xe0\x00\x08"      # lw ra, off(sp); ... ; jr ra
             }
             self.qemu_name = 'mips'
             self.triplet = 'mips-linux-gnu'
@@ -63,8 +63,8 @@ class ArchMIPS32(Arch):
         r"[\x00-\xff]{2}\xbf\x8f([\x00-\xff]{4}){0,4}\x08\x00\xe0\x03"      # lw ra, off(sp); ... ; jr ra
     }
 
-    ret_instruction = "\x08\x00\xE0\x03" + "\x25\x08\x20\x00"
-    nop_instruction = "\x00\x00\x00\x00"
+    ret_instruction = b"\x08\x00\xE0\x03" + b"\x25\x08\x20\x00"
+    nop_instruction = b"\x00\x00\x00\x00"
     instruction_alignment = 4
     persistent_regs = ['gp', 'ra', 't9']
 

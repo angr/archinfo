@@ -92,8 +92,8 @@ class ArchAMD64(Arch):
         r"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; retq
         r"\x48[\x83,\x81]\xc4([\x00-\xff]{1}|[\x00-\xff]{4})\xc3", #  add rsp, <siz>; retq
     }
-    ret_instruction = "\xc3"
-    nop_instruction = "\x90"
+    ret_instruction = b"\xc3"
+    nop_instruction = b"\x90"
     instruction_alignment = 1
     default_register_values = [
         ( 'd', 1, False, None ),
