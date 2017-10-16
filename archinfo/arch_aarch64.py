@@ -8,13 +8,13 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 class ArchAArch64(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchAArch64, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             self.ida_processor = 'armb'
             self.function_prologs = set((
                 # TODO
@@ -40,8 +40,8 @@ class ArchAArch64(Arch):
     syscall_num_offset = 80
     call_pushes_ret = False
     stack_change = -8
-    memory_endness = 'Iend_LE'
-    register_endness = 'Iend_LE'
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_ARM64
@@ -52,8 +52,8 @@ class ArchAArch64(Arch):
     uc_prefix = "UC_ARM64_" if _unicorn else None
     initial_sp = 0x7ffffffffff0000
 
-    ret_instruction = "\xC0\x03\x5F\xD6"    # ret
-    nop_instruction = "\x1F\x20\x03\xD5"    # nop
+    ret_instruction = b"\xC0\x03\x5F\xD6"    # ret
+    nop_instruction = b"\x1F\x20\x03\xD5"    # nop
     function_prologs = set((
         #r"\xFD\x7B\xBE\xA9\xFD\x03\x00\x91"
         # TODO

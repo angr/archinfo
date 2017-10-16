@@ -8,7 +8,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
@@ -16,16 +16,16 @@ from .tls import TLSArchInfo
 # TODO: which endianness should be default?
 
 class ArchARM(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchARM, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             self.function_prologs = {
-                r"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
-                r"\xe5\x2d\xe0\x04",                        # push {lr}
+                br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
+                br"\xe5\x2d\xe0\x04",                        # push {lr}
             }
             self.function_epilogs = {
-                r"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
-                r"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
+                br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
+                br"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
             }
 
     # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
@@ -92,8 +92,8 @@ class ArchARM(Arch):
     syscall_num_offset = 36
     call_pushes_ret = False
     stack_change = -4
-    memory_endness = 'Iend_LE'
-    register_endness = 'Iend_LE'
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_ARM
@@ -103,16 +103,16 @@ class ArchARM(Arch):
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_const = _unicorn.arm_const if _unicorn else None
     uc_prefix = "UC_ARM_" if _unicorn else None
-    #self.ret_instruction = "\x0E\xF0\xA0\xE1" # this is mov pc, lr
-    ret_instruction = "\x1E\xFF\x2F\xE1" # this is bx lr
-    nop_instruction = "\x00\x00\x00\x00"
+    #self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
+    ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
+    nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
-        r"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
-        r"\x04\xe0\x2d\xe5",                        # push {lr}
+        br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
+        br"\x04\xe0\x2d\xe5",                        # push {lr}
     }
     function_epilogs = {
-        r"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
-        r"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
+        br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
+        br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
     }
     instruction_alignment = 2  # cuz there is also thumb mode
     concretize_unique_registers = {64}
@@ -307,6 +307,6 @@ class ArchARMEL(ArchARM):
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
 
 register_arch([r'.*armhf.*'], 32, 'any', ArchARMHF)
-register_arch([r'.*armeb|.*armbe'], 32, 'Iend_BE', ArchARM)
-register_arch([r'.*armel|arm.*'], 32, 'Iend_LE', ArchARMEL)
+register_arch([r'.*armeb|.*armbe'], 32, Endness.BE, ArchARM)
+register_arch([r'.*armel|arm.*'], 32, Endness.LE, ArchARMEL)
 register_arch([r'.*arm.*|.*thumb.*'], 32, 'any', ArchARM)

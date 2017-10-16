@@ -8,13 +8,13 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
 class ArchAMD64(Arch):
-    def __init__(self, endness='Iend_LE'):
-        if endness != 'Iend_LE':
+    def __init__(self, endness=Endness.LE):
+        if endness != Endness.LE:
             raise ArchError('Arch AMD64 must be little endian')
         super(ArchAMD64, self).__init__(endness)
 
@@ -72,8 +72,8 @@ class ArchAMD64(Arch):
     stack_change = -8
     initial_sp = 0x7ffffffffff0000
     call_sp_fix = -8
-    memory_endness = "Iend_LE"
-    register_endness = "Iend_LE"
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_X86
@@ -92,8 +92,8 @@ class ArchAMD64(Arch):
         r"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; retq
         r"\x48[\x83,\x81]\xc4([\x00-\xff]{1}|[\x00-\xff]{4})\xc3", #  add rsp, <siz>; retq
     }
-    ret_instruction = "\xc3"
-    nop_instruction = "\x90"
+    ret_instruction = b"\xc3"
+    nop_instruction = b"\x90"
     instruction_alignment = 1
     default_register_values = [
         ( 'd', 1, False, None ),
@@ -273,13 +273,13 @@ class ArchAMD64(Arch):
         'ymm16': (736, 32),
         'ftop': (768, 4),
         'mm0': (776, 8),
-        'mm1': (777, 8),
-        'mm2': (778, 8),
-        'mm3': (779, 8),
-        'mm4': (780, 8),
-        'mm5': (781, 8),
-        'mm6': (782, 8),
-        'mm7': (783, 8),
+        'mm1': (784, 8),
+        'mm2': (792, 8),
+        'mm3': (800, 8),
+        'mm4': (808, 8),
+        'mm5': (816, 8),
+        'mm6': (824, 8),
+        'mm7': (832, 8),
         'fpreg': (776, 64),
         'fpu_regs': (776, 64),
         'fptag': (840, 8),
@@ -324,7 +324,7 @@ class ArchAMD64(Arch):
         registers['xmm6'][0]: 6,
         registers['xmm7'][0]: 7
     }
-    
+
     symbol_type_translation = {
         10: 'STT_GNU_IFUNC',
         'STT_LOOS': 'STT_GNU_IFUNC'
@@ -334,4 +334,4 @@ class ArchAMD64(Arch):
     elf_tls = TLSArchInfo(2, 704, [16], [8], [0], 0, 0)
 
 
-register_arch([r'.*amd64|.*x64|.*x86_64|.*metapc'], 64, 'Iend_LE', ArchAMD64)
+register_arch([r'.*amd64|.*x64|.*x86_64|.*metapc'], 64, Endness.LE, ArchAMD64)

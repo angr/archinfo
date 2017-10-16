@@ -22,6 +22,17 @@ import logging
 l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
 
+class Endness:
+    """ Endness specifies the byte order for integer values
+
+    :cvar LE:      little endian, least significant byte is stored at lowest address
+    :cvar BE:      big endian, most significant byte is stored at lowest address 
+    :cvar ME:      Middle-endian. Yep.
+    """
+    LE = "Iend_LE"
+    BE = "Iend_BE"
+    ME = 'Iend_ME'
+
 class Arch(object):
     """
     A collection of information about a given architecture. This class should be subclasses for each different
@@ -74,19 +85,22 @@ class Arch(object):
     :ivar list lib_paths: A listing of common locations where shared libraries for this architecture may be found
     :ivar str got_section_name: The name of the GOT section in ELFs
     :ivar str ld_linux_name: The name of the linux dynamic loader program
+    :cvar int byte_width: the number of bits in a byte.
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
+    byte_width = 8
+
     def __init__(self, endness):
-        if endness not in ('Iend_LE', 'Iend_BE'):
-            raise ArchError('Must pass a valid VEX endness: "Iend_LE" or "Iend_BE"')
+        if endness not in (Endness.LE, Endness.BE, Endness.ME):
+            raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
 
         if _pyvex:
             self.vex_archinfo = _pyvex.default_vex_archinfo()
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             if self.vex_archinfo:
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
-            self.memory_endness = 'Iend_BE'
-            self.register_endness = 'Iend_BE'
+            self.memory_endness = Endness.BE
+            self.register_endness = Endness.BE
             if _capstone:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
@@ -95,7 +109,8 @@ class Arch(object):
 
         # generate regitster mapping (offset, size): name
         self.register_size_names = {}
-        for k, v in self.registers.iteritems():
+        for k in self.registers:
+            v = self.registers[k]
 
             # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
             if self.name in {'X86', 'AMD64'} and k in {'bp', 'sp', 'ip'}:
@@ -107,15 +122,16 @@ class Arch(object):
 
         # unicorn specific stuff
         if self.uc_mode is not None:
-            if endness == 'Iend_BE':
+            if endness == Endness.BE:
                 self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
                 self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
             self.uc_regs = { }
             # map register names to unicorn const
-            for r in self.register_names.itervalues():
+            for r in self.register_names.values():
                 reg_name = self.uc_prefix + 'REG_' + r.upper()
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
+
 
     def copy(self):
         """
@@ -184,7 +200,7 @@ class Arch(object):
         if size is None:
             size = self.bits
 
-        if self.memory_endness == "Iend_BE":
+        if self.memory_endness == Endness.BE:
             fmt += ">"
         else:
             fmt += "<"
@@ -202,12 +218,14 @@ class Arch(object):
 
         return fmt
 
+
+
     @property
     def bytes(self):
         """
         The standard word size in bytes, calculated from the ``bits`` field
         """
-        return self.bits/8
+        return self.bits // self.byte_width
 
     # e.g. sizeof['int'] = 4
     sizeof = {}
@@ -262,6 +280,12 @@ class Arch(object):
         except KeyError:
             return str(offset)
 
+    def get_register_offset(self, name):
+        try:
+            return self.registers[name][0]
+        except:
+            raise ValueError("Register %s does not exist!" % name)
+
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
     def library_search_path(self, pedantic=False):
         """
@@ -291,8 +315,8 @@ class Arch(object):
 
     # instruction stuff
     max_inst_bytes = None
-    ret_instruction = ''
-    nop_instruction = ''
+    ret_instruction = b''
+    nop_instruction = b''
     instruction_alignment = None
 
     # register ofsets
@@ -307,8 +331,8 @@ class Arch(object):
 
     # memory stuff
     bits = None
-    memory_endness = 'Iend_LE'
-    register_endness = 'Iend_LE'
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
     stack_change = None
 
     # is it safe to cache IRSBs?
@@ -379,7 +403,7 @@ def register_arch(regexes, bits, endness, my_arch):
     :type regexes: list
     :param bits: The canonical "bits" of this architecture, ex. 32 or 64
     :type bits: int
-    :param endness: The "endness" of this architecture.  Use "Iend_LE", "Iend_BE", or "any"
+    :param endness: The "endness" of this architecture.  Use Endness.LE, Endness.BE, or "any"
     :type endness: str
     :param Arch my_arch:
     :return: None
@@ -398,12 +422,12 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if not isinstance(endness,str):
-        if endness != "Iend_BE" and endness != "Iend_LE" and endness != "any":
-            raise TypeError("Endness must be 'Iend_BE', 'Iend_LE', or 'any'")
+        if endness != Endness.BE and endness != Endness.LE and endness != "any":
+            raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
-        all_arches.append(my_arch('Iend_BE'))
-        all_arches.append(my_arch('Iend_LE'))
+        all_arches.append(my_arch(Endness.BE))
+        all_arches.append(my_arch(Endness.LE))
     else:
         all_arches.append(my_arch(endness))
 
@@ -425,17 +449,17 @@ def arch_from_id(ident, endness='any', bits=''):
 
     endness = endness.lower()
     if 'lit' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'big' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'lsb' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'msb' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'le' in endness:
-        endness = 'Iend_LE'
+        endness = Endness.LE
     elif 'be' in endness:
-        endness = 'Iend_BE'
+        endness = Endness.BE
     elif 'l' in endness:
         endness = 'unsure'
     elif 'b' in endness:
@@ -472,17 +496,8 @@ def arch_from_id(ident, endness='any', bits=''):
         return cls(endness)
 
 
-class Endness:
-    """ Endness specifies the byte order for integer values
-
-    :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address 
-    """
-    LE = "Iend_LE"
-    BE = "Iend_BE"
-
 def reverse_ends(string):
-    ise = 'I'*(len(string)/4)
+    ise = 'I'*(len(string)//4)
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
 
 def get_host_arch():

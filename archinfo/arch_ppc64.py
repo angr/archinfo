@@ -8,16 +8,16 @@ except ImportError:
 #except ImportError:
 #    _unicorn = None
 
-from .arch import Arch, register_arch
+from .arch import Arch, register_arch, Endness
 from .tls import TLSArchInfo
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # Normally r1 is used as stack pointer
 
 class ArchPPC64(Arch):
-    def __init__(self, endness="Iend_LE"):
+    def __init__(self, endness=Endness.LE):
         super(ArchPPC64, self).__init__(endness)
-        if endness == 'Iend_BE':
+        if endness == Endness.BE:
             self.function_prologs = {
                 r"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6",                        # stwu r1, -off(r1); mflr r0
                 r"(?!\x94\x21[\x00-\xff]{2})\x7c\x08\x02\xa6",                    # mflr r0
@@ -52,8 +52,8 @@ class ArchPPC64(Arch):
     # unicorn not supported
     #uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     #uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
-    ret_instruction = "\x20\x00\x80\x4e"
-    nop_instruction = "\x00\x00\x00\x60"
+    ret_instruction = b"\x20\x00\x80\x4e"
+    nop_instruction = b"\x00\x00\x00\x60"
     instruction_alignment = 4
     persistent_regs = [ 'r2' ]
 
