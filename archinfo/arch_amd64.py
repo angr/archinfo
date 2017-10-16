@@ -273,13 +273,13 @@ class ArchAMD64(Arch):
         'ymm16': (736, 32),
         'ftop': (768, 4),
         'mm0': (776, 8),
-        'mm1': (777, 8),
-        'mm2': (778, 8),
-        'mm3': (779, 8),
-        'mm4': (780, 8),
-        'mm5': (781, 8),
-        'mm6': (782, 8),
-        'mm7': (783, 8),
+        'mm1': (784, 8),
+        'mm2': (792, 8),
+        'mm3': (800, 8),
+        'mm4': (808, 8),
+        'mm5': (816, 8),
+        'mm6': (824, 8),
+        'mm7': (832, 8),
         'fpreg': (776, 64),
         'fpu_regs': (776, 64),
         'fptag': (840, 8),
@@ -324,7 +324,7 @@ class ArchAMD64(Arch):
         registers['xmm6'][0]: 6,
         registers['xmm7'][0]: 7
     }
-    
+
     symbol_type_translation = {
         10: 'STT_GNU_IFUNC',
         'STT_LOOS': 'STT_GNU_IFUNC'
