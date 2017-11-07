@@ -62,6 +62,10 @@ class Arch(object):
     :ivar int stack_change: The change to the stack pointer caused by a push instruction
     :ivar str memory_endness: The endness of memory, as a VEX enum
     :ivar str register_endness: The endness of registers, as a VEX enum. Should usually be same as above
+    :ivar str instruction_endness: The endness of instructions stored in memory.
+        In other words, this controls whether instructions are stored endian-flipped compared to their description
+        in the ISA manual, and should be flipped when lifted. Iend_BE means "don't flip"
+        NOTE: Only used for non-libVEX lifters.
     :ivar dict sizeof: A mapping from C type to variable size in bits
     :ivar cs_arch: The capstone arch value for this arch
     :ivar cs_mode: The capstone mode value for this arch
@@ -89,6 +93,7 @@ class Arch(object):
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
     byte_width = 8
+    instruction_endness = "Iend_BE"
 
     def __init__(self, endness):
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
