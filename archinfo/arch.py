@@ -101,7 +101,7 @@ class Arch(object):
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
             self.memory_endness = Endness.BE
             self.register_endness = Endness.BE
-            if _capstone:
+            if _capstone and self.cs_mode is not None:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
             self.ret_instruction = reverse_ends(self.ret_instruction)
