@@ -22,6 +22,7 @@ import logging
 l = logging.getLogger('archinfo.arch')
 l.addHandler(logging.NullHandler())
 
+
 class Endness:
     """ Endness specifies the byte order for integer values
 
@@ -32,6 +33,7 @@ class Endness:
     LE = "Iend_LE"
     BE = "Iend_BE"
     ME = 'Iend_ME'
+
 
 class Arch(object):
     """
@@ -96,11 +98,15 @@ class Arch(object):
     instruction_endness = "Iend_BE"
 
     def __init__(self, endness):
-        if endness not in (Endness.LE, Endness.BE, Endness.ME):
-            raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
+        if self.vex_support:
+            if endness not in (Endness.LE, Endness.BE, Endness.ME):
+                raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
 
-        if _pyvex:
-            self.vex_archinfo = _pyvex.default_vex_archinfo()
+            if _pyvex:
+                self.vex_archinfo = _pyvex.default_vex_archinfo()
+        else:
+            self._vex_archinfo = None
+
         if endness == Endness.BE:
             if self.vex_archinfo:
                 self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
@@ -112,7 +118,7 @@ class Arch(object):
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
-        # generate regitster mapping (offset, size): name
+        # generate register mapping (offset, size): name
         self.register_size_names = {}
         for k in self.registers:
             v = self.registers[k]
@@ -310,6 +316,13 @@ class Arch(object):
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
         return map(subfunc, path)
 
+    vex_support = True
+    unicorn_support = True
+    address_types = (int, long)
+    function_address_types = (int, long)
+    supported_register_types = { 'SimSymbolicMemory', 'SimFastMemory' }
+    supported_memory_types = { 'SimSymbolicMemory', 'SimFastMemory', 'SimAbstractMemory' }
+
     # various names
     name = None
     vex_arch = None
@@ -397,6 +410,7 @@ arch_id_map = []
 
 all_arches = []
 
+
 def register_arch(regexes, bits, endness, my_arch):
     """
     Register a new architecture.
@@ -408,9 +422,10 @@ def register_arch(regexes, bits, endness, my_arch):
     :type regexes: list
     :param bits: The canonical "bits" of this architecture, ex. 32 or 64
     :type bits: int
-    :param endness: The "endness" of this architecture.  Use Endness.LE, Endness.BE, or "any"
-    :type endness: str
-    :param Arch my_arch:
+    :param endness: The "endness" of this architecture.  Use Endness.LE, Endness.BE, Endness.ME, "any", or None if the
+                    architecture has no intrinsic endianness.
+    :type endness: str or None
+    :param class my_arch:
     :return: None
     """
     if not isinstance(regexes, list):
@@ -426,8 +441,8 @@ def register_arch(regexes, bits, endness, my_arch):
     #    raise TypeError("Arch must be a subclass of archinfo.Arch")
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
-    if not isinstance(endness,str):
-        if endness != Endness.BE and endness != Endness.LE and endness != "any":
+    if endness is not None:
+        if endness != Endness.BE and endness != Endness.LE and endness != Endness.ME and endness != "any":
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
