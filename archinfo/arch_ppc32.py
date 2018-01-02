@@ -491,4 +491,5 @@ class ArchPPC32(Arch):
     ld_linux_name = 'ld.so.1'
     elf_tls = TLSArchInfo(1, 52, [], [48], [], 0x7000, 0x8000)
 
+register_arch([r'.*p\w*pc.*be'], 32, 'Iend_BE', ArchPPC32)
 register_arch([r'.*p\w*pc.*'], 32, 'any', ArchPPC32)
