@@ -337,8 +337,6 @@ class Arch(object):
 
     address_types = (int, long)
     function_address_types = (int, long)
-    supported_register_types = { 'SimSymbolicMemory', 'SimFastMemory' }
-    supported_memory_types = { 'SimSymbolicMemory', 'SimFastMemory', 'SimAbstractMemory' }
 
     # various names
     name = None
