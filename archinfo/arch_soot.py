@@ -87,8 +87,8 @@ class ArchSoot(Arch):
 
         super(ArchSoot, self).__init__(None)
 
-    vex_support = False
-    unicorn_support = False
+    vex_arch = None  # No VEX support
+    qemu_name = None  # No Qemu/Unicorn-engine support
     bits = 64
     address_types = (SootAddressDescriptor, )
     function_address_types = (SootMethodDescriptor, )

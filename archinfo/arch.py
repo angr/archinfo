@@ -311,8 +311,29 @@ class Arch(object):
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
         return map(subfunc, path)
 
-    vex_support = True
-    unicorn_support = True
+    @property
+    def vex_support(self):
+        """
+        Whether the architecture is supported by VEX or not.
+
+        :return: True if this Arch is supported by VEX, False otherwise.
+        :rtype:  bool
+        """
+
+        return self.vex_arch is not None
+
+    @property
+    def unicorn_support(self):
+        """
+        Whether the architecture is supported by Unicorn engine or not,
+
+        :return: True if this Arch is supported by the Unicorn engine, False otherwise.
+        :rtype:  bool
+        """
+
+        return self.qemu_name is not None
+
+
     address_types = (int, long)
     function_address_types = (int, long)
     supported_register_types = { 'SimSymbolicMemory', 'SimFastMemory' }
