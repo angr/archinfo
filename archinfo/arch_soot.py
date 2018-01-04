@@ -94,8 +94,6 @@ class ArchSoot(Arch):
     bits = 64
     address_types = (SootAddressDescriptor, )
     function_address_types = (SootMethodDescriptor, )
-    supported_register_types = { 'SimKeyValueMemory' }
-    supported_memory_types = { 'SimJavaVmMemory' }
 
     name = 'Soot'
 
