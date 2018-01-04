@@ -93,10 +93,11 @@ class Arch(object):
     byte_width = 8
 
     def __init__(self, endness):
-        if self.vex_support:
-            if endness not in (Endness.LE, Endness.BE, Endness.ME):
-                raise ArchError('Must pass a valid VEX endness: Endness.LE or Endness.BE')
 
+        if endness not in (Endness.LE, Endness.BE, Endness.ME):
+            raise ArchError('Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME')
+
+        if self.vex_support:
             if _pyvex:
                 self.vex_archinfo = _pyvex.default_vex_archinfo()
         else:
