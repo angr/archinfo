@@ -83,9 +83,11 @@ class SootAddressDescriptor(object):
 
 
 class ArchSoot(Arch):
-    def __init__(self, endness):  # pylint:disable=unused-args
+    def __init__(self, endness=Endness.BE):  # pylint:disable=unused-args
 
-        super(ArchSoot, self).__init__(None)
+        assert endness == Endness.BE
+
+        super(ArchSoot, self).__init__(Endness.BE)
 
     vex_arch = None  # No VEX support
     qemu_name = None  # No Qemu/Unicorn-engine support
