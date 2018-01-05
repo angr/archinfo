@@ -150,7 +150,7 @@ class Arch(object):
         Produce a copy of this instance of this arch.
         """
         new_arch = type(self)(self.memory_endness)
-        new_arch.vex_archinfo = self.vex_archinfo.copy()
+        new_arch.vex_archinfo = self.vex_archinfo.copy() if self.vex_archinfo is not None else None
 
         return new_arch
 
