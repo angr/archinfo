@@ -98,4 +98,4 @@ class ArchSoot(Arch):
     name = 'Soot'
 
 
-register_arch(['soot'], 8, None, ArchSoot)
+register_arch(['soot'], 8, Endness.BE, ArchSoot)
