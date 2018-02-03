@@ -82,6 +82,14 @@ class SootAddressDescriptor(object):
         return False
 
 
+class SootAddressTerminator(SootAddressDescriptor):
+    def __init__(self):
+        super(SootAddressTerminator, self).__init__(SootMethodDescriptor("dummy", "dummy", tuple()), 0, 0)
+
+    def __repr__(self):
+        return "<Terminator>"
+
+
 class ArchSoot(Arch):
     def __init__(self, endness=Endness.BE):  # pylint:disable=unused-args
 
