@@ -339,6 +339,16 @@ class Arch(object):
 
         return self.qemu_name is not None
 
+    @property
+    def capstone_support(self):
+        """
+        Whether the architecture is supported by the Capstone engine or not.
+
+        :return: True if this Arch is supported by the Capstone engine, False Otherwise.
+        :rtype:  bool
+        """
+
+        return self.cs_arch is not None
 
     address_types = (int, long)
     function_address_types = (int, long)
