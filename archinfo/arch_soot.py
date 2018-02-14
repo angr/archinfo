@@ -66,10 +66,28 @@ class SootAddressDescriptor(object):
         return hash((self.method, self.stmt_idx))
 
     def __eq__(self, other):
+        # We do not compare the block IDs since statement IDs are unique enough
         return isinstance(other, SootAddressDescriptor) and \
                 self.method == other.method and \
-                self.block_idx == other.block_idx and \
                 self.stmt_idx == other.stmt_idx
+
+    def __lt__(self, other):
+        if not isinstance(other, SootAddressDescriptor):
+            raise TypeError("You cannot compare a SootAddressDescriptor with a %s." % type(other))
+
+        if self.method != other.method:
+            raise ValueError("You cannot compare two SootAddressDescriptor instances of two different methods.")
+
+        return self.stmt_idx < other.stmt_idx
+
+    def __le__(self, other):
+        if not isinstance(other, SootAddressDescriptor):
+            raise TypeError("You cannot compare a SootAddressDescriptor with a %s." % type(other))
+
+        if self.method != other.method:
+            raise ValueError("You cannot compare two SootAddressDescriptor instances of two different methods.")
+
+        return self.stmt_idx <= other.stmt_idx
 
     def copy(self):
         return SootAddressDescriptor(method=self.method,
@@ -80,6 +98,15 @@ class SootAddressDescriptor(object):
     @property
     def symbolic(self):
         return False
+
+    def __add__(self, stmts_offset):
+
+        if not isinstance(stmts_offset, (int, long)):
+            raise TypeError('The stmts_offset must be an int or a long.')
+
+        s = self.copy()
+        s.stmt_idx += stmts_offset
+        return s
 
 
 class SootAddressTerminator(SootAddressDescriptor):
