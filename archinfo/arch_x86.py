@@ -269,6 +269,10 @@ class ArchX86(Arch):
                            registers['esi'][0],
                            registers['edi'][0] }
 
+    symbol_type_translation = {
+        10: 'STT_GNU_IFUNC',
+        'STT_LOOS': 'STT_GNU_IFUNC'
+    }
     lib_paths = ['/lib32', '/usr/lib32']
     got_section_name = '.got.plt'
     ld_linux_name = 'ld-linux.so.2'
