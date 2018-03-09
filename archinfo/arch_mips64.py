@@ -1,11 +1,23 @@
+import logging
+
+l = logging.getLogger("archinfo.arch_mips64")
+
 try:
     import capstone as _capstone
 except ImportError:
+    l.warning("Unable to import Capstone...")
     _capstone = None
+
+try:
+    import keystone as _keystone
+except ImportError:
+    l.warning("Unable to import Keystone...")
+    _keystone = None
 
 try:
     import unicorn as _unicorn
 except ImportError:
+    l.warning("Unable to import Unicorn...")
     _unicorn = None
 
 from .arch import Arch, register_arch, Endness
@@ -46,6 +58,9 @@ class ArchMIPS64(Arch):
     if _capstone:
         cs_arch = _capstone.CS_ARCH_MIPS
         cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
+    if _keystone:
+        ks_arch = _keystone.KS_ARCH_MIPS
+        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.mips_const if _unicorn else None

@@ -1,11 +1,23 @@
+import logging
+
+l = logging.getLogger("archinfo.arch_arm")
+
 try:
     import capstone as _capstone
 except ImportError:
+    l.warning("Unable to import Capstone...")
     _capstone = None
+
+try:
+    import keystone as _keystone
+except ImportError:
+    l.warning("Unable to import Keystone...")
+    _keystone = None
 
 try:
     import unicorn as _unicorn
 except ImportError:
+    l.warning("Unable to import Unicorn...")
     _unicorn = None
 
 from .arch import Arch, register_arch, Endness
@@ -44,6 +56,7 @@ class ArchARM(Arch):
     def __getstate__(self):
         self._cs = None
         self._cs_thumb = None
+        self._ks = None
         return self.__dict__
 
     def __setstate__(self, data):
@@ -52,7 +65,7 @@ class ArchARM(Arch):
     @property
     def capstone(self):
         if self.cs_arch is None:
-            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
+            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_ARM)
             self._cs.detail = True
@@ -61,11 +74,23 @@ class ArchARM(Arch):
     @property
     def capstone_thumb(self):
         if self.cs_arch is None:
-            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
+            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs_thumb is None:
             self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
             self._cs_thumb.detail = True
         return self._cs_thumb
+
+    def asm(self, string, addr=0, as_bytes=False, thumb=False):
+        if self.ks_arch is None:
+            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
+        if self._ks is None:
+            if thumb:
+                self.ks_mode += _keystone.KS_MODE_THUMB
+            else:
+                self.ks_mode += _keystone.KS_MODE_ARM
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+        encoding, count = self._ks.asm(string, addr, as_bytes)
+        return encoding
 
     @property
     def unicorn(self):
@@ -99,6 +124,9 @@ class ArchARM(Arch):
         cs_arch = _capstone.CS_ARCH_ARM
         cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     _cs_thumb = None
+    if _keystone:
+        ks_arch = _keystone.KS_ARCH_ARM
+        ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_const = _unicorn.arm_const if _unicorn else None
