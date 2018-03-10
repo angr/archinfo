@@ -5,19 +5,16 @@ l = logging.getLogger("archinfo.arch_amd64")
 try:
     import capstone as _capstone
 except ImportError:
-    l.warning("Unable to import Capstone...")
     _capstone = None
 
 try:
     import keystone as _keystone
 except ImportError:
-    l.warning("Unable to import Keystone...")
     _keystone = None
 
 try:
     import unicorn as _unicorn
 except ImportError:
-    l.warning("Unable to import Unicorn...")
     _unicorn = None
 
 from .arch import Arch, register_arch, Endness
@@ -32,6 +29,9 @@ class ArchAMD64(Arch):
 
     @property
     def capstone(self):
+        if _capstone is None:
+            l.warning("Capstone is not found!")
+            return None
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
@@ -94,6 +94,9 @@ class ArchAMD64(Arch):
             self.keystone_x86_syntax = new_syntax
 
     def asm(self, string, addr=0, as_bytes=False, thumb=False):
+        if _keystone is None:
+            l.warning("Keystone is not found!")
+            return None
         if self.ks_arch is None:
             raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
         if self._ks is None:

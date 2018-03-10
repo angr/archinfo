@@ -5,19 +5,16 @@ l = logging.getLogger("archinfo.arch_ppc64")
 try:
     import capstone as _capstone
 except ImportError:
-    l.warning("Unable to import Capstone...")
     _capstone = None
 
 try:
     import keystone as _keystone
 except ImportError:
-    l.warning("Unable to import Keystone...")
     _keystone = None
 
 #try:
 #    import unicorn as _unicorn
 #except ImportError:
-#    l.warning("Unable to import Unicorn...")
 #    _unicorn = None
 
 from .arch import Arch, register_arch, Endness

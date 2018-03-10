@@ -10,25 +10,21 @@ l.addHandler(logging.NullHandler())
 try:
     import pyvex as _pyvex
 except ImportError:
-    l.warning("Unable to import Pyvex...")
     _pyvex = None
 
 try:
     import unicorn as _unicorn
 except ImportError:
-    l.warning("Unable to import Unicorn...")
     _unicorn = None
 
 try:
     import capstone as _capstone
 except ImportError:
-    l.warning("Unable to import Capstone...")
     _capstone = None
 
 try:
     import keystone as _keystone
 except ImportError:
-    l.warning("Unable to import Keystone...")
     _keystone = None
 
 
@@ -262,6 +258,9 @@ class Arch(object):
         """
         A Capstone instance for this arch
         """
+        if _capstone is None:
+            l.warning("Capstone is not found!")
+            return None
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
@@ -283,6 +282,9 @@ class Arch(object):
         """
         Compile the assembly instruction represented by string using Keystone
         """
+        if _keystone is None:
+            l.warning("Keystone is not found!")
+            return None
         if self.ks_arch is None:
             raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
         if self._ks is None:
