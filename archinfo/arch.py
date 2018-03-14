@@ -1,7 +1,11 @@
+import logging
 import struct as _struct
 import platform as _platform
 import re
 from archinfo.archerror import ArchError
+
+l = logging.getLogger("archinfo.arch")
+l.addHandler(logging.NullHandler())
 
 try:
     import pyvex as _pyvex
@@ -18,9 +22,10 @@ try:
 except ImportError:
     _capstone = None
 
-import logging
-l = logging.getLogger('archinfo.arch')
-l.addHandler(logging.NullHandler())
+try:
+    import keystone as _keystone
+except ImportError:
+    _keystone = None
 
 
 class Endness:
@@ -69,12 +74,14 @@ class Arch(object):
         in the ISA manual, and should be flipped when lifted. Iend_BE means "don't flip"
         NOTE: Only used for non-libVEX lifters.
     :ivar dict sizeof: A mapping from C type to variable size in bits
-    :ivar cs_arch: The capstone arch value for this arch
-    :ivar cs_mode: The capstone mode value for this arch
-    :ivar uc_arch: The unicorn engine arch value for this arch
-    :ivar uc_mode: The unicorn engine mode value for this arch
-    :ivar uc_const: The unicorn engine constants module for this arch
-    :ivar uc_prefix: The prefix used for variables in the unicorn engine constants module
+    :ivar cs_arch: The Capstone arch value for this arch
+    :ivar cs_mode: The Capstone mode value for this arch
+    :ivar ks_arch: The Keystone arch value for this arch
+    :ivar ks_mode: The Keystone mode value for this arch
+    :ivar uc_arch: The Unicorn engine arch value for this arch
+    :ivar uc_mode: The Unicorn engine mode value for this arch
+    :ivar uc_const: The Unicorn engine constants module for this arch
+    :ivar uc_prefix: The prefix used for variables in the Unicorn engine constants module
     :ivar list function_prologs: A list of regular expressions matching the bytes for common function prologues
     :ivar list function_epilogs: A list of regular expressions matching the bytes for common function epilogues
     :ivar str ret_instruction: The bytes for a return instruction
@@ -116,6 +123,9 @@ class Arch(object):
             if _capstone and self.cs_mode is not None:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
+            if _keystone and self.ks_mode is not None:
+                self.ks_mode -= _keystone.KS_MODE_LITTLE_ENDIAN
+                self.ks_mode += _keystone.KS_MODE_BIG_ENDIAN
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
@@ -132,13 +142,13 @@ class Arch(object):
                 continue
             self.register_size_names[v] = k
 
-        # unicorn specific stuff
+        # Unicorn specific stuff
         if self.uc_mode is not None:
             if endness == Endness.BE:
                 self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
                 self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
             self.uc_regs = { }
-            # map register names to unicorn const
+            # map register names to Unicorn const
             for r in self.register_names.values():
                 reg_name = self.uc_prefix + 'REG_' + r.upper()
                 if hasattr(self.uc_const, reg_name):
@@ -169,6 +179,7 @@ class Arch(object):
 
     def __getstate__(self):
         self._cs = None
+        self._ks = None
         return self.__dict__
 
     def __setstate__(self, data):
@@ -245,10 +256,13 @@ class Arch(object):
     @property
     def capstone(self):
         """
-        A capstone instance for this arch
+        A Capstone instance for this arch
         """
+        if _capstone is None:
+            l.warning("Capstone is not found!")
+            return None
         if self.cs_arch is None:
-            raise ArchError("Arch %s does not support disassembly with capstone" % self.name)
+            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
             self._cs.detail = True
@@ -257,12 +271,26 @@ class Arch(object):
     @property
     def unicorn(self):
         """
-        A unicorn engine instance for this arch
+        A Unicorn engine instance for this arch
         """
         if _unicorn is None or self.uc_arch is None:
-            raise ArchError("Arch %s does not support with unicorn" % self.name)
-        # always create a new unicorn instance
+            raise ArchError("Arch %s does not support with Unicorn" % self.name)
+        # always create a new Unicorn instance
         return _unicorn.Uc(self.uc_arch, self.uc_mode)
+
+    def asm(self, string, addr=0, as_bytes=False, thumb=False):
+        """
+        Compile the assembly instruction represented by string using Keystone
+        """
+        if _keystone is None:
+            l.warning("Keystone is not found!")
+            return None
+        if self.ks_arch is None:
+            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
+        if self._ks is None:
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+        encoding, count = self._ks.asm(string, addr, as_bytes)
+        return encoding
 
     def translate_dynamic_tag(self, tag):
         try:
@@ -344,11 +372,22 @@ class Arch(object):
         """
         Whether the architecture is supported by the Capstone engine or not.
 
-        :return: True if this Arch is supported by the Capstone engine, False Otherwise.
+        :return: True if this Arch is supported by the Capstone engine, False otherwise.
         :rtype:  bool
         """
 
         return self.cs_arch is not None
+
+    @property
+    def keystone_support(self):
+        """
+        Whether the architecture is supported by the Keystone engine or not.
+
+        :return: True if this Arch is supported by the Keystone engine, False otherwise.
+        :rtype:  bool
+        """
+
+        return self.ks_arch is not None
 
     address_types = (int, long)
     function_address_types = (int, long)
@@ -395,6 +434,11 @@ class Arch(object):
     cs_arch = None
     cs_mode = None
     _cs = None
+
+    # Keystone stuff
+    ks_arch = None
+    ks_mode = None
+    _ks = None
 
     # Unicorn stuff
     uc_arch = None
