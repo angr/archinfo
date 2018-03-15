@@ -17,7 +17,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch, Endness
+from .arch import Arch, register_arch, Endness, ArchError
 from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
@@ -81,7 +81,16 @@ class ArchARM(Arch):
             self._cs_thumb.detail = True
         return self._cs_thumb
 
-    def asm(self, string, addr=0, as_bytes=False, thumb=False):
+    def asm(self, string, addr=0, as_bytes=True, thumb=False):
+        """
+        Compile the assembly instruction represented by string using Keystone
+
+        :param string:      The textual assembly instructions, separated by semicolons
+        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
+        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
+        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
+        :return:            The assembled bytecode
+        """
         if _keystone is None:
             l.warning("Keystone is not found!")
             return None
@@ -91,7 +100,14 @@ class ArchARM(Arch):
             self._ks_thumb = thumb
             mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
             self._ks = _keystone.Ks(self.ks_arch, self.ks_mode + mode)
-        encoding, _ = self._ks.asm(string, addr, as_bytes)
+        try:
+            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+        except TypeError:
+            bytelist, _ = self._ks.asm(string, addr)
+            if as_bytes:
+                encoding = ''.join(chr(c) for c in bytelist)
+            else:
+                encoding = bytelist
         return encoding
 
     @property

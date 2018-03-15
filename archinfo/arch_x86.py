@@ -95,7 +95,18 @@ class ArchX86(Arch):
             self._ks = None
             self._ks_x86_syntax = new_syntax
 
-    def asm(self, string, addr=0, as_bytes=False, thumb=False):
+    def asm(self, string, addr=0, as_bytes=True, thumb=False):
+        """
+        Compile the assembly instruction represented by string using Keystone
+
+        :param string:      The textual assembly instructions, separated by semicolons
+        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
+        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
+        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
+        :return:            The assembled bytecode
+        """
+        if thumb is True:
+            l.warning("Specified thumb=True on non-ARM architecture")
         if _keystone is None:
             l.warning("Keystone is not found!")
             return None
@@ -114,7 +125,14 @@ class ArchX86(Arch):
                 self._ks.syntax = _keystone.KS_OPT_SYNTAX_GAS
             elif self._ks_x86_syntax == 'radix16':
                 self._ks.syntax = _keystone.KS_OPT_SYNTAX_RADIX16
-        encoding, _ = self._ks.asm(string, addr, as_bytes)
+        try:
+            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+        except TypeError:
+            bytelist, _ = self._ks.asm(string, addr)
+            if as_bytes:
+                encoding = ''.join(chr(c) for c in bytelist)
+            else:
+                encoding = bytelist
         return encoding
 
     bits = 32

@@ -28,11 +28,11 @@ except ImportError:
     _keystone = None
 
 
-class Endness:
+class Endness: # pylint: disable=no-init
     """ Endness specifies the byte order for integer values
 
     :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address 
+    :cvar BE:      big endian, most significant byte is stored at lowest address
     :cvar ME:      Middle-endian. Yep.
     """
     LE = "Iend_LE"
@@ -278,10 +278,18 @@ class Arch(object):
         # always create a new Unicorn instance
         return _unicorn.Uc(self.uc_arch, self.uc_mode)
 
-    def asm(self, string, addr=0, as_bytes=False, thumb=False):
+    def asm(self, string, addr=0, as_bytes=True, thumb=False):
         """
         Compile the assembly instruction represented by string using Keystone
+
+        :param string:      The textual assembly instructions, separated by semicolons
+        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
+        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
+        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
+        :return:            The assembled bytecode
         """
+        if thumb is True:
+            l.warning("Specified thumb=True on non-ARM architecture")
         if _keystone is None:
             l.warning("Keystone is not found!")
             return None
@@ -289,7 +297,15 @@ class Arch(object):
             raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
         if self._ks is None:
             self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
-        encoding, _ = self._ks.asm(string, addr, as_bytes)
+        try:
+            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+        except TypeError:
+            bytelist, _ = self._ks.asm(string, addr)
+            if as_bytes:
+                encoding = ''.join(chr(c) for c in bytelist)
+            else:
+                encoding = bytelist
+
         return encoding
 
     def translate_dynamic_tag(self, tag):
