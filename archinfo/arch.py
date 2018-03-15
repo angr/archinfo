@@ -289,7 +289,7 @@ class Arch(object):
             raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
         if self._ks is None:
             self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
-        encoding, count = self._ks.asm(string, addr, as_bytes)
+        encoding, _ = self._ks.asm(string, addr, as_bytes)
         return encoding
 
     def translate_dynamic_tag(self, tag):

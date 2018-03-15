@@ -114,7 +114,7 @@ class ArchX86(Arch):
                 self._ks.syntax = _keystone.KS_OPT_SYNTAX_GAS
             elif self.keystone_x86_syntax == 'radix16':
                 self._ks.syntax = _keystone.KS_OPT_SYNTAX_RADIX16
-        encoding, count = self._ks.asm(string, addr, as_bytes)
+        encoding, _ = self._ks.asm(string, addr, as_bytes)
         return encoding
 
     bits = 32
