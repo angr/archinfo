@@ -54,6 +54,7 @@ class ArchARM(Arch):
         self._cs = None
         self._cs_thumb = None
         self._ks = None
+        self._ks_thumb = None
         return self.__dict__
 
     def __setstate__(self, data):
@@ -86,13 +87,11 @@ class ArchARM(Arch):
             return None
         if self.ks_arch is None:
             raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
-        if self._ks is None:
-            if thumb:
-                self.ks_mode += _keystone.KS_MODE_THUMB
-            else:
-                self.ks_mode += _keystone.KS_MODE_ARM
-            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
-        encoding, count = self._ks.asm(string, addr, as_bytes)
+        if self._ks is None or self._ks_thumb != thumb:
+            self._ks_thumb = thumb
+            mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode + mode)
+        encoding, _ = self._ks.asm(string, addr, as_bytes)
         return encoding
 
     @property
@@ -130,6 +129,7 @@ class ArchARM(Arch):
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM
         ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
+    _ks_thumb = None
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_const = _unicorn.arm_const if _unicorn else None
