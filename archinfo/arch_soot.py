@@ -20,6 +20,9 @@ class SootMethodDescriptor(object):
                 self.name == other.name and \
                 self.params == other.params
 
+    def __ne__(self, other):
+        return not self == other
+
     @classmethod
     def from_string(cls, tstr):
         # this should be the opposite of repr
@@ -70,6 +73,9 @@ class SootAddressDescriptor(object):
         return isinstance(other, SootAddressDescriptor) and \
                 self.method == other.method and \
                 self.stmt_idx == other.stmt_idx
+
+    def __ne__(self, other):
+        return not self == other
 
     def __lt__(self, other):
         if not isinstance(other, SootAddressDescriptor):
