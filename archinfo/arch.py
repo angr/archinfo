@@ -104,10 +104,13 @@ class Arch(object):
     byte_width = 8
     instruction_endness = "Iend_BE"
 
-    def __init__(self, endness):
+    def __init__(self, endness, instruction_endness=None):
 
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
             raise ArchError('Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME')
+
+        if instruction_endness is not None:
+            self.instruction_endness = instruction_endness
 
         if self.vex_support:
             if _pyvex:

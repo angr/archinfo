@@ -26,7 +26,14 @@ from .tls import TLSArchInfo
 
 class ArchARM(Arch):
     def __init__(self, endness=Endness.LE):
-        super(ArchARM, self).__init__(endness)
+
+        instruction_endness = None
+        if endness == Endness.LE:
+            instruction_endness = Endness.LE
+
+        super(ArchARM, self).__init__(endness,
+                                      instruction_endness=instruction_endness
+                                      )
         if endness == Endness.BE:
             self.function_prologs = {
                 br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
