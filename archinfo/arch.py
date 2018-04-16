@@ -308,6 +308,9 @@ class Arch(object):
             bytelist, _ = self._ks.asm(string, addr)
             if as_bytes:
                 encoding = ''.join(chr(c) for c in bytelist)
+                if not isinstance(encoding, bytes):
+                    l.warning("Cheap hack to create bytestring from Keystone!")
+                    encoding = encoding.encode()
             else:
                 encoding = bytelist
 
