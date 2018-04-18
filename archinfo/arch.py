@@ -1,3 +1,5 @@
+from past.builtins import long
+from future.utils import iteritems
 import logging
 import struct as _struct
 import platform as _platform
@@ -212,7 +214,7 @@ class Arch(object):
     def get_default_reg_value(self, register):
         if register == 'sp':
             # Convert it to the corresponding register name
-            registers = [r for r, v in self.registers.items() if v[0] == self.sp_offset]
+            registers = [r for r, v in iteritems(self.registers) if v[0] == self.sp_offset]
             if len(registers) > 0:
                 register = registers[0]
             else:
@@ -312,6 +314,9 @@ class Arch(object):
             bytelist, _ = self._ks.asm(string, addr)
             if as_bytes:
                 encoding = ''.join(chr(c) for c in bytelist)
+                if not isinstance(encoding, bytes):
+                    l.warning("Cheap hack to create bytestring from Keystone!")
+                    encoding = encoding.encode()
             else:
                 encoding = bytelist
 
@@ -368,7 +373,7 @@ class Arch(object):
 
         if pedantic:
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
-        return map(subfunc, path)
+        return list(map(subfunc, path))
 
     @property
     def vex_support(self):

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from future.utils import itervalues, iteritems, listitems
 import pkg_resources
 
 filecache = {}
@@ -59,7 +61,7 @@ for line in a:
 
 import archinfo
 def canon_name(archh, offseth):
-    for some_name, (some_offset, _) in archh.registers.iteritems():
+    for some_name, (some_offset, _) in iteritems(archh.registers):
         if some_offset == offseth and some_name in arch_data[archh.vex_arch[7:].lower()]:
             return some_name
     return None
@@ -68,13 +70,13 @@ for archname in arch_data:
     try:
         arch = archinfo.arch_from_id(archname)
     except (archinfo.ArchError, RuntimeError):
-        print 'Skipping', archname
+        print('Skipping', archname)
         continue
 
     new_register_names = {}
     new_registers_reverse = {}
     misses = []
-    for a_offset, a_fieldname in arch.register_names.iteritems():
+    for a_offset, a_fieldname in iteritems(arch.register_names):
         cname = canon_name(arch, a_offset)
         if cname is None:
             misses.append((a_offset, a_fieldname))
@@ -83,7 +85,7 @@ for archname in arch_data:
         # deal with picking up subregisters? shouldn't need to, beyond the above...
         new_register_names[new_offset] = a_fieldname
 
-        for alt_name, (sub_offset, sub_size) in arch.registers.iteritems():
+        for alt_name, (sub_offset, sub_size) in iteritems(arch.registers):
             if sub_offset >= a_offset and sub_offset < a_offset + new_size:
                 new_sub_offset = new_offset + (sub_offset - a_offset)
                 if new_sub_offset not in new_registers_reverse:
@@ -91,7 +93,7 @@ for archname in arch_data:
                 new_registers_reverse[new_sub_offset].append((sub_size, alt_name))
 
     for misso, miss in misses:
-        for dlist in new_registers_reverse.itervalues():
+        for dlist in itervalues(new_registers_reverse):
             for _, alt_name in dlist:
                 if alt_name == miss:
                     new_register_names[misso] = miss
@@ -122,12 +124,12 @@ for archname in arch_data:
 
     # dump out the new data
     file_fp.write('    register_names = {\n')
-    for new_offset in sorted(new_register_names.iterkeys()):
+    for new_offset in sorted(list(new_register_names)):
         file_fp.write('        %d: \'%s\',\n' % (new_offset, new_register_names[new_offset]))
     file_fp.write('    }\n\n')
     file_fp.write('    registers = {\n')
 
-    for new_offset, dlist in sorted(new_registers_reverse.iteritems()):
+    for new_offset, dlist in sorted(listitems(new_registers_reverse)):
         for new_size, new_name in sorted(dlist):
             file_fp.write('        \'%s\': (%d, %d),\n' % (new_name, new_offset, new_size))
     file_fp.write('    }\n')
