@@ -138,5 +138,10 @@ class ArchSoot(Arch):
 
     name = 'Soot'
 
+    def library_search_path(self, pedantic=False):
+        # system specific paths cannot get determinend,
+        # since java is mostly system independent
+        # => return an empty list
+        return []
 
 register_arch(['soot'], 8, Endness.BE, ArchSoot)
