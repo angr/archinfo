@@ -3,10 +3,13 @@ from .arch import Arch, register_arch, Endness
 
 
 class SootMethodDescriptor(object):
-    def __init__(self, class_name, name, params):
+    def __init__(self, class_name, name, params, attrs=[], ret=None, exceptions=()):
         self.class_name = class_name
         self.name = name
         self.params = params
+        self.attrs = attrs
+        self.ret = None
+        self.exceptions=()
 
     def __repr__(self):
         return "%s.%s(%s)" % (self.class_name, self.name, ",".join(self.params))
@@ -42,7 +45,21 @@ class SootMethodDescriptor(object):
 
     @classmethod
     def from_method(cls, method):
-        return cls(method.class_name, method.name, method.params)
+        return cls(class_name=method.class_name, 
+                   name=method.name, 
+                   params=method.params, 
+                   attrs=method.attrs,
+                   ret=method.ret,
+                   exceptions=method.exceptions)
+
+    @classmethod
+    def from_soot_method(cls, soot_method):
+        return cls(class_name=str(soot_method.class_name), 
+                   name=str(soot_method.name), 
+                   params=soot_method.params, 
+                   attrs=soot_method.attrs,
+                   ret=soot_method.ret,
+                   exceptions=soot_method.exceptions)
 
     @property
     def symbolic(self):
