@@ -8,7 +8,7 @@ class SootMethodDescriptor(object):
         self.name = name
         self.params = params
         self.attrs = attrs
-        self.ret = None
+        self.ret = ret
         self.exceptions=()
 
     def __repr__(self):
