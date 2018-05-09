@@ -141,11 +141,8 @@ class SootAddressTerminator(SootAddressDescriptor):
 
 
 class ArchSoot(Arch):
-    def __init__(self, endness=Endness.BE):  # pylint:disable=unused-args
-
-        assert endness == Endness.BE
-
-        super(ArchSoot, self).__init__(Endness.BE)
+    def __init__(self, endness=Endness.LE):  # pylint:disable=unused-args
+        super(ArchSoot, self).__init__(endness)
 
     vex_arch = None  # No VEX support
     qemu_name = None  # No Qemu/Unicorn-engine support
@@ -161,4 +158,4 @@ class ArchSoot(Arch):
         # => return an empty list
         return []
 
-register_arch(['soot'], 8, Endness.BE, ArchSoot)
+register_arch(['soot'], 8, Endness.LE, ArchSoot)
