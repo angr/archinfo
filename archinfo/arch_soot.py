@@ -392,5 +392,4 @@ class ArchSoot(Arch):
         """
         return []
 
-
 register_arch(['soot'], 8, Endness.LE, ArchSoot)
