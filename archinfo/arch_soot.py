@@ -168,6 +168,29 @@ class ArchSoot(Arch):
     address_types = (SootAddressDescriptor, )
     function_address_types = (SootMethodDescriptor, )
 
+    # size of native counterparts from java primitive types
+    sizeof = {'boolean'  :  8,
+                  'byte'     :  8,
+                  'char'     : 16,
+                  'short'    : 16,
+                  'int'      : 32,
+                  'long'     : 64, 
+                  'float'    : 32,
+                  'double'   : 64
+                  }
+
+    # Note: sizes correspond to JNI native types
+    # In Soot all types smaller than int, are stored as 32-bit bitvector
+    primitive_types = {'boolean'  :  8,
+                       'byte'     :  8,
+                       'char'     : 16,
+                       'short'    : 16,
+                       'int'      : 32,
+                       'long'     : 64, 
+                       'float'    : 32,
+                       'double'   : 64
+                       }
+
     name = 'Soot'
 
     def library_search_path(self, pedantic=False):
