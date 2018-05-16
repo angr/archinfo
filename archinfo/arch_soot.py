@@ -43,6 +43,24 @@ class SootMethodDescriptor(object):
     def fullname(self):
         return "%s.%s" % (self.class_name, self.name)
 
+    def matches_with_native_name(self, native_name):
+        """
+        Name of native methods are getting encoded, s.t. they translate into valid C function names.
+        :return: True, if name of soot method matches the mangled native name.
+        """
+
+        if "__" in native_name:
+            # if native methods are overloaded, two underscores are used
+            # TODO check argument signature
+            raise NotImplementedError('Overloaded native methods are not yet supported.')
+
+        # mangle method name
+        method_name = self.name
+        method_name = method_name.replace('_', '_1')        
+        # TODO unicode escaping
+
+        return native_name.endswith(method_name)
+
     @classmethod
     def from_method(cls, method):
         return cls(class_name=method.class_name, 
