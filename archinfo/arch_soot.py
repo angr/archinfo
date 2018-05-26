@@ -159,8 +159,10 @@ class SootAddressTerminator(SootAddressDescriptor):
 
 
 class ArchSoot(Arch):
-    def __init__(self, endness=Endness.LE):  # pylint:disable=unused-args
+    def __init__(self, endness=Endness.LE):
         super(ArchSoot, self).__init__(endness)
+
+    name = 'Soot'
 
     vex_arch = None  # No VEX support
     qemu_name = None  # No Qemu/Unicorn-engine support
@@ -168,35 +170,33 @@ class ArchSoot(Arch):
     address_types = (SootAddressDescriptor, )
     function_address_types = (SootMethodDescriptor, )
 
-    # size of native counterparts from java primitive types
+    # Size of native counterparts of primitive Java types
     sizeof = {'boolean'  :  8,
-                  'byte'     :  8,
-                  'char'     : 16,
-                  'short'    : 16,
-                  'int'      : 32,
-                  'long'     : 64, 
-                  'float'    : 32,
-                  'double'   : 64
-                  }
+              'byte'     :  8,
+              'char'     : 16, 
+              'short'    : 16,
+              'int'      : 32,
+              'long'     : 64, 
+              'float'    : 32,
+              'double'   : 64
+             }
 
-    # Note: sizes correspond to JNI native types
-    # In Soot all types smaller than int, are stored as 32-bit bitvector
-    primitive_types = {'boolean'  :  8,
-                       'byte'     :  8,
-                       'char'     : 16,
-                       'short'    : 16,
-                       'int'      : 32,
-                       'long'     : 64, 
-                       'float'    : 32,
-                       'double'   : 64
-                       }
-
-    name = 'Soot'
+    primitive_types = ['boolean',
+                       'byte',
+                       'char',
+                       'short',
+                       'int',
+                       'long',
+                       'float',
+                       'double']
 
     def library_search_path(self, pedantic=False):
-        # system specific paths cannot get determinend,
-        # since java is mostly system independent
-        # => return an empty list
+        """
+        Since java is mostly system independet, we cannot return
+        system specific paths.
+        
+        :return: empty list
+        """
         return []
 
 register_arch(['soot'], 8, Endness.LE, ArchSoot)
