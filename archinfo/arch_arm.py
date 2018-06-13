@@ -1,0 +1,278 @@
+import logging
+
+l = logging.getLogger("archinfo.arch_arm")
+
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
+
+try:
+    import keystone as _keystone
+except ImportError:
+    _keystone = None
+
+try:
+    import unicorn as _unicorn
+except ImportError:
+    _unicorn = None
+
+from .arch import Arch, register_arch, Endness, ArchError, Register
+from .tls import TLSArchInfo
+
+# TODO: determine proper base register (if it exists)
+# TODO: handle multiple return registers?
+# TODO: which endianness should be default?
+
+class ArchARM(Arch):
+    def __init__(self, endness=Endness.LE):
+
+        instruction_endness = None
+        if endness == Endness.LE:
+            instruction_endness = Endness.LE
+
+        super(ArchARM, self).__init__(endness,
+                                      instruction_endness=instruction_endness
+                                      )
+        if endness == Endness.BE:
+            self.function_prologs = {
+                br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
+                br"\xe5\x2d\xe0\x04",                        # push {lr}
+            }
+            self.function_epilogs = {
+                br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
+                br"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
+            }
+
+    # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
+    def __eq__(self, other):
+        # pylint: disable=unidiomatic-typecheck
+        if not isinstance(other, ArchARM):
+            return False
+        if self.memory_endness != other.memory_endness or self.bits != other.bits:
+            return False
+        if type(self) is type(other):
+            return True
+        if type(self) is ArchARM or type(other) is ArchARM:
+            return True
+        return False
+
+    def __getstate__(self):
+        self._cs = None
+        self._cs_thumb = None
+        self._ks = None
+        self._ks_thumb = None
+        return self.__dict__
+
+    def __setstate__(self, data):
+        self.__dict__.update(data)
+
+    @property
+    def capstone(self):
+        if _capstone is None:
+            l.warning("Capstone is not found!")
+            return None
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
+        if self._cs is None:
+            self._cs = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_ARM)
+            self._cs.detail = True
+        return self._cs
+
+    @property
+    def capstone_thumb(self):
+        if self.cs_arch is None:
+            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
+        if self._cs_thumb is None:
+            self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
+            self._cs_thumb.detail = True
+        return self._cs_thumb
+
+    def asm(self, string, addr=0, as_bytes=True, thumb=False):
+        """
+        Compile the assembly instruction represented by string using Keystone
+
+        :param string:      The textual assembly instructions, separated by semicolons
+        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
+        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
+        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
+        :return:            The assembled bytecode
+        """
+        if _keystone is None:
+            l.warning("Keystone is not found!")
+            return None
+        if self.ks_arch is None:
+            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
+        if self._ks is None or self._ks_thumb != thumb:
+            self._ks_thumb = thumb
+            mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode + mode)
+        try:
+            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+        except TypeError:
+            bytelist, _ = self._ks.asm(string, addr)
+            if as_bytes:
+                encoding = ''.join(chr(c) for c in bytelist)
+                if not isinstance(encoding, bytes):
+                    l.warning("Cheap hack to create bytestring from Keystone!")
+                    encoding = encoding.encode()
+            else:
+                encoding = bytelist
+        return encoding
+
+    @property
+    def unicorn(self):
+        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_ARM) if _unicorn is not None else None
+
+    @property
+    def unicorn_thumb(self):
+        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_THUMB) if _unicorn is not None else None
+
+    bits = 32
+    vex_arch = "VexArchARM"
+    name = "ARMEL"
+    qemu_name = 'arm'
+    ida_processor = 'armb'
+    linux_name = 'arm'
+    triplet = 'arm-linux-gnueabihf'
+    max_inst_bytes = 4
+    ip_offset = 68
+    sp_offset = 60
+    bp_offset = 60
+    ret_offset = 8
+    lr_offset = 64
+    vex_conditional_helpers = True
+    syscall_num_offset = 36
+    call_pushes_ret = False
+    stack_change = -4
+    memory_endness = Endness.LE
+    register_endness = Endness.LE
+    sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_ARM
+        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
+    _cs_thumb = None
+    if _keystone:
+        ks_arch = _keystone.KS_ARCH_ARM
+        ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
+    _ks_thumb = None
+    uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
+    uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
+    uc_const = _unicorn.arm_const if _unicorn else None
+    uc_prefix = "UC_ARM_" if _unicorn else None
+    #self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
+    ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
+    nop_instruction = b"\x00\x00\x00\x00"
+    function_prologs = {
+        br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
+        br"\x04\xe0\x2d\xe5",                        # push {lr}
+    }
+    function_epilogs = {
+        br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
+        br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
+    }
+    instruction_alignment = 2  # cuz there is also thumb mode
+    register_list = [
+        Register(name='a1', size=4, vex_offset=8, alias_names=('r0',),
+                 general_purpose=True, argument=True, linux_entry_value='ld_destructor'),
+        Register(name='a2', size=4, vex_offset=12, alias_names=('r1',),
+                 general_purpose=True, argument=True),
+        Register(name='a3', size=4, vex_offset=16, alias_names=('r2',),
+                 general_purpose=True, argument=True),
+        Register(name='a4', size=4, vex_offset=20, alias_names=('r3',),
+                 general_purpose=True, argument=True),
+        Register(name='v1', size=4, vex_offset=24, alias_names=('r4',), 
+                 general_purpose=True),
+        Register(name='v2', size=4, vex_offset=28, alias_names=('r5',), 
+                 general_purpose=True),
+        Register(name='v3', size=4, vex_offset=32, alias_names=('r6',), 
+                 general_purpose=True),
+        Register(name='v4', size=4, vex_offset=36, alias_names=('r7',), 
+                 general_purpose=True),
+        Register(name='v5', size=4, vex_offset=40, alias_names=('r8',), 
+                 general_purpose=True),
+        Register(name='v6', size=4, vex_offset=44, alias_names=('r9', 'sb'), 
+                 general_purpose=True),
+        Register(name='v7', size=4, vex_offset=48, alias_names=('r10', 'sl'), 
+                 general_purpose=True),
+        Register(name='v8', size=4, vex_offset=52, alias_names=('r11', 'fp', 'bp'), 
+                 general_purpose=True),
+        Register(name='ip', size=4, vex_offset=56, alias_names=('r12',), 
+                 general_purpose=True),
+        Register(name='sp', size=4, vex_offset=60, alias_names=('r13',), 
+                 general_purpose=True, default_value=(Arch.initial_sp, True, 'global')),
+        Register(name='lr', size=4, vex_offset=64, alias_names=('r14',), 
+                 general_purpose=True, concretize_unique=True),
+        Register(name='pc', size=4, vex_offset=68, alias_names=('r15',)), 
+        Register(name='cc_op', size=4, vex_offset=72, default_value=(0, False, None)),
+        Register(name='cc_dep1', size=4, vex_offset=76, default_value=(0, False, None)),
+        Register(name='cc_dep2', size=4, vex_offset=80, default_value=(0, False, None)),
+        Register(name='cc_ndep', size=4, vex_offset=84, default_value=(0, False, None)),
+        Register(name='qflag32', size=4, vex_offset=88),
+        Register(name='geflag0', size=4, vex_offset=92),
+        Register(name='geflag1', size=4, vex_offset=96),
+        Register(name='geflag2', size=4, vex_offset=100),
+        Register(name='geflag3', size=4, vex_offset=104),
+        Register(name='emnote', size=4, vex_offset=108),
+        Register(name='cmstart', size=4, vex_offset=112),
+        Register(name='cmlen', size=4, vex_offset=116),
+        Register(name='nraddr', size=4, vex_offset=120),
+        Register(name='ip_at_syscall', size=4, vex_offset=124),
+        Register(name='d0', size=8, vex_offset=128, floating_point=True, vector=True),
+        Register(name='d1', size=8, vex_offset=136, floating_point=True, vector=True),
+        Register(name='d2', size=8, vex_offset=144, floating_point=True, vector=True),
+        Register(name='d3', size=8, vex_offset=152, floating_point=True, vector=True),
+        Register(name='d4', size=8, vex_offset=160, floating_point=True, vector=True),
+        Register(name='d5', size=8, vex_offset=168, floating_point=True, vector=True),
+        Register(name='d6', size=8, vex_offset=176, floating_point=True, vector=True),
+        Register(name='d7', size=8, vex_offset=184, floating_point=True, vector=True),
+        Register(name='d8', size=8, vex_offset=192, floating_point=True, vector=True),
+        Register(name='d9', size=8, vex_offset=200, floating_point=True, vector=True),
+        Register(name='d10', size=8, vex_offset=208, floating_point=True, vector=True),
+        Register(name='d11', size=8, vex_offset=216, floating_point=True, vector=True),
+        Register(name='d12', size=8, vex_offset=224, floating_point=True, vector=True),
+        Register(name='d13', size=8, vex_offset=232, floating_point=True, vector=True),
+        Register(name='d14', size=8, vex_offset=240, floating_point=True, vector=True),
+        Register(name='d15', size=8, vex_offset=248, floating_point=True, vector=True),
+        Register(name='d16', size=8, vex_offset=256, floating_point=True, vector=True),
+        Register(name='d17', size=8, vex_offset=264, floating_point=True, vector=True),
+        Register(name='d18', size=8, vex_offset=272, floating_point=True, vector=True),
+        Register(name='d19', size=8, vex_offset=280, floating_point=True, vector=True),
+        Register(name='d20', size=8, vex_offset=288, floating_point=True, vector=True),
+        Register(name='d21', size=8, vex_offset=296, floating_point=True, vector=True),
+        Register(name='d22', size=8, vex_offset=304, floating_point=True, vector=True),
+        Register(name='d23', size=8, vex_offset=312, floating_point=True, vector=True),
+        Register(name='d24', size=8, vex_offset=320, floating_point=True, vector=True),
+        Register(name='d25', size=8, vex_offset=328, floating_point=True, vector=True),
+        Register(name='d26', size=8, vex_offset=336, floating_point=True, vector=True),
+        Register(name='d27', size=8, vex_offset=344, floating_point=True, vector=True),
+        Register(name='d28', size=8, vex_offset=352, floating_point=True, vector=True),
+        Register(name='d29', size=8, vex_offset=360, floating_point=True, vector=True),
+        Register(name='d30', size=8, vex_offset=368, floating_point=True, vector=True),
+        Register(name='d31', size=8, vex_offset=376, floating_point=True, vector=True),
+        Register(name='fpscr', size=4, vex_offset=384, floating_point=True),
+        Register(name='tpidruro', size=4, vex_offset=388),
+        Register(name='itstate', size=4, vex_offset=392, default_value=(0, False, None)),
+    ]
+
+    got_section_name = '.got'
+    ld_linux_name = 'ld-linux.so.3'
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
+    #elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
+    # that line was lying in the original CLE code and I have no clue why it's different
+
+class ArchARMHF(ArchARM):
+    name = 'ARMHF'
+    triplet = 'arm-linux-gnueabihf'
+    ld_linux_name = 'ld-linux-armhf.so.3'
+
+class ArchARMEL(ArchARM):
+    name = 'ARMEL'
+    triplet = 'arm-linux-gnueabi'
+    ld_linux_name = 'ld-linux.so.3'
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
+
+register_arch([r'.*armhf.*'], 32, 'any', ArchARMHF)
+register_arch([r'.*armeb|.*armbe'], 32, Endness.BE, ArchARM)
+register_arch([r'.*armel|arm.*'], 32, Endness.LE, ArchARMEL)
+register_arch([r'.*arm.*|.*thumb.*'], 32, 'any', ArchARM)

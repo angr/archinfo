@@ -1,0 +1,57 @@
+before_script:
+    - angr-test sync hard
+
+### local
+lint:
+    script: "angr-test lint"
+    tags: [angr]
+
+### first level
+angr:
+    script: "angr-test angr"
+    tags: [angr]
+
+cle:
+    script: "angr-test cle"
+    tags: [angr]
+
+driller:
+    script: "angr-test driller"
+    tags: [angr]
+
+simuvex:
+    script: "angr-test simuvex"
+    tags: [angr]
+
+### other levels
+tracer:
+    script: "angr-test tracer"
+    tags: [angr]
+
+topsecret:
+    script: "angr-test top-secret"
+    tags: [angr]
+
+docs:
+    script: "angr-test docs"
+    tags: [angr]
+
+rex:
+    script: "angr-test rex"
+    tags: [angr]
+
+fidget:
+    script: "angr-test fidget"
+    tags: [angr]
+
+angrop:
+    script: "angr-test angrop"
+    tags: [angr]
+
+pwnrex:
+    script: "angr-test pwnrex"
+    tags: [angr]
+
+patcherex:
+    script: "angr-test patcherex"
+    tags: [angr]
