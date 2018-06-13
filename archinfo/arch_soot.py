@@ -200,6 +200,28 @@ class SootAddressTerminator(SootAddressDescriptor):
     def __repr__(self):
         return "<Terminator>"
 
+class SootFieldDescriptor(object):
+    def __init__(self, class_name, name, type_):
+        self.class_name = class_name
+        self.name = name
+        self.type = type_
+
+    def __repr__(self):
+        return "%s %s.%s" % (self.type, self.class_name, self.name)
+
+    def __hash__(self):
+        return hash((self.class_name, self.name, self.type))
+
+    def __eq__(self, other):
+        return isinstance(other, SootFieldDescriptor) and \
+                self.class_name == other.class_name and \
+                self.name == other.name and \
+                self.type == other.type
+
+    def __ne__(self, other):
+        return not self == other
+
+
 
 class SootFieldDescriptor(object):
 
