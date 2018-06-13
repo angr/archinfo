@@ -138,7 +138,7 @@ class ArchARM(Arch):
     max_inst_bytes = 4
     ip_offset = 68
     sp_offset = 60
-    bp_offset = 60
+    bp_offset = 52
     ret_offset = 8
     lr_offset = 64
     vex_conditional_helpers = True
@@ -173,29 +173,29 @@ class ArchARM(Arch):
     }
     instruction_alignment = 2  # cuz there is also thumb mode
     register_list = [
-        Register(name='a1', size=4, vex_offset=8, alias_names=('r0',),
+        Register(name='r0', size=4, vex_offset=8, alias_names=('r0',),
                  general_purpose=True, argument=True, linux_entry_value='ld_destructor'),
-        Register(name='a2', size=4, vex_offset=12, alias_names=('r1',),
+        Register(name='r1', size=4, vex_offset=12, alias_names=('r1',),
                  general_purpose=True, argument=True),
-        Register(name='a3', size=4, vex_offset=16, alias_names=('r2',),
+        Register(name='r2', size=4, vex_offset=16, alias_names=('r2',),
                  general_purpose=True, argument=True),
-        Register(name='a4', size=4, vex_offset=20, alias_names=('r3',),
+        Register(name='r3', size=4, vex_offset=20, alias_names=('r3',),
                  general_purpose=True, argument=True),
-        Register(name='v1', size=4, vex_offset=24, alias_names=('r4',), 
+        Register(name='r4', size=4, vex_offset=24, alias_names=('r4',), 
                  general_purpose=True),
-        Register(name='v2', size=4, vex_offset=28, alias_names=('r5',), 
+        Register(name='r5', size=4, vex_offset=28, alias_names=('r5',), 
                  general_purpose=True),
-        Register(name='v3', size=4, vex_offset=32, alias_names=('r6',), 
+        Register(name='r6', size=4, vex_offset=32, alias_names=('r6',), 
                  general_purpose=True),
-        Register(name='v4', size=4, vex_offset=36, alias_names=('r7',), 
+        Register(name='r7', size=4, vex_offset=36, alias_names=('r7',), 
                  general_purpose=True),
-        Register(name='v5', size=4, vex_offset=40, alias_names=('r8',), 
+        Register(name='r8', size=4, vex_offset=40, alias_names=('r8',), 
                  general_purpose=True),
-        Register(name='v6', size=4, vex_offset=44, alias_names=('r9', 'sb'), 
+        Register(name='r9', size=4, vex_offset=44, alias_names=('r9', 'sb'), 
                  general_purpose=True),
-        Register(name='v7', size=4, vex_offset=48, alias_names=('r10', 'sl'), 
+        Register(name='r10', size=4, vex_offset=48, alias_names=('r10', 'sl'), 
                  general_purpose=True),
-        Register(name='v8', size=4, vex_offset=52, alias_names=('r11', 'fp', 'bp'), 
+        Register(name='r11', size=4, vex_offset=52, alias_names=('r11', 'fp', 'bp'), 
                  general_purpose=True),
         Register(name='ip', size=4, vex_offset=56, alias_names=('r12',), 
                  general_purpose=True),
