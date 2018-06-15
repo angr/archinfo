@@ -1,5 +1,9 @@
 
 from .arch import Arch, register_arch, Endness
+import re
+
+import logging
+l = logging.getLogger('arhcinfo.arch_soot')
 
 
 class SootMethodDescriptor(object):
@@ -213,9 +217,47 @@ class ArchSoot(Arch):
                        'float',
                        'double']
 
+    sig_dict = {'Z' : 'boolean',
+                'B' : 'byte',
+                'C' : 'char',
+                'S' : 'short',
+                'I' : 'int',
+                'J' : 'long',
+                'F' : 'float',
+                'D' : 'double',
+                'V' : 'void'
+               } 
+
+    @staticmethod
+    def decode_type_signature(type_sig):
+
+        if type_sig == "":
+            return None
+
+        if type_sig in ArchSoot.sig_dict:
+            return ArchSoot.sig_dict[type_sig]
+
+        if type_sig.startswith('L') and type_sig.endswith(';'):
+            return type_sig[1:-1]
+
+        raise ValueError(type_sig)
+
+    @staticmethod
+    def decode_method_signature(method_sig):
+        match = re.search(r'\((.*)\)(.*)', method_sig)
+        
+        params = tuple(ArchSoot.decode_type_signature(param) 
+                       for param in re.findall(r'([\[]*[ZBCSIJFDV]|[\[]*L.+;)', match.group(1)))
+        ret = ArchSoot.decode_type_signature(match.group(2))
+
+        l.debug("Decoded method signature '%s' as params=%s and ret=%s"
+                "" % (method_sig, params, ret) )
+
+        return params, ret
+
     def library_search_path(self, pedantic=False):
         """
-        Since java is mostly system independet, we cannot return
+        Since java is mostly system independent, we cannot return
         system specific paths.
         
         :return: empty list
