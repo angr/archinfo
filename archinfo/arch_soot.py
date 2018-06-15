@@ -3,7 +3,7 @@ from .arch import Arch, register_arch, Endness
 import re
 
 import logging
-l = logging.getLogger('arhcinfo.arch_soot')
+l = logging.getLogger('archinfo.arch_soot')
 
 
 class SootMethodDescriptor(object):
