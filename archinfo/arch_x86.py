@@ -264,6 +264,7 @@ class ArchX86(Arch):
         Register(name='gs', size=2, vex_offset=296, default_value=(0, False, None), concrete=False),
         Register(name='ss', size=2, vex_offset=298),
         Register(name='ldt', size=8, vex_offset=304, default_value=(0, False, None), concrete=False),
+        Register(name='gdt', size=8, vex_offset=312, default_value=(0, False, None), concrete=False),
         Register(name='emnote', size=4, vex_offset=320),
         Register(name='cmstart', size=4, vex_offset=324),
         Register(name='cmlen', size=4, vex_offset=328),
