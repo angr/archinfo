@@ -346,6 +346,8 @@ class Arch(object):
     def _get_register_dict(self):
         res = {}
         for r in self.register_list:
+            if r.vex_offset is None:
+                continue
             res[r.name] = (r.vex_offset, r.size)
             for i in r.alias_names:
                 res[i] = (r.vex_offset, r.size)

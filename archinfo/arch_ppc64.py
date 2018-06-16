@@ -17,6 +17,11 @@ except ImportError:
 #except ImportError:
 #    _unicorn = None
 
+try:
+    import pyvex as _pyvex
+except ImportError:
+    _pyvex = None
+
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
@@ -72,7 +77,7 @@ class ArchPPC64(Arch):
             self.registers['vsr11'][0]: 9,
             self.registers['vsr12'][0]: 10,
             self.registers['vsr13'][0]: 11,
-        }
+        } if _pyvex is not None else None
 
     bits = 64
     vex_arch = "VexArchPPC64"
