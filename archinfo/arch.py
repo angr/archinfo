@@ -70,11 +70,12 @@ class Register(object):
     :ivar tuple default_value: The offset of the instruction pointer in the register file
     :ivar int, str linux_entry_value: The offset of the instruction pointer in the register file
     :ivar bool concretize_unique: Whether this register should be concretized, if unique, at the end of each block
+    :ivar bool concrete: Whether this register should be considered during the synchronization of the concrete execution of the process
     """
     def __init__(self, name, size, vex_offset, subregisters=None,
                  alias_names=None, general_purpose=False, floating_point=False,
                  vector=False, argument=False, persistent=False, default_value=None, 
-                 linux_entry_value=None, concretize_unique=False):
+                 linux_entry_value=None, concretize_unique=False, concrete=True):
         self.name = name
         self.size = size
         self.vex_offset = vex_offset
@@ -88,7 +89,7 @@ class Register(object):
         self.default_value = default_value
         self.linux_entry_value = linux_entry_value
         self.concretize_unique = concretize_unique
-
+        self.concrete = concrete
 
 class Arch(object):
     """
