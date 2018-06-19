@@ -207,7 +207,7 @@ class SootFieldDescriptor(object):
         self.type = type_
 
     def __repr__(self):
-        return "%s %s.%s" % (self.type, self.class_name, self.name)
+        return "%s.%s" % (self.class_name, self.name)
 
     def __hash__(self):
         return hash((self.class_name, self.name, self.type))
