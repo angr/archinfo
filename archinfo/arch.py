@@ -1,4 +1,4 @@
-from past.builtins import long
+from past.builtins import long # pylint: disable=redefined-builtin
 from future.utils import iteritems
 import logging
 import struct as _struct
@@ -60,6 +60,7 @@ class Register(object):
     :ivar str  name: The name of the register
     :ivar int  size: The size of the register (in bytes)
     :ivar int  vex_offset: The VEX offset used to identify this register
+    :ivar str  vex_name: The name libVEX uses to identify the register
     :ivar list subregisters: The list of subregisters in the form (name, offset from vex_offset, size)
     :ivar tuple alias_names: The list of possible alias names
     :ivar bool general_purpose: Whether this is a general purpose register
@@ -72,13 +73,14 @@ class Register(object):
     :ivar bool concretize_unique: Whether this register should be concretized, if unique, at the end of each block
     :ivar bool concrete: Whether this register should be considered during the synchronization of the concrete execution of the process
     """
-    def __init__(self, name, size, vex_offset, subregisters=None,
+    def __init__(self, name, size, vex_offset=None, vex_name=None, subregisters=None,
                  alias_names=None, general_purpose=False, floating_point=False,
-                 vector=False, argument=False, persistent=False, default_value=None, 
-                 linux_entry_value=None, concretize_unique=False, concrete=True):
+                 vector=False, argument=False, persistent=False, default_value=None,
+                 linux_entry_value=None, concretize_unique=False,concrete=True):
         self.name = name
         self.size = size
         self.vex_offset = vex_offset
+        self.vex_name = vex_name
         self.subregisters = [] if subregisters is None else subregisters
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
@@ -185,6 +187,18 @@ class Arch(object):
 
         # Register collections
         if self.register_list:
+            if self.vex_arch is not None and _pyvex is not None:
+                va = self.vex_arch[7:].lower()
+                for r in self.register_list:
+                    if r.vex_offset is None:
+                        for name in (r.vex_name, r.name) + r.alias_names:
+                            try:
+                                r.vex_offset = _pyvex.vex_ffi.guest_offsets[(va, name)]
+                            except KeyError:
+                                pass
+                            else:
+                                break
+
             self.default_register_values = [(r.name,) + r.default_value for r in self.register_list if r.default_value is not None]
 #           print 'default_register_values'
 #           for i in self.default_register_values:
@@ -333,6 +347,8 @@ class Arch(object):
     def _get_register_dict(self):
         res = {}
         for r in self.register_list:
+            if r.vex_offset is None:
+                continue
             res[r.name] = (r.vex_offset, r.size)
             for i in r.alias_names:
                 res[i] = (r.vex_offset, r.size)
