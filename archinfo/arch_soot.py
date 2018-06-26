@@ -7,13 +7,11 @@ l = logging.getLogger('archinfo.arch_soot')
 
 
 class SootMethodDescriptor(object):
-    def __init__(self, class_name, name, params, attrs=[], ret=None, exceptions=()):
+    def __init__(self, class_name, name, params, soot_method=None):
         self.class_name = class_name
         self.name = name
         self.params = params
-        self.attrs = attrs
-        self.ret = ret
-        self.exceptions=()
+        self._soot_method = soot_method
 
     def __repr__(self):
         return "%s.%s(%s)" % (self.class_name, self.name, ",".join(self.params))
@@ -55,38 +53,48 @@ class SootMethodDescriptor(object):
         
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
-            # TODO check argument signature
-            raise NotImplementedError('Overloaded native methods are not yet supported.')
+            # TODO check function signature
+            raise NotImplementedError('Overloaded native methods are not supported.')
 
         # demangle native name
         native_method =  native_method.replace('_1', '_')
         # TODO unicode escaping
 
-        method_native_name = "Java_{class_name}_{method_name}".format(class_name=self.class_name,
-                                                                      method_name=self.name)
+        method_native_name = "Java_{class_name}_{method_name}".format(
+                              class_name=self.class_name,
+                              method_name=self.name)
         return native_method == method_native_name
 
     @classmethod
-    def from_method(cls, method):
-        return cls(class_name=method.class_name, 
-                   name=method.name, 
-                   params=method.params, 
-                   attrs=method.attrs,
-                   ret=method.ret,
-                   exceptions=method.exceptions)
-
-    @classmethod
     def from_soot_method(cls, soot_method):
-        return cls(class_name=str(soot_method.class_name), 
-                   name=str(soot_method.name), 
+        return cls(class_name=soot_method.class_name, 
+                   name=soot_method.name, 
                    params=soot_method.params, 
-                   attrs=soot_method.attrs,
-                   ret=soot_method.ret,
-                   exceptions=soot_method.exceptions)
+                   soot_method=soot_method)
 
     @property
     def symbolic(self):
         return False
+    
+    @property 
+    def is_loaded(self):
+        """
+        :return: True, if the method is loaded in CLE and thus
+                 info about attrs, ret and exception are available.
+        """
+        return self._soot_method != None
+    
+    @property
+    def attrs(self):
+        return self._soot_method.attrs if self.is_loaded else []
+
+    @property
+    def exceptions(self):
+        return self._soot_method.exceptions if self.is_loaded else []
+
+    @property
+    def ret(self):
+        return self._soot_method.ret if self.is_loaded else []
 
 
 class SootAddressDescriptor(object):
@@ -162,6 +170,7 @@ class SootAddressTerminator(SootAddressDescriptor):
     def __repr__(self):
         return "<Terminator>"
 
+
 class SootFieldDescriptor(object):
     def __init__(self, class_name, name, type_):
         self.class_name = class_name
@@ -183,6 +192,45 @@ class SootFieldDescriptor(object):
     def __ne__(self, other):
         return not self == other
 
+
+class SootClassDescriptor(object):
+    
+    def __init__(self, name, soot_class=None):
+        self.name = name
+        self._soot_class = soot_class
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return isinstance(other, SootClassDescriptor) and \
+               self.name == other.name
+
+    def __ne__(self, other):
+        return not self == other
+
+    @property
+    def is_loaded(self):
+        """
+        :return: True, if the class is loaded in CLE and thus
+                 info about field, methods, ... are available.
+        """
+        return self._soot_class != None
+
+    @property
+    def fields(self):
+        return self._soot_class.fields if self.is_loaded else None
+  
+    @property
+    def methods(self):
+        return self._soot_class.methods if self.is_loaded else None
+    
+    @property
+    def superclass_name(self):
+        return self._soot_class.super_class if self.is_loaded else None
 
 
 class ArchSoot(Arch):
