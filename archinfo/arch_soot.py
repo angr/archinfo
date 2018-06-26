@@ -200,6 +200,7 @@ class SootAddressTerminator(SootAddressDescriptor):
     def __repr__(self):
         return "<Terminator>"
 
+
 class SootFieldDescriptor(object):
     def __init__(self, class_name, name, type_):
         self.class_name = class_name
@@ -221,6 +222,45 @@ class SootFieldDescriptor(object):
     def __ne__(self, other):
         return not self == other
 
+
+class SootClassDescriptor(object):
+    
+    def __init__(self, name, soot_class=None):
+        self.name = name
+        self._soot_class = soot_class
+
+    def __repr__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return isinstance(other, SootClassDescriptor) and \
+               self.name == other.name
+
+    def __ne__(self, other):
+        return not self == other
+
+    @property
+    def is_loaded(self):
+        """
+        :return: True, if the class is loaded in CLE and thus
+                 info about field, methods, ... are available.
+        """
+        return self._soot_class != None
+
+    @property
+    def fields(self):
+        return self._soot_class.fields if self.is_loaded else None
+  
+    @property
+    def methods(self):
+        return self._soot_class.methods if self.is_loaded else None
+    
+    @property
+    def superclass_name(self):
+        return self._soot_class.super_class if self.is_loaded else None
 
 
 class SootFieldDescriptor(object):
