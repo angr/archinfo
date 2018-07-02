@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name='archinfo',
-    version='7.8.6.16',
+    version='7.8.7.1',
     packages=packages,
     install_requires=['future'],
 )
