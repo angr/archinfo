@@ -75,7 +75,7 @@ class ArchMIPS64(Arch):
     register_list = [
         Register(name='zero', size=8, alias_names=('r0',)),
         Register(name='at', size=8, alias_names=('r1',),
-                 general_purpose=True, argument=True),
+                 general_purpose=True),
         Register(name='v0', size=8, alias_names=('r2',),
                  general_purpose=True, linux_entry_value='ld_destructor'),
         Register(name='v1', size=8, alias_names=('r3',),
