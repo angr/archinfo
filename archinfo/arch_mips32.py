@@ -47,11 +47,7 @@ class ArchMIPS32(Arch):
     linux_name = 'mipsel' # ???
     triplet = 'mipsel-linux-gnu'
     max_inst_bytes = 4
-    ip_offset = 136
-    sp_offset = 124
-    bp_offset = 128
     ret_offset = 16
-    lr_offset = 132
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4

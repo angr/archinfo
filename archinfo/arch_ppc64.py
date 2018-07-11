@@ -87,11 +87,7 @@ class ArchPPC64(Arch):
     triplet = 'powerpc64le-linux-gnu'
     linux_name = 'ppc750'
     max_inst_bytes = 4
-    ip_offset = 1296
-    sp_offset = 24
-    bp_offset = 264
     ret_offset = 40
-    lr_offset = 1304
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8

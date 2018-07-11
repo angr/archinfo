@@ -168,9 +168,6 @@ class ArchAMD64(Arch):
     linux_name = 'x86_64'
     triplet = 'x86_64-linux-gnu'
     max_inst_bytes = 15
-    ip_offset = 184
-    sp_offset = 48
-    bp_offset = 56
     ret_offset = 16
     vex_conditional_helpers = True
     syscall_num_offset = 16

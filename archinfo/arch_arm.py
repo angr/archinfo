@@ -136,11 +136,7 @@ class ArchARM(Arch):
     linux_name = 'arm'
     triplet = 'arm-linux-gnueabihf'
     max_inst_bytes = 4
-    ip_offset = 68
-    sp_offset = 60
-    bp_offset = 52
     ret_offset = 8
-    lr_offset = 64
     vex_conditional_helpers = True
     syscall_num_offset = 36
     call_pushes_ret = False
