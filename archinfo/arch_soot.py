@@ -79,26 +79,19 @@ class SootMethodDescriptor(object):
 
         :return: True, if name of soot method matches the mangled native name.
         """
-
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
-<<<<<<< f6ca7cd56f41ba95991a28ad8f83e3dc20bc39d4
             native_method, params_sig = native_method.split('__')
             params = ArchSoot.decode_parameter_list_signature(params_sig)
             # check function signature
             if params != self.params:
                 return False
-=======
-            # TODO check function signature
-            raise NotImplementedError('Overloaded native methods are not supported.')
->>>>>>> Improved management of method- / class-descriptor
 
         # demangle native name
         native_method = native_method.replace('_1', '_')
         # TODO unicode escaping
 
         method_native_name = "Java_{class_name}_{method_name}".format(
-<<<<<<< f6ca7cd56f41ba95991a28ad8f83e3dc20bc39d4
                               class_name=self.class_name.replace('.', '_'),
                               method_name=self.name)
 
@@ -123,30 +116,29 @@ class SootMethodDescriptor(object):
                    name=soot_method.name,
                    params=soot_method.params,
                    soot_method=soot_method)
-=======
-                              class_name=self.class_name,
                               method_name=self.name)
+
         return native_method == method_native_name
 
     @classmethod
     def from_soot_method(cls, soot_method):
-        return cls(class_name=soot_method.class_name, 
-                   name=soot_method.name, 
-                   params=soot_method.params, 
+        return cls(class_name=soot_method.class_name,
+                   name=soot_method.name,
+                   params=soot_method.params,
                    soot_method=soot_method)
 
     @property
     def symbolic(self):
         return False
-    
-    @property 
+
+    @property
     def is_loaded(self):
         """
-        :return: True, if the method is loaded in CLE and thus
-                 info about attrs, ret and exception are available.
+        :return: True, if the method is loaded in CLE and thus infos about attrs,
+                 ret and exceptions are available.
         """
-        return self._soot_method != None
-    
+        return self._soot_method is not None
+
     @property
     def attrs(self):
         return self._soot_method.attrs if self.is_loaded else []
@@ -158,7 +150,6 @@ class SootMethodDescriptor(object):
     @property
     def ret(self):
         return self._soot_method.ret if self.is_loaded else []
->>>>>>> Improved management of method- / class-descriptor
 
 
 class SootAddressDescriptor(object):
@@ -244,6 +235,9 @@ class SootAddressTerminator(SootAddressDescriptor):
 
 
 class SootFieldDescriptor(object):
+
+    __slots__ = ['class_name', 'name', 'type']
+
     def __init__(self, class_name, name, type_):
         self.class_name = class_name
         self.name = name
@@ -257,16 +251,18 @@ class SootFieldDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootFieldDescriptor) and \
-                self.class_name == other.class_name and \
-                self.name == other.name and \
-                self.type == other.type
+            self.class_name == other.class_name and \
+            self.name == other.name and \
+            self.type == other.type
 
     def __ne__(self, other):
         return not self == other
 
 
 class SootClassDescriptor(object):
-    
+
+    __slots__ = ['name', '_soot_class']
+
     def __init__(self, name, soot_class=None):
         self.name = name
         self._soot_class = soot_class
@@ -279,7 +275,7 @@ class SootClassDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootClassDescriptor) and \
-               self.name == other.name
+            self.name == other.name
 
     def __ne__(self, other):
         return not self == other
@@ -287,19 +283,19 @@ class SootClassDescriptor(object):
     @property
     def is_loaded(self):
         """
-        :return: True, if the class is loaded in CLE and thus
-                 info about field, methods, ... are available.
+        :return: True, if the class is loaded in CLE and thus info about field,
+                 methods, ... are available.
         """
-        return self._soot_class != None
+        return self._soot_class is not None
 
     @property
     def fields(self):
         return self._soot_class.fields if self.is_loaded else None
-  
+
     @property
     def methods(self):
         return self._soot_class.methods if self.is_loaded else None
-    
+
     @property
     def superclass_name(self):
         return self._soot_class.super_class if self.is_loaded else None
@@ -495,5 +491,6 @@ class ArchSoot(Arch):
         :return: empty list
         """
         return []
+
 
 register_arch(['soot'], 8, Endness.LE, ArchSoot)
