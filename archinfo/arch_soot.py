@@ -1,12 +1,16 @@
 
-from .arch import Arch, register_arch, Endness
+import logging
 import re
 
-import logging
+from .arch import Arch, Endness, register_arch
+
 l = logging.getLogger('archinfo.arch_soot')
 
 
 class SootMethodDescriptor(object):
+
+    __slots__ = ['class_name', 'name', 'params', '_soot_method']
+
     def __init__(self, class_name, name, params, soot_method=None):
         self.class_name = class_name
         self.name = name
@@ -21,9 +25,9 @@ class SootMethodDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootMethodDescriptor) and \
-                self.class_name == other.class_name and \
-                self.name == other.name and \
-                self.params == other.params
+            self.class_name == other.class_name and \
+            self.name == other.name and \
+            self.params == other.params
 
     def __ne__(self, other):
         return not self == other
@@ -47,43 +51,46 @@ class SootMethodDescriptor(object):
 
     def matches_with_native_name(self, native_method):
         """
-        Name of native methods are getting encoded, s.t. they translate into valid C function names.
+        The name of native methods are getting encoded, s.t. they translate into
+        valid C function names. This method indicates if the name of the given
+        native method matches the name of the soot method.
+
         :return: True, if name of soot method matches the mangled native name.
         """
-        
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
             # TODO check function signature
             raise NotImplementedError('Overloaded native methods are not supported.')
 
         # demangle native name
-        native_method =  native_method.replace('_1', '_')
+        native_method = native_method.replace('_1', '_')
         # TODO unicode escaping
 
         method_native_name = "Java_{class_name}_{method_name}".format(
-                              class_name=self.class_name,
+                              class_name=self.class_name.replace('.', '_'),
                               method_name=self.name)
+
         return native_method == method_native_name
 
     @classmethod
     def from_soot_method(cls, soot_method):
-        return cls(class_name=soot_method.class_name, 
-                   name=soot_method.name, 
-                   params=soot_method.params, 
+        return cls(class_name=soot_method.class_name,
+                   name=soot_method.name,
+                   params=soot_method.params,
                    soot_method=soot_method)
 
     @property
     def symbolic(self):
         return False
-    
-    @property 
+
+    @property
     def is_loaded(self):
         """
-        :return: True, if the method is loaded in CLE and thus
-                 info about attrs, ret and exception are available.
+        :return: True, if the method is loaded in CLE and thus infos about attrs,
+                 ret and exceptions are available.
         """
-        return self._soot_method != None
-    
+        return self._soot_method is not None
+
     @property
     def attrs(self):
         return self._soot_method.attrs if self.is_loaded else []
@@ -98,20 +105,23 @@ class SootMethodDescriptor(object):
 
 
 class SootAddressDescriptor(object):
+
+    __slots__ = ['method', 'block_idx', 'stmt_idx']
+
     def __init__(self, method, block_idx, stmt_idx):
 
         if not isinstance(method, SootMethodDescriptor):
-            raise ValueError('The parameter "method" must be an instance of SootMethodDescriptor.')
+            raise ValueError('The parameter "method" must be an '
+                             'instance of SootMethodDescriptor.')
 
         self.method = method
         self.block_idx = block_idx
         self.stmt_idx = stmt_idx
 
     def __repr__(self):
-        return "<%s+(%s:%s)>" % (repr(self.method),
-                               self.block_idx,
-                               '%d' % self.stmt_idx if self.stmt_idx is not None else '[0]'
-                               )
+        return "<%r+(%s:%s)>" % (self.method,
+                                 self.block_idx,
+                                 '%d' % self.stmt_idx if self.stmt_idx is not None else '[0]')
 
     def __hash__(self):
         return hash((self.method, self.stmt_idx))
@@ -119,59 +129,67 @@ class SootAddressDescriptor(object):
     def __eq__(self, other):
         # We do not compare the block IDs since statement IDs are unique enough
         return isinstance(other, SootAddressDescriptor) and \
-                self.method == other.method and \
-                self.stmt_idx == other.stmt_idx
+            self.method == other.method and \
+            self.stmt_idx == other.stmt_idx
 
     def __ne__(self, other):
         return not self == other
 
     def __lt__(self, other):
         if not isinstance(other, SootAddressDescriptor):
-            raise TypeError("You cannot compare a SootAddressDescriptor with a %s." % type(other))
+            raise TypeError("You cannot compare a SootAddressDescriptor "
+                            "with a %s." % type(other))
 
         if self.method != other.method:
-            raise ValueError("You cannot compare two SootAddressDescriptor instances of two different methods.")
+            raise ValueError("You cannot compare two SootAddressDescriptor "
+                             "instances of two different methods.")
 
         return self.stmt_idx < other.stmt_idx
 
     def __le__(self, other):
         if not isinstance(other, SootAddressDescriptor):
-            raise TypeError("You cannot compare a SootAddressDescriptor with a %s." % type(other))
+            raise TypeError("You cannot compare a SootAddressDescriptor "
+                            "with a %s." % type(other))
 
         if self.method != other.method:
-            raise ValueError("You cannot compare two SootAddressDescriptor instances of two different methods.")
+            raise ValueError("You cannot compare two SootAddressDescriptor "
+                             "instances of two different methods.")
 
         return self.stmt_idx <= other.stmt_idx
+
+    def __add__(self, stmts_offset):
+        if not isinstance(stmts_offset, (int, long)):
+            raise TypeError('The stmts_offset must be an int or a long.')
+        s = self.copy()
+        s.stmt_idx += stmts_offset
+        return s
 
     def copy(self):
         return SootAddressDescriptor(method=self.method,
                                      block_idx=self.block_idx,
-                                     stmt_idx=self.stmt_idx
-                                     )
+                                     stmt_idx=self.stmt_idx)
 
     @property
     def symbolic(self):
         return False
 
-    def __add__(self, stmts_offset):
-
-        if not isinstance(stmts_offset, (int, long)):
-            raise TypeError('The stmts_offset must be an int or a long.')
-
-        s = self.copy()
-        s.stmt_idx += stmts_offset
-        return s
-
 
 class SootAddressTerminator(SootAddressDescriptor):
+
+    __slots__ = []
+
     def __init__(self):
-        super(SootAddressTerminator, self).__init__(SootMethodDescriptor("dummy", "dummy", tuple()), 0, 0)
+        dummy_method = SootMethodDescriptor("dummy", "dummy", tuple())
+        super(SootAddressTerminator, self).__init__(dummy_method, 0, 0)
 
     def __repr__(self):
         return "<Terminator>"
 
 
 class SootFieldDescriptor(object):
+
+    __slots__ = ['class_name', 'name', 'type']
+
     def __init__(self, class_name, name, type_):
         self.class_name = class_name
         self.name = name
@@ -185,16 +203,18 @@ class SootFieldDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootFieldDescriptor) and \
-                self.class_name == other.class_name and \
-                self.name == other.name and \
-                self.type == other.type
+            self.class_name == other.class_name and \
+            self.name == other.name and \
+            self.type == other.type
 
     def __ne__(self, other):
         return not self == other
 
 
 class SootClassDescriptor(object):
-    
+
+    __slots__ = ['name', '_soot_class']
+
     def __init__(self, name, soot_class=None):
         self.name = name
         self._soot_class = soot_class
@@ -207,7 +227,7 @@ class SootClassDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootClassDescriptor) and \
-               self.name == other.name
+            self.name == other.name
 
     def __ne__(self, other):
         return not self == other
@@ -215,22 +235,42 @@ class SootClassDescriptor(object):
     @property
     def is_loaded(self):
         """
-        :return: True, if the class is loaded in CLE and thus
-                 info about field, methods, ... are available.
+        :return: True, if the class is loaded in CLE and thus info about field,
+                 methods, ... are available.
         """
-        return self._soot_class != None
+        return self._soot_class is not None
 
     @property
     def fields(self):
         return self._soot_class.fields if self.is_loaded else None
-  
+
     @property
     def methods(self):
         return self._soot_class.methods if self.is_loaded else None
-    
+
     @property
     def superclass_name(self):
         return self._soot_class.super_class if self.is_loaded else None
+
+
+class SootNullConstant(object):
+
+    __slots__ = []
+
+    def __init__(self):
+        pass
+
+    def __repr__(self):
+        return 'null'
+
+    def __hash__(self):
+        return hash('null')
+
+    def __eq__(self, other):
+        return isinstance(other, SootNullConstant)
+
+    def __ne__(self, other):
+        return not self == other
 
 
 class ArchSoot(Arch):
@@ -246,15 +286,14 @@ class ArchSoot(Arch):
     function_address_types = (SootMethodDescriptor, )
 
     # Size of native counterparts of primitive Java types
-    sizeof = {'boolean'  :  8,
-              'byte'     :  8,
-              'char'     : 16, 
-              'short'    : 16,
-              'int'      : 32,
-              'long'     : 64, 
-              'float'    : 32,
-              'double'   : 64
-             }
+    sizeof = {'boolean':  8,
+              'byte':  8,
+              'char': 16,
+              'short': 16,
+              'int': 32,
+              'long': 64,
+              'float': 32,
+              'double': 64}
 
     primitive_types = ['boolean',
                        'byte',
@@ -265,51 +304,49 @@ class ArchSoot(Arch):
                        'float',
                        'double']
 
-    sig_dict = {'Z' : 'boolean',
-                'B' : 'byte',
-                'C' : 'char',
-                'S' : 'short',
-                'I' : 'int',
-                'J' : 'long',
-                'F' : 'float',
-                'D' : 'double',
-                'V' : 'void'
-               } 
+    sig_dict = {'Z': 'boolean',
+                'B': 'byte',
+                'C': 'char',
+                'S': 'short',
+                'I': 'int',
+                'J': 'long',
+                'F': 'float',
+                'D': 'double',
+                'V': 'void'}
 
     @staticmethod
     def decode_type_signature(type_sig):
-
-        if type_sig == "":
+        if not type_sig:
             return None
-
+        # try to translate signature as a primitive type
         if type_sig in ArchSoot.sig_dict:
             return ArchSoot.sig_dict[type_sig]
-
+        # java classes are encoded as 'Lclass_name;'
         if type_sig.startswith('L') and type_sig.endswith(';'):
             return type_sig[1:-1]
-
         raise ValueError(type_sig)
 
     @staticmethod
     def decode_method_signature(method_sig):
+        # signature format follows the pattern: (param_sig)ret_sig
         match = re.search(r'\((.*)\)(.*)', method_sig)
-        
-        params = tuple(ArchSoot.decode_type_signature(param) 
-                       for param in re.findall(r'([\[]*[ZBCSIJFDV]|[\[]*L.+;)', match.group(1)))
-        ret = ArchSoot.decode_type_signature(match.group(2))
-
-        l.debug("Decoded method signature '%s' as params=%s and ret=%s"
-                "" % (method_sig, params, ret) )
-
-        return params, ret
+        param_sig, ret_sig = match.group(1), match.group(2)
+        # decode types
+        params_types = tuple(ArchSoot.decode_type_signature(param)
+                             for param in re.findall(r'([\[]*[ZBCSIJFDV]|[\[]*L.+;)', param_sig))
+        ret_type = ArchSoot.decode_type_signature(ret_sig)
+        l.debug("Decoded method signature '%s' as params=%s and ret=%s",
+                method_sig, params_types, ret_type)
+        return params_types, ret_type
 
     def library_search_path(self, pedantic=False):
         """
-        Since java is mostly system independent, we cannot return
-        system specific paths.
-        
+        Since java is mostly system independent, we cannot return system
+        specific paths.
+
         :return: empty list
         """
         return []
+
 
 register_arch(['soot'], 8, Endness.LE, ArchSoot)
