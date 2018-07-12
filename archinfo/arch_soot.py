@@ -79,7 +79,6 @@ class SootMethodDescriptor(object):
 
         :return: True, if name of soot method matches the mangled native name.
         """
-
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
             native_method, params_sig = native_method.split('__')
@@ -202,6 +201,9 @@ class SootAddressTerminator(SootAddressDescriptor):
 
 
 class SootFieldDescriptor(object):
+
+    __slots__ = ['class_name', 'name', 'type']
+
     def __init__(self, class_name, name, type_):
         self.class_name = class_name
         self.name = name
@@ -215,16 +217,18 @@ class SootFieldDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootFieldDescriptor) and \
-                self.class_name == other.class_name and \
-                self.name == other.name and \
-                self.type == other.type
+            self.class_name == other.class_name and \
+            self.name == other.name and \
+            self.type == other.type
 
     def __ne__(self, other):
         return not self == other
 
 
 class SootClassDescriptor(object):
-    
+
+    __slots__ = ['name', '_soot_class']
+
     def __init__(self, name, soot_class=None):
         self.name = name
         self._soot_class = soot_class
@@ -237,7 +241,7 @@ class SootClassDescriptor(object):
 
     def __eq__(self, other):
         return isinstance(other, SootClassDescriptor) and \
-               self.name == other.name
+            self.name == other.name
 
     def __ne__(self, other):
         return not self == other
@@ -245,19 +249,19 @@ class SootClassDescriptor(object):
     @property
     def is_loaded(self):
         """
-        :return: True, if the class is loaded in CLE and thus
-                 info about field, methods, ... are available.
+        :return: True, if the class is loaded in CLE and thus info about field,
+                 methods, ... are available.
         """
-        return self._soot_class != None
+        return self._soot_class is not None
 
     @property
     def fields(self):
         return self._soot_class.fields if self.is_loaded else None
-  
+
     @property
     def methods(self):
         return self._soot_class.methods if self.is_loaded else None
-    
+
     @property
     def superclass_name(self):
         return self._soot_class.super_class if self.is_loaded else None
@@ -453,5 +457,6 @@ class ArchSoot(Arch):
         :return: empty list
         """
         return []
+
 
 register_arch(['soot'], 8, Endness.LE, ArchSoot)
