@@ -116,40 +116,6 @@ class SootMethodDescriptor(object):
                    name=soot_method.name,
                    params=soot_method.params,
                    soot_method=soot_method)
-                              method_name=self.name)
-
-        return native_method == method_native_name
-
-    @classmethod
-    def from_soot_method(cls, soot_method):
-        return cls(class_name=soot_method.class_name,
-                   name=soot_method.name,
-                   params=soot_method.params,
-                   soot_method=soot_method)
-
-    @property
-    def symbolic(self):
-        return False
-
-    @property
-    def is_loaded(self):
-        """
-        :return: True, if the method is loaded in CLE and thus infos about attrs,
-                 ret and exceptions are available.
-        """
-        return self._soot_method is not None
-
-    @property
-    def attrs(self):
-        return self._soot_method.attrs if self.is_loaded else []
-
-    @property
-    def exceptions(self):
-        return self._soot_method.exceptions if self.is_loaded else []
-
-    @property
-    def ret(self):
-        return self._soot_method.ret if self.is_loaded else []
 
 
 class SootAddressDescriptor(object):
@@ -299,77 +265,6 @@ class SootClassDescriptor(object):
     @property
     def superclass_name(self):
         return self._soot_class.super_class if self.is_loaded else None
-
-
-class SootFieldDescriptor(object):
-
-    __slots__ = ['class_name', 'name', 'type']
-
-    def __init__(self, class_name, name, type_):
-        self.class_name = class_name
-        self.name = name
-        self.type = type_
-
-    def __repr__(self):
-        return "%s.%s" % (self.class_name, self.name)
-
-    def __hash__(self):
-        return hash((self.class_name, self.name, self.type))
-
-    def __eq__(self, other):
-        return isinstance(other, SootFieldDescriptor) and \
-            self.class_name == other.class_name and \
-            self.name == other.name and \
-            self.type == other.type
-
-    def __ne__(self, other):
-        return not self == other
-
-
-class SootClassDescriptor(object):
-
-    __slots__ = ['name', '_soot_class']
-
-    def __init__(self, name, soot_class=None):
-        self.name = name
-        self._soot_class = soot_class
-
-    def __repr__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __eq__(self, other):
-        return isinstance(other, SootClassDescriptor) and \
-            self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
-
-    @property
-    def is_loaded(self):
-        """
-        :return: True, if the class is loaded in CLE and thus info about field,
-                 methods, ... are available.
-        """
-        return self._soot_class is not None
-
-    @property
-    def fields(self):
-        return self._soot_class.fields if self.is_loaded else None
-
-    @property
-    def methods(self):
-        return self._soot_class.methods if self.is_loaded else None
-
-    @property
-    def superclass_name(self):
-        return self._soot_class.super_class if self.is_loaded else None
-
-    @property
-    def type(self):
-        return "java.lang.Class"
 
 
 class SootNullConstant(object):
