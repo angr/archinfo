@@ -32,22 +32,37 @@ class SootMethodDescriptor(object):
     def __ne__(self, other):
         return not self == other
 
-    @classmethod
-    def from_string(cls, tstr):
-        # this should be the opposite of repr
-        tstr = tstr.strip()
-        class_and_method, tparams = tstr.split("(")
-        params_str = tparams.split(")")[0]
-        if params_str == "":
-            params = tuple()
-        else:
-            params = tuple([t.strip() for t in params_str.split(",")])
-        class_name, _, method = class_and_method.rpartition(".")
-        return cls(class_name, method, params)
-
     @property
     def fullname(self):
         return "%s.%s" % (self.class_name, self.name)
+
+    @property
+    def symbolic(self):
+        return False
+
+    @property
+    def is_loaded(self):
+        """
+        :return: True, if the method is loaded in CLE and thus infos about attrs,
+                 ret and exceptions are available.
+        """
+        return self._soot_method is not None
+
+    @property
+    def attrs(self):
+        return self._soot_method.attrs if self.is_loaded else []
+
+    @property
+    def exceptions(self):
+        return self._soot_method.exceptions if self.is_loaded else []
+
+    @property
+    def block_by_label(self):
+        return self._soot_method.block_by_label if self.is_loaded else None
+
+    @property
+    def ret(self):
+        return self._soot_method.ret if self.is_loaded else []
 
     def matches_with_native_name(self, native_method):
         """
@@ -73,35 +88,24 @@ class SootMethodDescriptor(object):
         return native_method == method_native_name
 
     @classmethod
+    def from_string(cls, tstr):
+        # this should be the opposite of repr
+        tstr = tstr.strip()
+        class_and_method, tparams = tstr.split("(")
+        params_str = tparams.split(")")[0]
+        if params_str == "":
+            params = tuple()
+        else:
+            params = tuple([t.strip() for t in params_str.split(",")])
+        class_name, _, method = class_and_method.rpartition(".")
+        return cls(class_name, method, params)
+
+    @classmethod
     def from_soot_method(cls, soot_method):
         return cls(class_name=soot_method.class_name,
                    name=soot_method.name,
                    params=soot_method.params,
                    soot_method=soot_method)
-
-    @property
-    def symbolic(self):
-        return False
-
-    @property
-    def is_loaded(self):
-        """
-        :return: True, if the method is loaded in CLE and thus infos about attrs,
-                 ret and exceptions are available.
-        """
-        return self._soot_method is not None
-
-    @property
-    def attrs(self):
-        return self._soot_method.attrs if self.is_loaded else []
-
-    @property
-    def exceptions(self):
-        return self._soot_method.exceptions if self.is_loaded else []
-
-    @property
-    def ret(self):
-        return self._soot_method.ret if self.is_loaded else []
 
 
 class SootAddressDescriptor(object):
@@ -255,8 +259,6 @@ class SootClassDescriptor(object):
 
 class SootNullConstant(object):
 
-    __slots__ = []
-
     def __init__(self):
         pass
 
@@ -271,6 +273,29 @@ class SootNullConstant(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+class SootArgument(object):
+    """
+    Typed Java argument.
+    """
+
+    __slots__ = ['value', 'type', 'is_this_ref']
+
+    def __init__(self, value, type_, is_this_ref=False):
+        """
+        :param value:        Value of the argument
+        :param type_:        Type of the argument
+        :param is_this_ref:  Indicates whether the argument represents the
+                             'this' reference, i.e. the object on which an
+                             instance method is invoked.
+        """
+        self.value = value
+        self.type = type_
+        self.is_this_ref = is_this_ref
+
+    def __repr__(self):
+        return "%s (%s)" % (self.value, self.type)
 
 
 class ArchSoot(Arch):
@@ -341,7 +366,7 @@ class ArchSoot(Arch):
 
     def library_search_path(self, pedantic=False):
         """
-        Since java is mostly system independent, we cannot return system
+        Since Java is mostly system independent, we cannot return system
         specific paths.
 
         :return: empty list
