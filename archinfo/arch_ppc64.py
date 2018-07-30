@@ -87,11 +87,7 @@ class ArchPPC64(Arch):
     triplet = 'powerpc64le-linux-gnu'
     linux_name = 'ppc750'
     max_inst_bytes = 4
-    ip_offset = 1296
-    sp_offset = 24
-    bp_offset = 264
     ret_offset = 40
-    lr_offset = 1304
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8
@@ -140,7 +136,7 @@ class ArchPPC64(Arch):
                  general_purpose=True),
         Register(name='gpr14', size=8, alias_names=('r14',),
                  general_purpose=True),
-        Register(name='gpr15', size=8, alias_names=('r15', 'bp'),
+        Register(name='gpr15', size=8, alias_names=('r15',),
                  general_purpose=True),
         Register(name='gpr16', size=8, alias_names=('r16',),
                  general_purpose=True),
@@ -172,7 +168,7 @@ class ArchPPC64(Arch):
                  general_purpose=True),
         Register(name='gpr30', size=8, alias_names=('r30',),
                  general_purpose=True),
-        Register(name='gpr31', size=8, alias_names=('r31',),
+        Register(name='gpr31', size=8, alias_names=('r31', 'bp'),
                  general_purpose=True),
         Register(name='vsr0', size=16,  subregisters=[('fpr0', 0, 8)],
                  alias_names=('v0',), floating_point=True),

@@ -590,6 +590,7 @@ defines = {
     "R_ARM_ABS8":                                 0x8,
     "R_ARM_SBREL32":                              0x9,
     "R_ARM_THM_PC22":                             0xa,
+    "R_ARM_THM_CALL":                             0xa,
     "R_ARM_THM_PC8":                              0xb,
     "R_ARM_AMP_VCALL9":                           0xc,
     "R_ARM_TLS_DESC":                             0xd,

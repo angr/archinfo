@@ -40,17 +40,14 @@ class ArchAArch64(Arch):
     linux_name = 'aarch64'
     triplet = 'aarch64-linux-gnueabihf'
     max_inst_bytes = 4
-    ip_offset = 272
-    sp_offset = 264
-    bp_offset = 248
     ret_offset = 16
-    lr_offset = 256
     vex_conditional_helpers = True
     syscall_num_offset = 80
     call_pushes_ret = False
     stack_change = -8
     memory_endness = Endness.LE
     register_endness = Endness.LE
+    instruction_endness = Endness.LE
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_ARM64

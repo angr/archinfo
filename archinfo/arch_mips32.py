@@ -47,11 +47,7 @@ class ArchMIPS32(Arch):
     linux_name = 'mipsel' # ???
     triplet = 'mipsel-linux-gnu'
     max_inst_bytes = 4
-    ip_offset = 136
-    sp_offset = 124
-    bp_offset = 128
     ret_offset = 16
-    lr_offset = 132
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
@@ -81,7 +77,7 @@ class ArchMIPS32(Arch):
     register_list = [
         Register(name='zero', size=4, alias_names=('r0',)),
         Register(name='at', size=4, alias_names=('r1',),
-                 general_purpose=True, argument=True),
+                 general_purpose=True),
         Register(name='v0', size=4, alias_names=('r2',),
                  general_purpose=True, linux_entry_value='ld_destructor'),
         Register(name='v1', size=4, alias_names=('r3',),

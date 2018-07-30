@@ -185,8 +185,8 @@ class Arch(object):
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
-        # Register collections
         if self.register_list:
+            # Register collections
             if self.vex_arch is not None and _pyvex is not None:
                 va = self.vex_arch[7:].lower()
                 for r in self.register_list:
@@ -200,37 +200,19 @@ class Arch(object):
                                 break
 
             self.default_register_values = [(r.name,) + r.default_value for r in self.register_list if r.default_value is not None]
-#           print 'default_register_values'
-#           for i in self.default_register_values:
-#               print i
             self.entry_register_values = {r.name: r.linux_entry_value for r in self.register_list if r.linux_entry_value is not None}
-#           print 'entry_register_values'
-#           for i in self.entry_register_values:
-#               print i
             self.default_symbolic_registers = [r.name for r in self.register_list if r.general_purpose]
-#           print 'default_symbolic_registers'
-#           for i in self.default_symbolic_registers:
-#               print i
             self.register_names = {r.vex_offset: r.name for r in self.register_list}
-#           print 'register_names'
-#           for k, v in self.register_names.iteritems():
-#               print k, v
             self.registers = self._get_register_dict()
-#           print 'registers'
-#           for k, v in self.registers.iteritems():
-#               print k, v
             self.argument_registers = set(r.vex_offset for r in self.register_list if r.argument)
-#           print 'argument_registers'
-#           for i in self.argument_registers:
-#               print i
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
-#           print 'persistent_regs'
-#           for i in self.persistent_regs:
-#               print i
             self.concretize_unique_registers = set(r.vex_offset for r in self.register_list if r.concretize_unique)
-#           print 'concretize_unique_registers'
-#           for i in self.concretize_unique_registers:
-#               print i
+
+            # Register offsets
+            self.ip_offset = self.registers['ip'][0]
+            self.sp_offset = self.registers['sp'][0]
+            self.bp_offset = self.registers['bp'][0]
+            self.lr_offset = self.registers.get('lr', (None, None))[0]
 
         # generate register mapping (offset, size): name
         self.register_size_names = {}
