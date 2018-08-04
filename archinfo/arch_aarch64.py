@@ -64,7 +64,7 @@ class ArchAArch64(Arch):
     ret_instruction = b"\xC0\x03\x5F\xD6"    # ret
     nop_instruction = b"\x1F\x20\x03\xD5"    # nop
     function_prologs = set((
-        #r"\xFD\x7B\xBE\xA9\xFD\x03\x00\x91"
+        #br"\xFD\x7B\xBE\xA9\xFD\x03\x00\x91"
         # TODO
     ))
     function_epilogs = set((
