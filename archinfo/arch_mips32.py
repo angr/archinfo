@@ -29,8 +29,8 @@ class ArchMIPS32(Arch):
         if endness == Endness.BE:
 
             self.function_prologs = {
-                r"\x27\xbd\xff[\x00-\xff]"                                          # addiu $sp, xxx
-                r"\x3c\x1c[\x00-\xff][\x00-\xff]\x9c\x27[\x00-\xff][\x00-\xff]"     # lui $gp, xxx; addiu $gp, $gp, xxxx
+                br"\x27\xbd\xff[\x00-\xff]"                                          # addiu $sp, xxx
+                br"\x3c\x1c[\x00-\xff][\x00-\xff]\x9c\x27[\x00-\xff][\x00-\xff]"     # lui $gp, xxx; addiu $gp, $gp, xxxx
             }
             self.function_epilogs = {
                 br"\x8f\xbf[\x00-\xff]{2}([\x00-\xff]{4}){0,4}\x03\xe0\x00\x08"      # lw ra, off(sp); ... ; jr ra
@@ -64,11 +64,11 @@ class ArchMIPS32(Arch):
     uc_const = _unicorn.mips_const if _unicorn else None
     uc_prefix = "UC_MIPS_" if _unicorn else None
     function_prologs = {
-        r"[\x00-\xff]\xff\xbd\x27",                                         # addiu $sp, xxx
-        r"[\x00-\xff][\x00-\xff]\x1c\x3c[\x00-\xff][\x00-\xff]\x9c\x27"     # lui $gp, xxx; addiu $gp, $gp, xxxx
+        br"[\x00-\xff]\xff\xbd\x27",                                         # addiu $sp, xxx
+        br"[\x00-\xff][\x00-\xff]\x1c\x3c[\x00-\xff][\x00-\xff]\x9c\x27"     # lui $gp, xxx; addiu $gp, $gp, xxxx
     }
     function_epilogs = {
-        r"[\x00-\xff]{2}\xbf\x8f([\x00-\xff]{4}){0,4}\x08\x00\xe0\x03"      # lw ra, off(sp); ... ; jr ra
+        br"[\x00-\xff]{2}\xbf\x8f([\x00-\xff]{4}){0,4}\x08\x00\xe0\x03"      # lw ra, off(sp); ... ; jr ra
     }
 
     ret_instruction = b"\x08\x00\xE0\x03" + b"\x25\x08\x20\x00"

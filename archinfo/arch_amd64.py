@@ -191,13 +191,13 @@ class ArchAMD64(Arch):
     uc_const = _unicorn.x86_const if _unicorn else None
     uc_prefix = "UC_X86_" if _unicorn else None
     function_prologs = {
-        r"\x55\x48\x89\xe5", # push rbp; mov rbp, rsp
-        r"\x48[\x83,\x81]\xec[\x00-\xff]", # sub rsp, xxx
+        br"\x55\x48\x89\xe5", # push rbp; mov rbp, rsp
+        br"\x48[\x83,\x81]\xec[\x00-\xff]", # sub rsp, xxx
     }
     function_epilogs = {
-        r"\xc9\xc3", # leaveq; retq
-        r"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; retq
-        r"\x48[\x83,\x81]\xc4([\x00-\xff]{1}|[\x00-\xff]{4})\xc3", #  add rsp, <siz>; retq
+        br"\xc9\xc3", # leaveq; retq
+        br"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; retq
+        br"\x48[\x83,\x81]\xc4([\x00-\xff]{1}|[\x00-\xff]{4})\xc3", #  add rsp, <siz>; retq
     }
     ret_instruction = b"\xc3"
     nop_instruction = b"\x90"
