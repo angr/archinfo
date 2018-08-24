@@ -706,8 +706,11 @@ def arch_from_id(ident, endness='any', bits=''):
 
 
 def reverse_ends(string):
-    ise = 'I'*(len(string)//4)
+    count = (len(string) + 3) // 4
+    ise = 'I' * count
+    string += '\x00' * (count * 4 - len(string))
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
+
 
 def get_host_arch():
     """
