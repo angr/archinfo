@@ -15,3 +15,4 @@ from .arch_mips32   import ArchMIPS32
 from .arch_mips64   import ArchMIPS64
 from .arch_soot     import ArchSoot
 from .archerror     import ArchError
+from .arch_s390x    import ArchS390X
