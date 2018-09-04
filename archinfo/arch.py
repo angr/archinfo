@@ -650,6 +650,10 @@ def register_arch(regexes, bits, endness, my_arch):
         all_arches.append(my_arch(endness))
 
 
+class ArchNotFound(Exception):
+    pass
+
+
 def arch_from_id(ident, endness='any', bits=''):
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
@@ -701,7 +705,7 @@ def arch_from_id(ident, endness='any', bits=''):
             cls = acls
             break
     if not cls:
-        raise RuntimeError("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
+        raise ArchNotFound("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
     if endness == 'unsure':
         if aendness == 'any':
             # We really don't care, use default
