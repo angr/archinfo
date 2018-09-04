@@ -170,4 +170,4 @@ class ArchS390X(Arch):
         dtv_entry_offset=0)
 
 
-register_arch(['em_s390'], 64, Endness.BE, ArchS390X)
+register_arch(['s390'], 64, Endness.BE, ArchS390X)
