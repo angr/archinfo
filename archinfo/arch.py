@@ -31,7 +31,7 @@ except ImportError:
     _keystone = None
 
 if sys.version_info[0] >= 3:
-    integer_types = int,
+    integer_types = (int,)
 else:
     integer_types = (int, long)
 
@@ -297,33 +297,42 @@ class Arch(object):
                 return val
         return None
 
-    def struct_fmt(self, size=None):
+    def struct_fmt(self, size=None, signed=False, endness=None):
         """
-        Produce a format string for use in python's ``struct`` module.
+        Produce a format string for use in python's ``struct`` module to decode a single word.
 
-        Optionally, the ``size`` parameter can specify the width of the int to store.
+        :param int size:    The size in bits to pack/unpack. Defaults to wordsize
+        :param bool signed: Whether the data should be extracted signed/unsigned. Default unsigned
+        :param str Endness: The endian to use in packing/unpacking. Defaults to memory endness
+        :return str:        A format string with an endness modifier and a single format character
         """
-        fmt = ""
         if size is None:
             size = self.bits
+        if endness is None:
+            endness = self.memory_endness
 
         if self.memory_endness == Endness.BE:
-            fmt += ">"
+            fmt_end = ">"
+        elif self.memory_endness == Endness.LE:
+            fmt_end = "<"
         else:
-            fmt += "<"
+            raise ValueError("Please don't middle-endian at me, I'm begging you")
 
         if size == 64:
-            fmt += "Q"
+            fmt_size = "Q"
         elif size == 32:
-            fmt += "I"
+            fmt_size = "I"
         elif size == 16:
-            fmt += "H"
+            fmt_size = "H"
         elif size == 8:
-            fmt += "B"
+            fmt_size = "B"
         else:
             raise ValueError("Invalid size: Must be a muliple of 8")
 
-        return fmt
+        if signed:
+            fmt_size = fmt_size.lower()
+
+        return fmt_end + fmt_size
 
     def _get_register_dict(self):
         res = {}
@@ -631,7 +640,7 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(bits, integer_types):
         raise TypeError("Bits must be an int")
     if endness is not None:
-        if endness != Endness.BE and endness != Endness.LE and endness != Endness.ME and endness != "any":
+        if endness not in (Endness.BE, Endness.LE, Endness.ME, 'any'):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
@@ -708,7 +717,7 @@ def arch_from_id(ident, endness='any', bits=''):
 def reverse_ends(string):
     count = (len(string) + 3) // 4
     ise = 'I' * count
-    string += '\x00' * (count * 4 - len(string))
+    string += b'\x00' * (count * 4 - len(string))
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
 
 
