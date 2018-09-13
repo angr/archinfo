@@ -186,8 +186,8 @@ class Arch(object):
 
         if self.register_list:
             # Register collections
-            if self.vex_arch is not None and _pyvex is not None:
-                va = self.vex_arch[7:].lower()
+            if type(self.vex_arch) is str and _pyvex is not None:
+                va = self.vex_arch[7:].lower() # pylint: disable=unsubscriptable-object
                 for r in self.register_list:
                     if r.vex_offset is None:
                         for name in (r.vex_name, r.name) + r.alias_names:
@@ -362,14 +362,36 @@ class Arch(object):
         A Capstone instance for this arch
         """
         if _capstone is None:
-            l.warning("Capstone is not found!")
+            l.warning("Capstone is not installed!")
             return None
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
+            self._configure_capstone()
             self._cs.detail = True
         return self._cs
+
+    @property
+    def keystone(self):
+        """
+        A Keystone instance for this arch
+        """
+        if self._ks is None:
+            if _keystone is None:
+                l.warning("Keystone is not installed!")
+                return None
+            if self.ks_arch is None:
+                raise ArchError("Arch %s does not support disassembly with Keystone" % self.name)
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+            self._configure_keystone()
+        return self._ks
+
+    def _configure_capstone(self):
+        pass
+
+    def _configure_keystone(self):
+        pass
 
     @property
     def unicorn(self):
@@ -391,24 +413,20 @@ class Arch(object):
         :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
         :return:            The assembled bytecode
         """
-        if thumb is True:
+        if thumb and not hasattr(self, 'keystone_thumb'):
             l.warning("Specified thumb=True on non-ARM architecture")
-        if _keystone is None:
-            l.warning("Keystone is not found!")
-            return None
-        if self.ks_arch is None:
-            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
-        if self._ks is None:
-            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+            thumb = False
+        ks = self.keystone_thumb if thumb else self.keystone # pylint: disable=no-member
+
         try:
-            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+            encoding, _ = ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
         except TypeError:
-            bytelist, _ = self._ks.asm(string, addr)
+            bytelist, _ = ks.asm(string, addr)
             if as_bytes:
-                encoding = ''.join(chr(c) for c in bytelist)
-                if not isinstance(encoding, bytes):
-                    l.warning("Cheap hack to create bytestring from Keystone!")
-                    encoding = encoding.encode()
+                if bytes is str:
+                    encoding = ''.join(chr(c) for c in bytelist)
+                else:
+                    encoding = bytes(bytelist)
             else:
                 encoding = bytelist
 

@@ -68,65 +68,31 @@ class ArchARM(Arch):
         self.__dict__.update(data)
 
     @property
-    def capstone(self):
-        if _capstone is None:
-            l.warning("Capstone is not found!")
-            return None
-        if self.cs_arch is None:
-            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
-        if self._cs is None:
-            self._cs = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_ARM)
-            self._cs.detail = True
-        return self._cs
-
-    @property
     def capstone_thumb(self):
-        if self.cs_arch is None:
-            raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
+        if _capstone is None:
+            l.warning("Capstone is not installed!")
+            return None
         if self._cs_thumb is None:
             self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
             self._cs_thumb.detail = True
         return self._cs_thumb
 
-    def asm(self, string, addr=0, as_bytes=True, thumb=False):
-        """
-        Compile the assembly instruction represented by string using Keystone
-
-        :param string:      The textual assembly instructions, separated by semicolons
-        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
-        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
-        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
-        :return:            The assembled bytecode
-        """
-        if _keystone is None:
-            l.warning("Keystone is not found!")
-            return None
-        if self.ks_arch is None:
-            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
-        if self._ks is None or self._ks_thumb != thumb:
-            self._ks_thumb = thumb
-            mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
-            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode + mode)
-        try:
-            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
-        except TypeError:
-            bytelist, _ = self._ks.asm(string, addr)
-            if as_bytes:
-                encoding = ''.join(chr(c) for c in bytelist)
-                if not isinstance(encoding, bytes):
-                    l.warning("Cheap hack to create bytestring from Keystone!")
-                    encoding = encoding.encode()
-            else:
-                encoding = bytelist
-        return encoding
-
     @property
-    def unicorn(self):
-        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_ARM) if _unicorn is not None else None
+    def keystone_thumb(self):
+        if _keystone is None:
+            l.warning("Keystone is not installed!")
+            return None
+        if self._ks_thumb is None:
+            mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
+            self._ks_thumb = _keystone.Ks(self.ks_arch, self.ks_mode + _keystone.KS_MODE_THUMB)
+        return self._ks_thumb
 
     @property
     def unicorn_thumb(self):
-        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_THUMB) if _unicorn is not None else None
+        if _unicorn is None:
+            l.warning("Unicorn is not installed!")
+            return None
+        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_THUMB)
 
     bits = 32
     vex_arch = "VexArchARM"
