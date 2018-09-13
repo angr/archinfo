@@ -256,6 +256,10 @@ class SootClassDescriptor(object):
     def superclass_name(self):
         return self._soot_class.super_class if self.is_loaded else None
 
+    @property
+    def type(self):
+        return "java.lang.Class"
+
 
 class SootNullConstant(object):
 
