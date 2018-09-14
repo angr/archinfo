@@ -712,7 +712,7 @@ def arch_from_id(ident, endness='any', bits=''):
     for arxs, abits, aendness, acls in arch_id_map:
         found_it = False
         for rx in arxs:
-            if re.match(rx, ident):
+            if re.search(rx, ident):
                 found_it = True
                 break
         if not found_it:
