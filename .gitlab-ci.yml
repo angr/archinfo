@@ -19,10 +19,6 @@ driller:
     script: "angr-test driller"
     tags: [angr]
 
-simuvex:
-    script: "angr-test simuvex"
-    tags: [angr]
-
 ### other levels
 tracer:
     script: "angr-test tracer"
