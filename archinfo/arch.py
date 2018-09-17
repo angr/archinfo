@@ -269,21 +269,6 @@ class Arch(object):
     def __setstate__(self, data):
         self.__dict__.update(data)
 
-    def gather_info_from_state(self, state):
-        info = {}
-        for reg in self.persistent_regs:
-            info[reg] = state.registers.load(reg)
-        return info
-
-    def prepare_state(self, state, info=None):
-        if info is not None:
-            # TODO: Only do this for PIC!
-            for reg in self.persistent_regs:
-                if reg in info:
-                    state.registers.store(reg, info[reg])
-
-        return state
-
     def get_default_reg_value(self, register):
         if register == 'sp':
             # Convert it to the corresponding register name
