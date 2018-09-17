@@ -32,6 +32,13 @@ class SootMethodDescriptor(object):
     def __ne__(self, other):
         return not self == other
 
+    def address(self, block_idx=0, stmt_idx=0):
+        """
+        :return Address of the method.
+        :rtype: SootAddressDescriptor
+        """
+        return SootAddressDescriptor(self, block_idx, stmt_idx)
+
     @property
     def fullname(self):
         return "%s.%s" % (self.class_name, self.name)
