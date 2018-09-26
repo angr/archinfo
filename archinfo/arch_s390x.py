@@ -1,0 +1,173 @@
+try:
+    import capstone as _capstone
+except ImportError:
+    _capstone = None
+
+try:
+    import keystone as _keystone
+except ImportError:
+    _keystone = None
+
+try:
+    import pyvex as _pyvex
+except ImportError:
+    _pyvex = None
+
+from .arch import Arch, register_arch, Endness, Register
+from .archerror import ArchError
+from .tls import TLSArchInfo
+
+
+class ArchS390X(Arch):
+    def __init__(self, endness=Endness.BE):
+        super(ArchS390X, self).__init__(endness)
+        if endness != Endness.BE:
+            raise ArchError('Arch s390x must be big endian')
+        self.argument_register_positions = {
+            self.registers['r2'][0]: 0,
+            self.registers['r3'][0]: 1,
+            self.registers['r4'][0]: 2,
+            self.registers['r5'][0]: 3,
+            self.registers['r6'][0]: 4,
+            # fp registers
+            self.registers['f0'][0]: 0,
+            self.registers['f2'][0]: 1,
+            self.registers['f4'][0]: 2,
+            self.registers['f6'][0]: 3,
+        } if _pyvex is not None else None
+
+    bits = 64
+    vex_arch = "VexArchS390X"  # enum VexArch
+    name = "S390X"
+    qemu_name = 's390x'  # target/s390x
+    triplet = 's390x-linux-gnu'
+    linux_name = 's390'  # arch/s390
+    max_inst_bytes = 6
+    ret_offset = 208  # offsetof(VexGuestS390XState, guest_r2)
+    syscall_num_offset = 200  # offsetof(VexGuestS390XState, guest_r1)
+    call_pushes_ret = False
+    stack_change = -8
+    initial_sp = 0x40000000000
+    sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_SYSZ
+        cs_mode = _capstone.CS_MODE_BIG_ENDIAN
+    if _keystone:
+        ks_arch = _keystone.KS_ARCH_SYSTEMZ
+        ks_mode = _keystone.KS_MODE_BIG_ENDIAN
+    ret_instruction = b'\x07\xf4'  # br %r14
+    nop_instruction = b'\x07\x07'  # nopr %r7
+    instruction_alignment = 2
+    register_list = [
+        Register(name='ia', size=8, alias_names=('ip', 'pc')),
+        Register(name='r0', size=8,
+                 general_purpose=True),
+        Register(name='r1', size=8,
+                 general_purpose=True),
+        Register(name='r2', size=8,
+                 general_purpose=True, argument=True),
+        Register(name='r3', size=8,
+                 general_purpose=True, argument=True,
+                 linux_entry_value='argc'),
+        Register(name='r4', size=8,
+                 general_purpose=True, argument=True,
+                 linux_entry_value='argv'),
+        Register(name='r5', size=8,
+                 general_purpose=True, argument=True,
+                 linux_entry_value='envp'),
+        Register(name='r6', size=8,
+                 general_purpose=True, argument=True, persistent=True),
+        Register(name='r7', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r8', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r9', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r10', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r11', size=8, alias_names=('bp',),
+                 general_purpose=True, persistent=True),
+        Register(name='r12', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r13', size=8,
+                 general_purpose=True, persistent=True),
+        Register(name='r14', size=8,
+                 general_purpose=True),
+        Register(name='r15', size=8, alias_names=('sp',),
+                 general_purpose=True, persistent=True,
+                 default_value=(initial_sp, True, 'global')),
+        Register(name='f0', size=8,
+                 floating_point=True),
+        Register(name='f1', size=8,
+                 floating_point=True),
+        Register(name='f2', size=8,
+                 floating_point=True),
+        Register(name='f3', size=8,
+                 floating_point=True),
+        Register(name='f4', size=8,
+                 floating_point=True),
+        Register(name='f5', size=8,
+                 floating_point=True),
+        Register(name='f6', size=8,
+                 floating_point=True),
+        Register(name='f7', size=8,
+                 floating_point=True),
+        Register(name='f8', size=8,
+                 floating_point=True),
+        Register(name='f9', size=8,
+                 floating_point=True),
+        Register(name='f10', size=8,
+                 floating_point=True),
+        Register(name='f11', size=8,
+                 floating_point=True),
+        Register(name='f12', size=8,
+                 floating_point=True),
+        Register(name='f13', size=8,
+                 floating_point=True),
+        Register(name='f14', size=8,
+                 floating_point=True),
+        Register(name='f15', size=8,
+                 floating_point=True),
+        Register(name='a0', size=4),
+        Register(name='a1', size=4),
+        Register(name='a2', size=4),
+        Register(name='a3', size=4),
+        Register(name='a4', size=4),
+        Register(name='a5', size=4),
+        Register(name='a6', size=4),
+        Register(name='a7', size=4),
+        Register(name='a8', size=4),
+        Register(name='a9', size=4),
+        Register(name='a10', size=4),
+        Register(name='a11', size=4),
+        Register(name='a12', size=4),
+        Register(name='a13', size=4),
+        Register(name='a14', size=4),
+        Register(name='a15', size=4),
+        Register(name='nraddr', size=8),
+        Register(name='cmstart', size=8),
+        Register(name='cmlen', size=8),
+        Register(name='ip_at_syscall', size=8),
+        Register(name='emnote', size=4),
+    ]
+
+    function_prologs = {
+        br'\xeb.[\xf0-\xff]..\x24',  # stmg %r1,%r3,d2(%r15)
+    }
+    function_epilogs = {
+        br'\x07\xf4',  # br %r14
+    }
+
+    got_section_name = '.got'
+    ld_linux_name = 'ld64.so.1'
+    elf_tls = TLSArchInfo(
+        variant=2,  # 3.4.7 @ https://www.uclibc.org/docs/tls.pdf
+        tcbhead_size=64,  # sizeof(tcbhead_t)
+        head_offsets=[0],  # offsetof(tcbhead_t, tcb)
+        dtv_offsets=[8],  # offsetof(tcbhead_t, dtv)
+        pthread_offsets=[16],  # offsetof(tcbhead_t, self)
+        tp_offset=0,
+        dtv_entry_offset=0)
+
+
+register_arch(['s390'], 64, Endness.BE, ArchS390X)

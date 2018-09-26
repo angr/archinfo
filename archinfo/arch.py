@@ -31,7 +31,7 @@ except ImportError:
     _keystone = None
 
 if sys.version_info[0] >= 3:
-    integer_types = int,
+    integer_types = (int,)
 else:
     integer_types = (int, long)
 
@@ -187,8 +187,8 @@ class Arch(object):
 
         if self.register_list:
             # Register collections
-            if self.vex_arch is not None and _pyvex is not None:
-                va = self.vex_arch[7:].lower()
+            if type(self.vex_arch) is str and _pyvex is not None:
+                va = self.vex_arch[7:].lower() # pylint: disable=unsubscriptable-object
                 for r in self.register_list:
                     if r.vex_offset is None:
                         for name in (r.vex_name, r.name) + r.alias_names:
@@ -298,33 +298,42 @@ class Arch(object):
                 return val
         return None
 
-    def struct_fmt(self, size=None):
+    def struct_fmt(self, size=None, signed=False, endness=None):
         """
-        Produce a format string for use in python's ``struct`` module.
+        Produce a format string for use in python's ``struct`` module to decode a single word.
 
-        Optionally, the ``size`` parameter can specify the width of the int to store.
+        :param int size:    The size in bits to pack/unpack. Defaults to wordsize
+        :param bool signed: Whether the data should be extracted signed/unsigned. Default unsigned
+        :param str Endness: The endian to use in packing/unpacking. Defaults to memory endness
+        :return str:        A format string with an endness modifier and a single format character
         """
-        fmt = ""
         if size is None:
             size = self.bits
+        if endness is None:
+            endness = self.memory_endness
 
         if self.memory_endness == Endness.BE:
-            fmt += ">"
+            fmt_end = ">"
+        elif self.memory_endness == Endness.LE:
+            fmt_end = "<"
         else:
-            fmt += "<"
+            raise ValueError("Please don't middle-endian at me, I'm begging you")
 
         if size == 64:
-            fmt += "Q"
+            fmt_size = "Q"
         elif size == 32:
-            fmt += "I"
+            fmt_size = "I"
         elif size == 16:
-            fmt += "H"
+            fmt_size = "H"
         elif size == 8:
-            fmt += "B"
+            fmt_size = "B"
         else:
             raise ValueError("Invalid size: Must be a muliple of 8")
 
-        return fmt
+        if signed:
+            fmt_size = fmt_size.lower()
+
+        return fmt_end + fmt_size
 
     def _get_register_dict(self):
         res = {}
@@ -354,14 +363,36 @@ class Arch(object):
         A Capstone instance for this arch
         """
         if _capstone is None:
-            l.warning("Capstone is not found!")
+            l.warning("Capstone is not installed!")
             return None
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
             self._cs = _capstone.Cs(self.cs_arch, self.cs_mode)
+            self._configure_capstone()
             self._cs.detail = True
         return self._cs
+
+    @property
+    def keystone(self):
+        """
+        A Keystone instance for this arch
+        """
+        if self._ks is None:
+            if _keystone is None:
+                l.warning("Keystone is not installed!")
+                return None
+            if self.ks_arch is None:
+                raise ArchError("Arch %s does not support disassembly with Keystone" % self.name)
+            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+            self._configure_keystone()
+        return self._ks
+
+    def _configure_capstone(self):
+        pass
+
+    def _configure_keystone(self):
+        pass
 
     @property
     def unicorn(self):
@@ -383,24 +414,20 @@ class Arch(object):
         :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
         :return:            The assembled bytecode
         """
-        if thumb is True:
+        if thumb and not hasattr(self, 'keystone_thumb'):
             l.warning("Specified thumb=True on non-ARM architecture")
-        if _keystone is None:
-            l.warning("Keystone is not found!")
-            return None
-        if self.ks_arch is None:
-            raise ArchError("Arch %s does not support assembly with Keystone" % self.name)
-        if self._ks is None:
-            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
+            thumb = False
+        ks = self.keystone_thumb if thumb else self.keystone # pylint: disable=no-member
+
         try:
-            encoding, _ = self._ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+            encoding, _ = ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
         except TypeError:
-            bytelist, _ = self._ks.asm(string, addr)
+            bytelist, _ = ks.asm(string, addr)
             if as_bytes:
-                encoding = ''.join(chr(c) for c in bytelist)
-                if not isinstance(encoding, bytes):
-                    l.warning("Cheap hack to create bytestring from Keystone!")
-                    encoding = encoding.encode()
+                if bytes is str:
+                    encoding = ''.join(chr(c) for c in bytelist)
+                else:
+                    encoding = bytes(bytelist)
             else:
                 encoding = bytelist
 
@@ -632,7 +659,7 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(bits, integer_types):
         raise TypeError("Bits must be an int")
     if endness is not None:
-        if endness != Endness.BE and endness != Endness.LE and endness != Endness.ME and endness != "any":
+        if endness not in (Endness.BE, Endness.LE, Endness.ME, 'any'):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == 'any':
@@ -640,6 +667,10 @@ def register_arch(regexes, bits, endness, my_arch):
         all_arches.append(my_arch(Endness.LE))
     else:
         all_arches.append(my_arch(endness))
+
+
+class ArchNotFound(Exception):
+    pass
 
 
 def arch_from_id(ident, endness='any', bits=''):
@@ -682,7 +713,7 @@ def arch_from_id(ident, endness='any', bits=''):
     for arxs, abits, aendness, acls in arch_id_map:
         found_it = False
         for rx in arxs:
-            if re.match(rx, ident):
+            if re.search(rx, ident):
                 found_it = True
                 break
         if not found_it:
@@ -693,7 +724,7 @@ def arch_from_id(ident, endness='any', bits=''):
             cls = acls
             break
     if not cls:
-        raise RuntimeError("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
+        raise ArchNotFound("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
     if endness == 'unsure':
         if aendness == 'any':
             # We really don't care, use default
@@ -707,8 +738,11 @@ def arch_from_id(ident, endness='any', bits=''):
 
 
 def reverse_ends(string):
-    ise = 'I'*(len(string)//4)
+    count = (len(string) + 3) // 4
+    ise = 'I' * count
+    string += b'\x00' * (count * 4 - len(string))
     return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
+
 
 def get_host_arch():
     """
