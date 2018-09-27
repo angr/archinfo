@@ -270,21 +270,6 @@ class Arch(object):
     def __setstate__(self, data):
         self.__dict__.update(data)
 
-    def gather_info_from_state(self, state):
-        info = {}
-        for reg in self.persistent_regs:
-            info[reg] = state.registers.load(reg)
-        return info
-
-    def prepare_state(self, state, info=None):
-        if info is not None:
-            # TODO: Only do this for PIC!
-            for reg in self.persistent_regs:
-                if reg in info:
-                    state.registers.store(reg, info[reg])
-
-        return state
-
     def get_default_reg_value(self, register):
         if register == 'sp':
             # Convert it to the corresponding register name
@@ -302,33 +287,35 @@ class Arch(object):
         """
         Produce a format string for use in python's ``struct`` module to decode a single word.
 
-        :param int size:    The size in bits to pack/unpack. Defaults to wordsize
+        :param int size:    The size in bytes to pack/unpack. Defaults to wordsize
         :param bool signed: Whether the data should be extracted signed/unsigned. Default unsigned
-        :param str Endness: The endian to use in packing/unpacking. Defaults to memory endness
+        :param str endness: The endian to use in packing/unpacking. Defaults to memory endness
         :return str:        A format string with an endness modifier and a single format character
         """
         if size is None:
-            size = self.bits
+            size = self.bytes
         if endness is None:
             endness = self.memory_endness
 
-        if self.memory_endness == Endness.BE:
+        if endness == Endness.BE:
             fmt_end = ">"
-        elif self.memory_endness == Endness.LE:
+        elif endness == Endness.LE:
             fmt_end = "<"
-        else:
+        elif endness == Endness.ME:
             raise ValueError("Please don't middle-endian at me, I'm begging you")
+        else:
+            raise ValueError("Invalid endness value: %r" % endness)
 
-        if size == 64:
+        if size == 8:
             fmt_size = "Q"
-        elif size == 32:
+        elif size == 4:
             fmt_size = "I"
-        elif size == 16:
+        elif size == 2:
             fmt_size = "H"
-        elif size == 8:
+        elif size == 1:
             fmt_size = "B"
         else:
-            raise ValueError("Invalid size: Must be a muliple of 8")
+            raise ValueError("Invalid size: Must be a integer power of 2 less than 16")
 
         if signed:
             fmt_size = fmt_size.lower()
