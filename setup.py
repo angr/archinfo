@@ -9,7 +9,8 @@ except ImportError:
 
 setup(
     name='archinfo',
-    version='7.8.8.1',
+    version='7.8.9.26',
+    python_requires='<3.0',
     packages=packages,
-    install_requires=['future'],
+    install_requires=['future==0.16.0'],
 )
