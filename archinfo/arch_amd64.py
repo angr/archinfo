@@ -168,7 +168,7 @@ class ArchAMD64(Arch):
         Register(name='rsp', size=8, subregisters=[('esp', 0, 4)], alias_names=('sp',),
                  general_purpose=True, default_value=(initial_sp, True, 'global')),
         Register(name='rbp', size=8, subregisters=[('ebp', 0, 4)], alias_names=('bp',),
-                 general_purpose=True),
+                 general_purpose=True, linux_entry_value=0),
         Register(name='rsi', size=8, subregisters=[('esi', 0, 4),
                                                    ('si', 0, 2),
                                                    ('sil', 0, 1),
