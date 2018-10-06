@@ -79,10 +79,14 @@ class SootMethodDescriptor(object):
 
         :return: True, if name of soot method matches the mangled native name.
         """
+
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
-            # TODO check function signature
-            raise NotImplementedError('Overloaded native methods are not supported.')
+            native_method, params_sig = native_method.split('__')
+            params = ArchSoot.decode_parameter_list_signature(params_sig)
+            # check function signature
+            if params != self.params:
+                return False
 
         # demangle native name
         native_method = native_method.replace('_1', '_')
@@ -363,13 +367,17 @@ class ArchSoot(Arch):
         raise ValueError(type_sig)
 
     @staticmethod
+    def decode_parameter_list_signature(param_sig):
+        return tuple(ArchSoot.decode_type_signature(param)
+                     for param in re.findall(r'([\[]*[ZBCSIJFDV]|[\[]*L.+;)', param_sig))
+
+    @staticmethod
     def decode_method_signature(method_sig):
         # signature format follows the pattern: (param_sig)ret_sig
         match = re.search(r'\((.*)\)(.*)', method_sig)
         param_sig, ret_sig = match.group(1), match.group(2)
         # decode types
-        params_types = tuple(ArchSoot.decode_type_signature(param)
-                             for param in re.findall(r'([\[]*[ZBCSIJFDV]|[\[]*L.+;)', param_sig))
+        params_types = ArchSoot.decode_parameter_list_signature(param_sig)
         ret_type = ArchSoot.decode_type_signature(ret_sig)
         l.debug("Decoded method signature '%s' as params=%s and ret=%s",
                 method_sig, params_types, ret_type)
