@@ -142,9 +142,9 @@ class SootAddressDescriptor(object):
         return hash((self.method, self.stmt_idx))
 
     def __eq__(self, other):
-        # We do not compare the block IDs since statement IDs are unique enough
         return isinstance(other, SootAddressDescriptor) and \
             self.method == other.method and \
+            self.block_idx == other.block_idx and \
             self.stmt_idx == other.stmt_idx
 
     def __ne__(self, other):
