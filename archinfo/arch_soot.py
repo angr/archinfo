@@ -79,6 +79,7 @@ class SootMethodDescriptor(object):
 
         :return: True, if name of soot method matches the mangled native name.
         """
+
         if "__" in native_method:
             # if native methods are overloaded, two underscores are used
             native_method, params_sig = native_method.split('__')
