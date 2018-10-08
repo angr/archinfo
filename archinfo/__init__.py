@@ -2,6 +2,10 @@
 archinfo is a collection of classes that contain architecture-specific information.
 It is useful for cross-architecture tools (such as pyvex).
 """
+
+if bytes is str:
+    raise Exception("This module is designed for python 3 only. Please install an older version to use python 2.")
+
 # pylint: disable=wildcard-import
 from .arch import *
 from .defines import defines
