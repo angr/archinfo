@@ -255,6 +255,9 @@ class ArchARM(Arch):
         Register(name='fpscr', size=4, floating_point=True),
         Register(name='tpidruro', size=4),
         Register(name='itstate', size=4, default_value=(0, False, None)),
+        Register(name='itstate', size=4, default_value=(0, False, None)),
+        Register(name='basepri', size=4, default_value=(0, False, None)),
+        Register(name='primask', size=4, default_value=(0, False, None)),
     ]
 
     got_section_name = '.got'

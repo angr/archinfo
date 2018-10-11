@@ -134,7 +134,7 @@ class ArchAArch64(Arch):
                  general_purpose=True),
         Register(name='x30', size=8, subregisters=[('w30', 0, 4)], alias_names=('r30', 'lr'),
                  general_purpose=True),
-        Register(name='xsp', size=8, subregisters=[('wsp', 0, 4)], alias_names=('sp',),
+        Register(name='xsp', size=8, subregisters=[('wsp', 0, 4)], alias_names=('sp','xsp   '),
                  general_purpose=True, default_value=(initial_sp, True, 'global')),
         Register(name='pc', size=8, alias_names=('ip',)),
         Register(name='cc_op', size=8, artificial=True),
