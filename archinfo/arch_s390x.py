@@ -91,8 +91,12 @@ class ArchS390X(Arch):
                  general_purpose=True, persistent=True),
         Register(name='r13', size=8,
                  general_purpose=True, persistent=True),
+        # Strictly speaking, there is no fixed link register on s390x.
+        # However, %r14 is almost always used for that, so mark it as such.
+        # Situations when that's not the case (e.g. brasl %r0,X)
+        # can still be handled explicitly.
         Register(name='r14', size=8,
-                 general_purpose=True),
+                 general_purpose=True, alias_names=('lr',)),
         Register(name='r15', size=8, alias_names=('sp',),
                  general_purpose=True, persistent=True,
                  default_value=(initial_sp, True, 'global')),
