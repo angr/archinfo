@@ -2,7 +2,6 @@ import logging
 import struct as _struct
 import platform as _platform
 import re
-import sys
 from archinfo.archerror import ArchError
 
 l = logging.getLogger("archinfo.arch")
@@ -41,7 +40,7 @@ class Endness: # pylint: disable=no-init
     ME = 'Iend_ME'
 
 
-class Register(object):
+class Register:
     """
     A collection of information about a register. Each different architecture
     has its own list of registers, which is the base for all other
@@ -85,7 +84,7 @@ class Register(object):
         self.concretize_unique = concretize_unique
 
 
-class Arch(object):
+class Arch:
     """
     A collection of information about a given architecture. This class should be subclasses for each different
     architecture, and then that subclass should be registered with the ``register_arch`` method.
@@ -211,16 +210,13 @@ class Arch(object):
 
         # generate register mapping (offset, size): name
         self.register_size_names = {}
-        for k in self.registers:
-            v = self.registers[k]
-
-            # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
-            if self.name in {'X86', 'AMD64'} and k in {'bp', 'sp', 'ip'}:
-                continue
-
-            if v in self.register_size_names and k not in self.register_names:
-                continue
-            self.register_size_names[v] = k
+        for reg in self.register_list:
+            self.register_size_names[(reg.vex_offset, reg.size)] = reg.name
+            for name, off, sz in reg.subregisters:
+                # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
+                if self.name in {'X86', 'AMD64'} and name in {'bp', 'sp', 'ip'}:
+                    continue
+                self.register_size_names[(reg.vex_offset + off, sz)] = name
 
         # Unicorn specific stuff
         if self.uc_mode is not None:
