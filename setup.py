@@ -15,5 +15,4 @@ setup(
     version='8.18.10.5',
     python_requires='>=3.5',
     packages=packages,
-    install_requires=['future'],
 )
