@@ -18,7 +18,7 @@ class SootMethodDescriptor(object):
         self._soot_method = soot_method
 
     def __repr__(self):
-        return "%s.%s(%s)" % (self.class_name, self.name, ",".join(self.params))
+        return "%s.%s(%s)" % (self.class_name, self.name, ", ".join(self.params))
 
     def __hash__(self):
         return hash((self.class_name, self.name, self.params))
