@@ -208,10 +208,13 @@ class Arch(object):
             self.concretize_unique_registers = set(r.vex_offset for r in self.register_list if r.concretize_unique)
 
             # Register offsets
-            self.ip_offset = self.registers['ip'][0]
-            self.sp_offset = self.registers['sp'][0]
-            self.bp_offset = self.registers['bp'][0]
-            self.lr_offset = self.registers.get('lr', (None, None))[0]
+            try:
+                self.ip_offset = self.registers['ip'][0]
+                self.sp_offset = self.registers['sp'][0]
+                self.bp_offset = self.registers['bp'][0]
+                self.lr_offset = self.registers.get('lr', (None, None))[0]
+            except KeyError:
+                pass
 
         # generate register mapping (offset, size): name
         self.register_size_names = {}
