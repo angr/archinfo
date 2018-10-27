@@ -211,6 +211,8 @@ class Arch:
         # generate register mapping (offset, size): name
         self.register_size_names = {}
         for reg in self.register_list:
+            if reg.vex_offset is None:
+                continue
             self.register_size_names[(reg.vex_offset, reg.size)] = reg.name
             for name, off, sz in reg.subregisters:
                 # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
