@@ -169,9 +169,14 @@ class ArchARM(Arch):
         br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
         br"\x04\xe0\x2d\xe5",                        # push {lr}
     }
+    # HACK: FIXME: I'm really sorry
+    thumb_prologs = {
+        br"[\x00-\xff]\xb5" # push {xxx,lr}
+    }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
+        br"[\x00-\xff]\xbd"
     }
     instruction_alignment = 2  # cuz there is also thumb mode
     register_list = [
