@@ -169,14 +169,9 @@ class ArchARM(Arch):
         br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
         br"\x04\xe0\x2d\xe5",                        # push {lr}
     }
-    # HACK: FIXME: I'm really sorry
-    thumb_prologs = {
-        br"[\x00-\xff]\xb5" # push {xxx,lr}
-    }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
-        br"[\x00-\xff]\xbd"
     }
     instruction_alignment = 2  # cuz there is also thumb mode
     register_list = [
@@ -260,9 +255,6 @@ class ArchARM(Arch):
         Register(name='fpscr', size=4, floating_point=True),
         Register(name='tpidruro', size=4),
         Register(name='itstate', size=4, default_value=(0, False, None)),
-        Register(name='itstate', size=4, default_value=(0, False, None)),
-        Register(name='basepri', size=4, default_value=(0, False, None)),
-        Register(name='primask', size=4, default_value=(0, False, None)),
     ]
 
     got_section_name = '.got'
@@ -282,7 +274,83 @@ class ArchARMEL(ArchARM):
     ld_linux_name = 'ld-linux.so.3'
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
 
+class ArchARMCortexM(ArchARMEL):
+    """
+    This is an architecture description for ARM Cortex-M microcontroller-class CPUs.
+
+    These CPUs have the following unusual / annoying distinctions from their relatives:
+    - Explicitly only support the Thumb-2 instruction set.  Executing with the T-bit off causes the processor to fault
+      instantly
+    - Always little-endian
+    - Coprocessors? Nope, none of that rubbish
+    - Well-known standard memory map across all devices
+    - Rarely use an MPU, even though this does exist on some devices
+    - A built-in "NVIC" (Nested Vectored Interrupt Controller) as part of the standard.
+    - Standardized "blob format" including the IVT, with initial SP and entry prepended
+    - Usually don't run an OS (SimLinux? No thanks)
+    - As part of the above, handle syscalls (SVC) instructions through an interrupt (now called PendSV)
+      Uses its own fancy stack layout for this, which (UGH) varies by sub-sub-architecture
+    - Some fancy instructions normally never seen in other uses of Thumb (CPSID, CPSIE, WFI, MRS.W, MSR.W)
+    - New registers, namely:
+        * FAULTMASK
+        * PRIMASK
+        * BASEPRI
+        * CONTROL
+        * SP, banked as PSP or MSP
+        * PSR, now just one PSR, with a few meta-registers APSR, IPSR, and EPSR which take a chunk of that each
+
+    """
+
+    name = "ARMCortexM"
+    triplet = 'arm-none-eabi'  # ARM's own CM compilers use this triplet
+
+    # These are the standard THUMB prologs.  We leave these off for other ARMs due to their length
+    # For CM, we assume the FPs are OK, as they are almost guaranteed to appear all over the place
+    function_prologs = {}
+
+    thumb_prologs = {
+        br"[\x00-\xff]\xb5",  # push {xxx,lr}
+        br"[\x00-\xff][\x00-\xff]\x2d\xe9", # push.w {xxx, lr}
+    }
+    function_epilogs = {
+        br"[\x00-\xff]\xbd" # pop {xxx, pc}
+        # TODO: POP.W
+    }
+
+    def __init__(self, *args, **kwargs):
+        ArchARMEL.__init__(self, *args, **kwargs)
+
+        # See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CHDBIBGJ.html
+        # for relevant pain-points.  Most of these only get updated on an exception/interrupt/syscall
+        # Except we leave T on because we have to.
+        self.register_list += [
+            # Whether exceptions are masked or not. (e.g., everything but NMI)
+            Register(name='faultmask', size=4, default_value=(0, False, None)),
+            # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
+            # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
+            Register(name='basepri', size=4, default_value=(0, False, None)),
+            # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
+            # Configures whether interrupt priorities are respected or not.
+            Register(name='primask', size=4, default_value=(0, False, None)),
+            # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
+            # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
+            # We only keep here the data not computed via CCalls
+            # The default is to have the T bit on.
+            Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
+            # CONTROL:
+            # Bit 2: Whether the FPU is active or not
+            # Bit 1: Whether we use MSP (0) or PSP (1)
+            # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
+            Register(name='control', size=4, default_value=(0, False, None))
+        ]
+
+    # TODO: Make arm_spotter use these
+    # TODO: Make SimOS use these.
+    # TODO: Add.... the NVIC? to SimOS
+
+
 register_arch([r'.*armhf.*'], 32, 'any', ArchARMHF)
 register_arch([r'.*armeb|.*armbe'], 32, Endness.BE, ArchARM)
 register_arch([r'.*armel|arm.*'], 32, Endness.LE, ArchARMEL)
 register_arch([r'.*arm.*|.*thumb.*'], 32, 'any', ArchARM)
+register_arch([r'.*cortex\-m.*|.*v7\-m.*'], 32, 'any', ArchARMCortexM)
