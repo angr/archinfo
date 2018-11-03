@@ -467,6 +467,39 @@ class Arch:
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
         return list(map(subfunc, path))
 
+    def m_addr(self, addr, *args, **kwargs):
+        """
+        Given the address of some code block, convert it to the address where this block
+        is stored in memory. The memory address can also be referred to as the "real" address.
+
+        :param addr:    The address to convert.
+        :return:        The "real" address in memory.
+        :rtype:         int
+        """
+        return addr
+
+    def x_addr(self, addr, *args, **kwargs):
+        """
+        Given the address of some code block, convert it to the value that should be assigned
+        to the instruction pointer register in order to execute the code in that block.
+
+        :param addr:    The address to convert.
+        :return:        The "execution" address.
+        :rtype:         int
+        """
+        return addr
+
+    def is_thumb(self, addr):  # pylint:disable=unused-argument
+        """
+        Return True, if the address is the THUMB address. False otherwise.
+
+        For non-ARM architectures this method always returns False.
+
+        :param addr:    The address to check.
+        :return:        Whether the given address is the THUMB address.
+        """
+        return False
+
     @property
     def vex_support(self):
         """
