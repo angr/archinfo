@@ -83,8 +83,7 @@ class ArchARM(Arch):
             l.warning("Keystone is not installed!")
             return None
         if self._ks_thumb is None:
-            mode = _keystone.KS_MODE_THUMB if thumb else _keystone.KS_MODE_ARM
-            self._ks_thumb = _keystone.Ks(self.ks_arch, self.ks_mode + _keystone.KS_MODE_THUMB)
+            self._ks_thumb = _keystone.Ks(self.ks_arch, _keystone.KS_MODE_THUMB)
         return self._ks_thumb
 
     @property
@@ -157,7 +156,7 @@ class ArchARM(Arch):
     _cs_thumb = None
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM
-        ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
+        ks_mode = _keystone.KS_MODE_ARM + _keystone.KS_MODE_LITTLE_ENDIAN
     _ks_thumb = None
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
