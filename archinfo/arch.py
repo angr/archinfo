@@ -68,7 +68,7 @@ class Register:
     def __init__(self, name, size, vex_offset=None, vex_name=None, subregisters=None,
                  alias_names=None, general_purpose=False, floating_point=False,
                  vector=False, argument=False, persistent=False, default_value=None,
-                 linux_entry_value=None, concretize_unique=False,concrete=True):
+                 linux_entry_value=None, concretize_unique=False, concrete=True):
         self.name = name
         self.size = size
         self.vex_offset = vex_offset
