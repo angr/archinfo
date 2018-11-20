@@ -41,6 +41,9 @@ class SootMethodDescriptor(object):
 
     @property
     def fullname(self):
+        """
+        :return the full name of the method (class name + method name)
+        """
         return "%s.%s" % (self.class_name, self.name)
 
     @property
@@ -70,6 +73,14 @@ class SootMethodDescriptor(object):
     @property
     def ret(self):
         return self._soot_method.ret if self.is_loaded else []
+
+    @property
+    def addr(self):
+        """
+        :return: the soot address description of the entry point of the method
+        """
+        return SootAddressDescriptor(self, 0, 0)
+
 
     def matches_with_native_name(self, native_method):
         """
