@@ -221,6 +221,22 @@ class Arch:
                     continue
                 self.register_size_names[(reg.vex_offset + off, sz)] = name
 
+        # allow mapping a sub-register to its base register
+        self.subregister_map = { }
+        for reg in self.register_list:
+            if reg.vex_offset is None:
+                continue
+            base_reg = reg.vex_offset, reg.size
+            self.subregister_map[(reg.vex_offset, reg.size)] = base_reg
+            self.subregister_map[reg.vex_offset] = base_reg
+            for name, off, sz in reg.subregisters:
+                if self.name in {'X86', 'AMD64'} and name in {'bp', 'sp', 'ip'}:
+                    continue
+                subreg_offset = reg.vex_offset + off
+                self.subregister_map[(subreg_offset, sz)] = base_reg
+                if subreg_offset not in self.subregister_map:
+                    self.subregister_map[subreg_offset] = base_reg
+
         # Unicorn specific stuff
         if self.uc_mode is not None:
             if endness == Endness.BE:
@@ -441,6 +457,22 @@ class Arch:
             return self.register_names[offset]
         except KeyError:
             return str(offset)
+
+    def get_base_register(self, offset, size=None):
+        """
+        Convert a register or sub-register to its base register's offset.
+
+        :param int offset:  The offset of the register to look up for.
+        :param int size:    Size of the register.
+        :return:            Offset and size of the base register, or None if no base register is found.
+        """
+
+        if size is None:
+            key = offset
+        else:
+            key = (offset, size)
+
+        return self.subregister_map.get(key, None)
 
     def get_register_offset(self, name):
         try:
