@@ -224,6 +224,8 @@ class Arch:
         # allow mapping a sub-register to its base register
         self.subregister_map = { }
         for reg in self.register_list:
+            if reg.vex_offset is None:
+                continue
             base_reg = reg.vex_offset, reg.size
             self.subregister_map[(reg.vex_offset, reg.size)] = base_reg
             self.subregister_map[reg.vex_offset] = base_reg
