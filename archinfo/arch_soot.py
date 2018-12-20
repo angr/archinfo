@@ -9,13 +9,14 @@ l = logging.getLogger('archinfo.arch_soot')
 
 class SootMethodDescriptor(object):
 
-    __slots__ = ['class_name', 'name', 'params', '_soot_method']
+    __slots__ = ['class_name', 'name', 'params', '_soot_method', 'ret']
 
-    def __init__(self, class_name, name, params, soot_method=None):
+    def __init__(self, class_name, name, params, soot_method=None, type_=None):
         self.class_name = class_name
         self.name = name
         self.params = params
         self._soot_method = soot_method
+        self.ret = type_
 
     def __repr__(self):
         return "%s.%s(%s)" % (self.class_name, self.name, ", ".join(self.params))
@@ -70,9 +71,9 @@ class SootMethodDescriptor(object):
     def block_by_label(self):
         return self._soot_method.block_by_label if self.is_loaded else None
 
-    @property
-    def ret(self):
-        return self._soot_method.ret if self.is_loaded else []
+    # @property
+    # def ret(self):
+    #     return self._soot_method.ret if self.is_loaded else []
 
     @property
     def addr(self):
@@ -127,7 +128,8 @@ class SootMethodDescriptor(object):
         return cls(class_name=soot_method.class_name,
                    name=soot_method.name,
                    params=soot_method.params,
-                   soot_method=soot_method)
+                   soot_method=soot_method,
+                   type_=soot_method.ret)
 
 
 class SootAddressDescriptor(object):
