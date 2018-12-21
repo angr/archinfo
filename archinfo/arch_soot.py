@@ -11,12 +11,12 @@ class SootMethodDescriptor(object):
 
     __slots__ = ['class_name', 'name', 'params', '_soot_method', 'ret']
 
-    def __init__(self, class_name, name, params, soot_method=None, type_=None):
+    def __init__(self, class_name, name, params, soot_method=None, ret_type =None):
         self.class_name = class_name
         self.name = name
         self.params = params
         self._soot_method = soot_method
-        self.ret = type_
+        self.ret = ret_type
 
     def __repr__(self):
         return "%s.%s(%s)" % (self.class_name, self.name, ", ".join(self.params))
@@ -129,7 +129,7 @@ class SootMethodDescriptor(object):
                    name=soot_method.name,
                    params=soot_method.params,
                    soot_method=soot_method,
-                   type_=soot_method.ret)
+                   ret_type=soot_method.ret)
 
 
 class SootAddressDescriptor(object):
