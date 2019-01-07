@@ -63,12 +63,15 @@ class Register:
     :ivar tuple default_value: The offset of the instruction pointer in the register file
     :ivar int, str linux_entry_value: The offset of the instruction pointer in the register file
     :ivar bool concretize_unique: Whether this register should be concretized, if unique, at the end of each block
-    :ivar bool concrete: Whether this register should be considered during the synchronization of the concrete execution of the process
+    :ivar bool concrete: Whether this register should be considered during the synchronization of the concrete execution
+                         of the process
+    :ivar bool artificial: Whether this register is an artificial register added by VEX IR or other ILs.
     """
     def __init__(self, name, size, vex_offset=None, vex_name=None, subregisters=None,
                  alias_names=None, general_purpose=False, floating_point=False,
                  vector=False, argument=False, persistent=False, default_value=None,
-                 linux_entry_value=None, concretize_unique=False, concrete=True):
+                 linux_entry_value=None, concretize_unique=False, concrete=True,
+                 artificial=False):
         self.name = name
         self.size = size
         self.vex_offset = vex_offset
@@ -84,6 +87,7 @@ class Register:
         self.linux_entry_value = linux_entry_value
         self.concretize_unique = concretize_unique
         self.concrete = concrete
+        self.artificial = artificial
 
 class Arch:
     """
@@ -199,6 +203,7 @@ class Arch:
             self.argument_registers = set(r.vex_offset for r in self.register_list if r.argument)
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
             self.concretize_unique_registers = set(r.vex_offset for r in self.register_list if r.concretize_unique)
+            self.artificial_registers = set(r.name for r in self.register_list if r.artificial)
 
             # Register offsets
             try:
@@ -479,6 +484,20 @@ class Arch:
             return self.registers[name][0]
         except:
             raise ValueError("Register %s does not exist!" % name)
+
+    def is_artificial_register(self, offset, size):
+
+        r = self.get_base_register(offset, size)
+        if r is None:
+            return False
+        r_offset, _ = r
+
+        try:
+            r_name = self.register_names[r_offset]
+        except KeyError:
+            return False
+
+        return r_name in self.artificial_registers
 
     # Determined by watching the output of strace ld-linux.so.2 --list --inhibit-cache
     def library_search_path(self, pedantic=False):

@@ -179,7 +179,7 @@ class ArchMIPS64(Arch):
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),
-        Register(name='ip_at_syscall', size=8),
+        Register(name='ip_at_syscall', size=8, artificial=True),
     ]
 
     # http://techpubs.sgi.com/library/manuals/4000/007-4658-001/pdf/007-4658-001.pdf

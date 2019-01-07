@@ -190,7 +190,7 @@ class ArchMIPS32(Arch):
         Register(name='ac2', size=8),
         Register(name='ac3', size=8),
         Register(name='cp0_status', size=4),
-        Register(name='ip_at_syscall', size=4),
+        Register(name='ip_at_syscall', size=4, artificial=True),
     ]
 
     # see https://github.com/radare/radare/blob/master/src/include/elf/mips.h

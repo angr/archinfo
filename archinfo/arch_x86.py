@@ -175,10 +175,10 @@ class ArchX86(Arch):
                                                    ('dil', 0, 1),
                                                    ('dih', 1, 1)],
                  general_purpose=True, argument=True),
-        Register(name='cc_op', size=4, default_value=(0, False, None), concrete=False),
-        Register(name='cc_dep1', size=4, concrete=False),
-        Register(name='cc_dep2', size=4, concrete=False),
-        Register(name='cc_ndep', size=4, concrete=False),
+        Register(name='cc_op', size=4, default_value=(0, False, None), concrete=False, artificial=True),
+        Register(name='cc_dep1', size=4, concrete=False, artificial=True),
+        Register(name='cc_dep2', size=4, concrete=False, artificial=True),
+        Register(name='cc_ndep', size=4, concrete=False, artificial=True),
         Register(name='d', size=4, alias_names=('dflag',),
                  default_value=(1, False, None), concrete=False),
         Register(name='id', size=4, alias_names=('idflag',),
@@ -225,7 +225,7 @@ class ArchX86(Arch):
         Register(name='cmlen', size=4),
         Register(name='nraddr', size=4),
         Register(name='sc_class', size=4),
-        Register(name='ip_at_syscall', size=4, concrete=False),
+        Register(name='ip_at_syscall', size=4, concrete=False, artificial=True),
     ]
 
     symbol_type_translation = {

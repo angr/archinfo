@@ -137,10 +137,10 @@ class ArchAArch64(Arch):
         Register(name='xsp', size=8, subregisters=[('wsp', 0, 4)], alias_names=('sp',),
                  general_purpose=True, default_value=(initial_sp, True, 'global')),
         Register(name='pc', size=8, alias_names=('ip',)),
-        Register(name='cc_op', size=8),
-        Register(name='cc_dep1', size=8),
-        Register(name='cc_dep2', size=8),
-        Register(name='cc_ndep', size=8),
+        Register(name='cc_op', size=8, artificial=True),
+        Register(name='cc_dep1', size=8, artificial=True),
+        Register(name='cc_dep2', size=8, artificial=True),
+        Register(name='cc_ndep', size=8, artificial=True),
         Register(name='tpidr_el0', size=8),
         Register(name='q0', size=16, subregisters=[('d0', 0, 8),
                                                    ('s0', 0, 4),
@@ -307,7 +307,7 @@ class ArchAArch64(Arch):
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),
-        Register(name='ip_at_syscall', size=8),
+        Register(name='ip_at_syscall', size=8, artificial=True),
         Register(name='fpcr', size=4, floating_point=True, default_value=(initial_sp, True, 'global')),
     ]
 
