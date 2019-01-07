@@ -301,7 +301,7 @@ class ArchPPC64(Arch):
         Register(name='nraddr_gpr2', size=8),
         Register(name='redir_sp', size=8),
         Register(name='redir_stack', size=256),
-        Register(name='ip_at_syscall', size=8),
+        Register(name='ip_at_syscall', size=8, artificial=True),
         Register(name='sprg3_ro', size=8),
         Register(name='tfhar', size=8),
         Register(name='texasr', size=8),

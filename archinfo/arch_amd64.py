@@ -187,10 +187,10 @@ class ArchAMD64(Arch):
         Register(name='r13', size=8, general_purpose=True),
         Register(name='r14', size=8, general_purpose=True),
         Register(name='r15', size=8, general_purpose=True),
-        Register(name='cc_op', size=8, default_value=(0, False, None), concrete=False),
-        Register(name='cc_dep1', size=8, concrete=False),
-        Register(name='cc_dep2', size=8, concrete=False),
-        Register(name='cc_ndep', size=8, concrete=False),
+        Register(name='cc_op', size=8, default_value=(0, False, None), concrete=False, artificial=True),
+        Register(name='cc_dep1', size=8, concrete=False, artificial=True),
+        Register(name='cc_dep2', size=8, concrete=False, artificial=True),
+        Register(name='cc_ndep', size=8, concrete=False, artificial=True),
         Register(name='d', size=8, alias_names=('dflag',),
                  default_value=(1, False, None), concrete=False),
         Register(name='rip', size=8, alias_names=('ip', 'pc'),
@@ -237,7 +237,7 @@ class ArchAMD64(Arch):
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),
         Register(name='gs', size=8, alias_names=('gs_const',), concrete=False),
-        Register(name='ip_at_syscall', size=8, concrete=False),
+        Register(name='ip_at_syscall', size=8, concrete=False, artificial=True),
     ]
 
     symbol_type_translation = {
