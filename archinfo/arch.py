@@ -267,6 +267,9 @@ class Arch:
     def __repr__(self):
         return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
 
+    def __hash__(self):
+        return hash((self.name, self.bits, self.memory_endness))
+
     def __eq__(self, other):
         if not isinstance(other, Arch):
             return False
