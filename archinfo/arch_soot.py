@@ -33,6 +33,18 @@ class SootMethodDescriptor(object):
     def __ne__(self, other):
         return not self == other
 
+    def __lt__(self, other):
+        return self.__repr__() < other.__repr__()
+
+    def __gt__(self, other):
+        return self.__repr__() > other.__repr__()
+
+    def __le__(self, other):
+        return self.__repr__() <= other.__repr__()
+
+    def __ge__(self, other):
+        return self.__repr__() >= other.__repr__()
+
     def address(self, block_idx=0, stmt_idx=0):
         """
         :return Address of the method.
@@ -164,29 +176,19 @@ class SootAddressDescriptor(object):
         return not self == other
 
     def __lt__(self, other):
-        if not isinstance(other, SootAddressDescriptor):
-            raise TypeError("You cannot compare a SootAddressDescriptor "
-                            "with a %s." % type(other))
+        return self.__repr__() < other.__repr__()
 
-        if self.method != other.method:
-            raise ValueError("You cannot compare two SootAddressDescriptor "
-                             "instances of two different methods.")
-
-        return self.stmt_idx < other.stmt_idx
+    def __gt__(self, other):
+        return self.__repr__() > other.__repr__()
 
     def __le__(self, other):
-        if not isinstance(other, SootAddressDescriptor):
-            raise TypeError("You cannot compare a SootAddressDescriptor "
-                            "with a %s." % type(other))
+        return self.__repr__() <= other.__repr__()
 
-        if self.method != other.method:
-            raise ValueError("You cannot compare two SootAddressDescriptor "
-                             "instances of two different methods.")
-
-        return self.stmt_idx <= other.stmt_idx
+    def __ge__(self, other):
+        return self.__repr__() >= other.__repr__()
 
     def __add__(self, stmts_offset):
-        if not isinstance(stmts_offset, (int, long)):
+        if not isinstance(stmts_offset, int):
             raise TypeError('The stmts_offset must be an int or a long.')
         s = self.copy()
         s.stmt_idx += stmts_offset
