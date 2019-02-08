@@ -89,6 +89,9 @@ class Register:
         self.concrete = concrete
         self.artificial = artificial
 
+    def __repr__(self):
+        return '<Register %s>' % (self.name,)
+
 class Arch:
     """
     A collection of information about a given architecture. This class should be subclasses for each different
