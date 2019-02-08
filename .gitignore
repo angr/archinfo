@@ -3,3 +3,5 @@
 *.egg-info
 dist
 MANIFEST
+Pipfile
+Pipfile.lock
