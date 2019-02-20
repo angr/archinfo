@@ -47,6 +47,7 @@ class ArchMIPS64(Arch):
     syscall_register_offset = 16
     call_pushes_ret = False
     stack_change = -8
+    branch_delay_slot = True
     sizeof = {'short': 16, 'int': 32, 'long': 64, 'long long': 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_MIPS
