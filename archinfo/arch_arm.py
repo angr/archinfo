@@ -37,7 +37,8 @@ class ArchARM(Arch):
         if endness == Endness.BE:
             self.function_prologs = {
                 br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
-                br"\xe5\x2d\xe0\x04",                        # push {lr}
+                br"\xe5\x2d\xe0\x04",# push {lr}
+                br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.function_epilogs = {
                 br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
@@ -167,7 +168,10 @@ class ArchARM(Arch):
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
         br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
-        br"\x04\xe0\x2d\xe5",                        # push {lr}
+        br"\x04\xe0\x2d\xe5",# push {lr}
+        br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9", # mov r12, sp;  stmfd sp!, {xxxxx}
+        br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",# mov r12, sp; push {lr}
+       
     }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
@@ -280,7 +284,7 @@ class ArchARMCortexM(ArchARMEL):
 
     These CPUs have the following unusual / annoying distinctions from their relatives:
     - Explicitly only support the Thumb-2 instruction set.  Executing with the T-bit off causes the processor to fault
-      instantly
+    instantly
     - Always little-endian
     - Coprocessors? Nope, none of that rubbish
     - Well-known standard memory map across all devices
@@ -289,16 +293,16 @@ class ArchARMCortexM(ArchARMEL):
     - Standardized "blob format" including the IVT, with initial SP and entry prepended
     - Usually don't run an OS (SimLinux? No thanks)
     - As part of the above, handle syscalls (SVC) instructions through an interrupt (now called PendSV)
-      Uses its own fancy stack layout for this, which (UGH) varies by sub-sub-architecture
+    Uses its own fancy stack layout for this, which (UGH) varies by sub-sub-architecture
     - Some fancy instructions normally never seen in other uses of Thumb (CPSID, CPSIE, WFI, MRS.W, MSR.W)
     - New registers, namely:
-        * FAULTMASK
-        * PRIMASK
-        * BASEPRI
-        * CONTROL
-        * SP, banked as PSP or MSP
-        * PSR, now just one PSR, with a few meta-registers APSR, IPSR, and EPSR which take a chunk of that each
-
+    * FAULTMASK
+    * PRIMASK
+    * BASEPRI
+    * CONTROL
+    * SP, banked as PSP or MSP
+    * PSR, now just one PSR, with a few meta-registers APSR, IPSR, and EPSR which take a chunk of that each
+    
     """
 
     name = "ARMCortexM"
