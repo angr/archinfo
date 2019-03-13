@@ -37,14 +37,14 @@ class ArchS390X(Arch):
         } if _pyvex is not None else None
 
     bits = 64
-    vex_arch = "VexArchS390X"  # enum VexArch
-    name = "S390X"
+    vex_arch = 'VexArchS390X'  # enum VexArch
+    name = 'S390X'
     qemu_name = 's390x'  # target/s390x
     triplet = 's390x-linux-gnu'
     linux_name = 's390'  # arch/s390
     max_inst_bytes = 6
-    ret_offset = 208  # offsetof(VexGuestS390XState, guest_r2)
-    syscall_num_offset = 200  # offsetof(VexGuestS390XState, guest_r1)
+    ret_offset = 584  # offsetof(VexGuestS390XState, guest_r2)
+    syscall_num_offset = 576  # offsetof(VexGuestS390XState, guest_r1)
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0x40000000000
@@ -112,38 +112,54 @@ class ArchS390X(Arch):
         Register(name='r15', size=8, alias_names=('sp',),
                  general_purpose=True, persistent=True,
                  default_value=(initial_sp, True, 'global')),
-        Register(name='f0', size=8,
+        Register(name='v0', size=16, subregisters=[('f0', 0, 8)],
                  floating_point=True),
-        Register(name='f1', size=8,
+        Register(name='v1', size=16, subregisters=[('f1', 0, 8)],
                  floating_point=True),
-        Register(name='f2', size=8,
+        Register(name='v2', size=16, subregisters=[('f2', 0, 8)],
                  floating_point=True),
-        Register(name='f3', size=8,
+        Register(name='v3', size=16, subregisters=[('f3', 0, 8)],
                  floating_point=True),
-        Register(name='f4', size=8,
+        Register(name='v4', size=16, subregisters=[('f4', 0, 8)],
                  floating_point=True),
-        Register(name='f5', size=8,
+        Register(name='v5', size=16, subregisters=[('f5', 0, 8)],
                  floating_point=True),
-        Register(name='f6', size=8,
+        Register(name='v6', size=16, subregisters=[('f6', 0, 8)],
                  floating_point=True),
-        Register(name='f7', size=8,
+        Register(name='v7', size=16, subregisters=[('f7', 0, 8)],
                  floating_point=True),
-        Register(name='f8', size=8,
+        Register(name='v8', size=16, subregisters=[('f8', 0, 8)],
                  floating_point=True),
-        Register(name='f9', size=8,
+        Register(name='v9', size=16, subregisters=[('f9', 0, 8)],
                  floating_point=True),
-        Register(name='f10', size=8,
+        Register(name='v10', size=16, subregisters=[('f10', 0, 8)],
                  floating_point=True),
-        Register(name='f11', size=8,
+        Register(name='v11', size=16, subregisters=[('f11', 0, 8)],
                  floating_point=True),
-        Register(name='f12', size=8,
+        Register(name='v12', size=16, subregisters=[('f12', 0, 8)],
                  floating_point=True),
-        Register(name='f13', size=8,
+        Register(name='v13', size=16, subregisters=[('f13', 0, 8)],
                  floating_point=True),
-        Register(name='f14', size=8,
+        Register(name='v14', size=16, subregisters=[('f14', 0, 8)],
                  floating_point=True),
-        Register(name='f15', size=8,
+        Register(name='v15', size=16, subregisters=[('f15', 0, 8)],
                  floating_point=True),
+        Register(name='v16', size=16, vector=True),
+        Register(name='v17', size=16, vector=True),
+        Register(name='v18', size=16, vector=True),
+        Register(name='v19', size=16, vector=True),
+        Register(name='v20', size=16, vector=True),
+        Register(name='v21', size=16, vector=True),
+        Register(name='v22', size=16, vector=True),
+        Register(name='v23', size=16, vector=True),
+        Register(name='v24', size=16, vector=True),
+        Register(name='v25', size=16, vector=True),
+        Register(name='v26', size=16, vector=True),
+        Register(name='v27', size=16, vector=True),
+        Register(name='v28', size=16, vector=True),
+        Register(name='v29', size=16, vector=True),
+        Register(name='v30', size=16, vector=True),
+        Register(name='v31', size=16, vector=True),
         Register(name='a0', size=4),
         Register(name='a1', size=4),
         Register(name='a2', size=4),
