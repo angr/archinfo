@@ -17,7 +17,7 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch, Endness, ArchError, Register
+from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
@@ -107,6 +107,7 @@ class ArchARM(Arch):
         """
         return addr & ~1
 
+    # pylint: disable=keyword-arg-before-vararg, arguments-differ
     def x_addr(self, addr, thumb=None, *args, **kwargs):
         """
         Given the address of some code block, convert it to the value that should be assigned
@@ -167,11 +168,10 @@ class ArchARM(Arch):
     ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
-        br"[\x00-\xff][\x00-\xff]\x2d\xe9",          # stmfd sp!, {xxxxx}
-        br"\x04\xe0\x2d\xe5",# push {lr}
-        br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9", # mov r12, sp;  stmfd sp!, {xxxxx}
-        br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",# mov r12, sp; push {lr}
-       
+        br"[\x00-\xff][\x00-\xff]\x2d\xe9",                # stmfd sp!, {xxxxx}
+        br"\x04\xe0\x2d\xe5",                              # push {lr}
+        br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx}
+        br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
