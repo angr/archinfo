@@ -24,6 +24,9 @@ from .tls import TLSArchInfo
 # TODO: handle multiple return registers?
 # TODO: which endianness should be default?
 
+def is_arm_arch(a):
+    return a.name.startswith('ARM') or a.name.startswith("AArch")
+
 class ArchARM(Arch):
     def __init__(self, endness=Endness.LE):
 
@@ -37,7 +40,7 @@ class ArchARM(Arch):
         if endness == Endness.BE:
             self.function_prologs = {
                 br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
-                br"\xe5\x2d\xe0\x04",# push {lr}
+                br"\xe5\x2d\xe0\x04",                        # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.function_epilogs = {
@@ -314,15 +317,14 @@ class ArchARMCortexM(ArchARMEL):
 
     thumb_prologs = {
         br"[\x00-\xff]\xb5",  # push {xxx,lr}
-        br"[\x00-\xff][\x00-\xff]\x2d\xe9", # push.w {xxx, lr}
+        br"[\x00-\xff][\x00-\xff]\x2d\xe9",  # push.w {xxx, lr}
     }
     function_epilogs = {
-        br"[\x00-\xff]\xbd" # pop {xxx, pc}
+        br"[\x00-\xff]\xbd"  # pop {xxx, pc}
         # TODO: POP.W
     }
 
     def __init__(self, *args, **kwargs):
-        ArchARMEL.__init__(self, *args, **kwargs)
 
         # See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CHDBIBGJ.html
         # for relevant pain-points.  Most of these only get updated on an exception/interrupt/syscall
@@ -347,6 +349,7 @@ class ArchARMCortexM(ArchARMEL):
             # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
             Register(name='control', size=4, default_value=(0, False, None))
         ]
+        super(ArchARMCortexM, self).__init__(*args, **kwargs)
 
     # TODO: Make arm_spotter use these
     # TODO: Make SimOS use these.
