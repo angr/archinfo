@@ -184,11 +184,11 @@ class Arch:
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
-        if self.register_list:
+        if self.register_list and _pyvex is not None:
             (_, _), max_offset = max(_pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
             max_offset += self.bits
             # Register collections
-            if type(self.vex_arch) is str and _pyvex is not None:
+            if type(self.vex_arch) is str:
                 va = self.vex_arch[7:].lower() # pylint: disable=unsubscriptable-object
                 for r in self.register_list:
                     if r.vex_offset is None:
