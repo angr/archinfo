@@ -27,6 +27,18 @@ from .tls import TLSArchInfo
 def is_arm_arch(a):
     return a.name.startswith('ARM') or a.name.startswith("AArch")
 
+def get_real_address_if_arm(arch, addr):
+    """
+    Obtain the real address of an instruction. ARM architectures are supported.
+
+    :param Arch arch:   The Arch object.
+    :param int addr:    The instruction address.
+    :return:            The real address of an instruction.
+    :rtype:             int
+    """
+
+    return ((addr >> 1) << 1) if is_arm_arch(arch) else addr
+
 class ArchARM(Arch):
     def __init__(self, endness=Endness.LE):
 
