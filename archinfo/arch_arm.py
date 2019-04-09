@@ -336,6 +336,26 @@ class ArchARMCortexM(ArchARMEL):
         # TODO: POP.W
     }
 
+    # Special handling of CM mode in *stone
+    if _capstone:
+        cs_arch = _capstone.CS_ARCH_ARM
+        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN + _capstone.CS_MODE_THUMB + _capstone.CS_MODE_MCLASS
+    _cs_thumb = None
+    if _keystone:
+        ks_arch = _keystone.KS_ARCH_ARM
+        ks_mode = _keystone.KS_MODE_THUMB + _keystone.KS_MODE_LITTLE_ENDIAN
+    _ks_thumb = None
+
+    @property
+    def capstone_thumb(self):
+        return self.capstone
+
+    @property
+    def keystone_thumb(self):
+        return self.keystone
+
+
+
     def __init__(self, *args, **kwargs):
 
         # See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CHDBIBGJ.html
