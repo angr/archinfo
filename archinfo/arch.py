@@ -522,6 +522,7 @@ class Arch:
         elif self.bits == 32:
             path.append('/usr/${TRIPLET}/lib32/')
             path.append('/usr/lib32/')
+            path.append('/lib32/')
 
         if pedantic:
             path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
