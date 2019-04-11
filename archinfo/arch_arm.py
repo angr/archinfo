@@ -360,28 +360,28 @@ class ArchARMCortexM(ArchARMEL):
 
     # EDG says: Note, due to the thing about class members being single objects, don't do this
     # in the constructor, or you're gonna have a bad time
-    self.register_list += [
-        # Whether exceptions are masked or not. (e.g., everything but NMI)
-        Register(name='faultmask', size=4, default_value=(0, False, None)),
-        # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
-        # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
-        Register(name='basepri', size=4, default_value=(0, False, None)),
-        # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
-        # Configures whether interrupt priorities are respected or not.
-        Register(name='primask', size=4, default_value=(0, False, None)),
-        # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
-        # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
-        # We only keep here the data not computed via CCalls
-        # The default is to have the T bit on.
-        Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
-        # CONTROL:
-        # Bit 2: Whether the FPU is active or not
-        # Bit 1: Whether we use MSP (0) or PSP (1)
-        # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
-        Register(name='control', size=4, default_value=(0, False, None))
-    ]
 
     def __init__(self, *args, **kwargs):
+        self.register_list += [
+            # Whether exceptions are masked or not. (e.g., everything but NMI)
+            Register(name='faultmask', size=4, default_value=(0, False, None)),
+            # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
+            # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
+            Register(name='basepri', size=4, default_value=(0, False, None)),
+            # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
+            # Configures whether interrupt priorities are respected or not.
+            Register(name='primask', size=4, default_value=(0, False, None)),
+            # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
+            # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
+            # We only keep here the data not computed via CCalls
+            # The default is to have the T bit on.
+            Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
+            # CONTROL:
+            # Bit 2: Whether the FPU is active or not
+            # Bit 1: Whether we use MSP (0) or PSP (1)
+            # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
+            Register(name='control', size=4, default_value=(0, False, None))
+        ]
 
         super(ArchARMCortexM, self).__init__(*args, **kwargs)
 
