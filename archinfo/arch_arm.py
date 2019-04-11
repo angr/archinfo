@@ -229,15 +229,15 @@ class ArchARM(Arch):
         Register(name='cc_dep1', size=4, default_value=(0, False, None), artificial=True),
         Register(name='cc_dep2', size=4, default_value=(0, False, None), artificial=True),
         Register(name='cc_ndep', size=4, default_value=(0, False, None), artificial=True),
-        Register(name='qflag32', size=4),
-        Register(name='geflag0', size=4),
-        Register(name='geflag1', size=4),
-        Register(name='geflag2', size=4),
-        Register(name='geflag3', size=4),
-        Register(name='emnote', size=4),
-        Register(name='cmstart', size=4),
-        Register(name='cmlen', size=4),
-        Register(name='nraddr', size=4),
+        Register(name='qflag32', size=4, vector=True),
+        Register(name='geflag0', size=4, vector=True),
+        Register(name='geflag1', size=4, vector=True),
+        Register(name='geflag2', size=4, vector=True),
+        Register(name='geflag3', size=4, vector=True),
+        Register(name='emnote', size=4, vector=True),
+        Register(name='cmstart', size=4, artificial=True),
+        Register(name='cmlen', size=4, artificial=True),
+        Register(name='nraddr', size=4, artificial=True),
         Register(name='ip_at_syscall', size=4, artificial=True),
         Register(name='d0', size=8, floating_point=True, vector=True),
         Register(name='d1', size=8, floating_point=True, vector=True),
@@ -354,33 +354,35 @@ class ArchARMCortexM(ArchARMEL):
     def keystone_thumb(self):
         return self.keystone
 
-
-
-    def __init__(self, *args, **kwargs):
-
         # See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CHDBIBGJ.html
         # for relevant pain-points.  Most of these only get updated on an exception/interrupt/syscall
         # Except we leave T on because we have to.
-        self.register_list += [
-            # Whether exceptions are masked or not. (e.g., everything but NMI)
-            Register(name='faultmask', size=4, default_value=(0, False, None)),
-            # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
-            # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
-            Register(name='basepri', size=4, default_value=(0, False, None)),
-            # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
-            # Configures whether interrupt priorities are respected or not.
-            Register(name='primask', size=4, default_value=(0, False, None)),
-            # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
-            # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
-            # We only keep here the data not computed via CCalls
-            # The default is to have the T bit on.
-            Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
-            # CONTROL:
-            # Bit 2: Whether the FPU is active or not
-            # Bit 1: Whether we use MSP (0) or PSP (1)
-            # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
-            Register(name='control', size=4, default_value=(0, False, None))
-        ]
+
+    # EDG says: Note, due to the thing about class members being single objects, don't do this
+    # in the constructor, or you're gonna have a bad time
+    self.register_list += [
+        # Whether exceptions are masked or not. (e.g., everything but NMI)
+        Register(name='faultmask', size=4, default_value=(0, False, None)),
+        # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
+        # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
+        Register(name='basepri', size=4, default_value=(0, False, None)),
+        # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
+        # Configures whether interrupt priorities are respected or not.
+        Register(name='primask', size=4, default_value=(0, False, None)),
+        # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
+        # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
+        # We only keep here the data not computed via CCalls
+        # The default is to have the T bit on.
+        Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
+        # CONTROL:
+        # Bit 2: Whether the FPU is active or not
+        # Bit 1: Whether we use MSP (0) or PSP (1)
+        # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
+        Register(name='control', size=4, default_value=(0, False, None))
+    ]
+
+    def __init__(self, *args, **kwargs):
+
         super(ArchARMCortexM, self).__init__(*args, **kwargs)
 
     # TODO: Make arm_spotter use these
@@ -388,8 +390,8 @@ class ArchARMCortexM(ArchARMEL):
     # TODO: Add.... the NVIC? to SimOS
 
 
+register_arch([r'.*cortexm|.*cortex\-m.*|.*v7\-m.*'], 32, 'any', ArchARMCortexM)
 register_arch([r'.*armhf.*'], 32, 'any', ArchARMHF)
 register_arch([r'.*armeb|.*armbe'], 32, Endness.BE, ArchARM)
 register_arch([r'.*armel|arm.*'], 32, Endness.LE, ArchARMEL)
 register_arch([r'.*arm.*|.*thumb.*'], 32, 'any', ArchARM)
-register_arch([r'.*cortex\-m.*|.*v7\-m.*'], 32, 'any', ArchARMCortexM)

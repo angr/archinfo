@@ -294,6 +294,22 @@ class Arch:
     def __setstate__(self, data):
         self.__dict__.update(data)
 
+    def get_register_by_name(self, reg_name):
+        """
+        Return the Register object associated with the given name.
+        This includes subregisters.
+
+        For example, if you are operating in a platform-independent
+        setting, and wish to address "whatever the stack pointer is"
+        you could pass 'sp' here, and get Register(...r13...) back 
+        on an ARM platform.
+        
+        """
+        for r in self.register_list:
+            if reg_name == r.name or reg_name in r.alias_names:
+                return r
+        return None
+
     def get_default_reg_value(self, register):
         if register == 'sp':
             # Convert it to the corresponding register name
