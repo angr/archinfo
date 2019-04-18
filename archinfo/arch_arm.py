@@ -229,15 +229,15 @@ class ArchARM(Arch):
         Register(name='cc_dep1', size=4, default_value=(0, False, None), artificial=True),
         Register(name='cc_dep2', size=4, default_value=(0, False, None), artificial=True),
         Register(name='cc_ndep', size=4, default_value=(0, False, None), artificial=True),
-        Register(name='qflag32', size=4, vector=True),
-        Register(name='geflag0', size=4, vector=True),
-        Register(name='geflag1', size=4, vector=True),
-        Register(name='geflag2', size=4, vector=True),
-        Register(name='geflag3', size=4, vector=True),
-        Register(name='emnote', size=4, vector=True),
-        Register(name='cmstart', size=4, artificial=True),
-        Register(name='cmlen', size=4, artificial=True),
-        Register(name='nraddr', size=4, artificial=True),
+        Register(name='qflag32', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='geflag0', size=4, vector=True, default_value=(0, False, None), artificial=True),
+        Register(name='geflag1', size=4, vector=True, default_value=(0, False, None), artificial=True),
+        Register(name='geflag2', size=4, vector=True, default_value=(0, False, None), artificial=True),
+        Register(name='geflag3', size=4, vector=True, default_value=(0, False, None), artificial=True),
+        Register(name='emnote', size=4, vector=True, default_value=(0, False, None), artificial=True),
+        Register(name='cmstart', size=4, artificial=True, vector=True, default_value=(0, False, None)),
+        Register(name='cmlen', size=4, artificial=True, default_value=(0, False, None)),
+        Register(name='nraddr', size=4, artificial=True, default_value=(0, False, None)),
         Register(name='ip_at_syscall', size=4, artificial=True),
         Register(name='d0', size=8, floating_point=True, vector=True),
         Register(name='d1', size=8, floating_point=True, vector=True),
@@ -271,9 +271,9 @@ class ArchARM(Arch):
         Register(name='d29', size=8, floating_point=True, vector=True),
         Register(name='d30', size=8, floating_point=True, vector=True),
         Register(name='d31', size=8, floating_point=True, vector=True),
-        Register(name='fpscr', size=4, floating_point=True),
-        Register(name='tpidruro', size=4),
-        Register(name='itstate', size=4, default_value=(0, False, None)),
+        Register(name='fpscr', size=4, floating_point=True, artificial=True),
+        Register(name='tpidruro', size=4, artificial=True),
+        Register(name='itstate', size=4, artificial=True, default_value=(0, False, None)),
     ]
 
     got_section_name = '.got'
@@ -336,6 +336,85 @@ class ArchARMCortexM(ArchARMEL):
         # TODO: POP.W
     }
 
+    register_list = [
+        Register(name='r0', size=4, alias_names=('a1',),
+                 general_purpose=True, argument=True, linux_entry_value='ld_destructor'),
+        Register(name='r1', size=4, alias_names=('a2',),
+                 general_purpose=True, argument=True),
+        Register(name='r2', size=4, alias_names=('a3',),
+                 general_purpose=True, argument=True),
+        Register(name='r3', size=4, alias_names=('a4',),
+                 general_purpose=True, argument=True),
+        Register(name='r4', size=4, alias_names=('v1',),
+                 general_purpose=True),
+        Register(name='r5', size=4, alias_names=('v2',),
+                 general_purpose=True),
+        Register(name='r6', size=4, alias_names=('v3',),
+                 general_purpose=True),
+        Register(name='r7', size=4, alias_names=('v4',),
+                 general_purpose=True),
+        Register(name='r8', size=4, alias_names=('v5',),
+                 general_purpose=True),
+        Register(name='r9', size=4, alias_names=('v6', 'sb'),
+                 general_purpose=True),
+        Register(name='r10', size=4, alias_names=('v7', 'sl'),
+                 general_purpose=True),
+        Register(name='r11', size=4, alias_names=('v8', 'fp', 'bp'),
+                 general_purpose=True),
+        Register(name='r12', size=4, general_purpose=True),
+        # r12 is sometimes known as "ip" (intraprocedural call scratch) but we can't have that...
+        Register(name='sp', size=4, alias_names=('r13',),
+                 general_purpose=True, default_value=(Arch.initial_sp, True, 'global')),
+        Register(name='lr', size=4, alias_names=('r14',),
+                 general_purpose=True, concretize_unique=True),
+        Register(name='pc', size=4, vex_name='r15t', alias_names=('r15', 'ip')),
+        Register(name='cc_op', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='cc_dep1', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='cc_dep2', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='cc_ndep', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='qflag32', size=4, default_value=(0, False, None), artificial=True),
+        Register(name='ip_at_syscall', size=4, artificial=True),
+        # Cortex-M Has a different FPU from all other ARMs.
+        Register(name='d0', size=8, subregisters=[('s0', 0, 2), ('s1', 2, 2)], floating_point=True),
+        Register(name='d1', size=8, subregisters=[('s2', 0, 2), ('s3', 2, 2)], floating_point=True),
+        Register(name='d2', size=8, subregisters=[('s4', 0, 2), ('s5', 2, 2)], floating_point=True),
+        Register(name='d3', size=8, subregisters=[('s6', 0, 2), ('s7', 2, 2)], floating_point=True),
+        Register(name='d4', size=8, subregisters=[('s8', 0, 2), ('s9', 2, 2)], floating_point=True),
+        Register(name='d5', size=8, subregisters=[('s10', 0, 2), ('s11', 2, 2)], floating_point=True),
+        Register(name='d6', size=8, subregisters=[('s12', 0, 2), ('s13', 2, 2)], floating_point=True),
+        Register(name='d7', size=8, subregisters=[('s14', 0, 2), ('s15', 2, 2)], floating_point=True),
+        Register(name='d8', size=8, subregisters=[('s16', 0, 2), ('s17', 2, 2)], floating_point=True),
+        Register(name='d9', size=8, subregisters=[('s18', 0, 2), ('s19', 2, 2)], floating_point=True),
+        Register(name='d10', size=8, subregisters=[('s20', 0, 2), ('s21', 2, 2)], floating_point=True),
+        Register(name='d11', size=8, subregisters=[('s22', 0, 2), ('s23', 2, 2)], floating_point=True),
+        Register(name='d12', size=8, subregisters=[('s24', 0, 2), ('s25', 2, 2)], floating_point=True),
+        Register(name='d13', size=8, subregisters=[('s26', 0, 2), ('s27', 2, 2)], floating_point=True),
+        Register(name='d14', size=8, subregisters=[('s28', 0, 2), ('s29', 2, 2)], floating_point=True),
+        Register(name='d15', size=8, subregisters=[('s30', 0, 2), ('s31', 2, 2)], floating_point=True),
+        # TODO: NOTE: This is technically part of the EPSR, not its own register
+        Register(name='fpscr', size=4, floating_point=True),
+        # TODO: NOTE: This is also part of EPSR
+        Register(name='itstate', size=4, artificial=True, default_value=(0, False, None)),
+        # Whether exceptions are masked or not. (e.g., everything but NMI)
+        Register(name='faultmask', size=4, default_value=(0, False, None)),
+        # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
+        # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
+        Register(name='basepri', size=4, default_value=(0, False, None)),
+        # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
+        # Configures whether interrupt priorities are respected or not.
+        Register(name='primask', size=4, default_value=(0, False, None)),
+        # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
+        # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
+        # We only keep here the data not computed via CCalls
+        # The default is to have the T bit on.
+        Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
+        # CONTROL:
+        # Bit 2: Whether the FPU is active or not
+        # Bit 1: Whether we use MSP (0) or PSP (1)
+        # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
+        Register(name='control', size=4, default_value=(0, False, None))
+    ]
+
     # Special handling of CM mode in *stone
     if _capstone:
         cs_arch = _capstone.CS_ARCH_ARM
@@ -354,35 +433,7 @@ class ArchARMCortexM(ArchARMEL):
     def keystone_thumb(self):
         return self.keystone
 
-        # See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CHDBIBGJ.html
-        # for relevant pain-points.  Most of these only get updated on an exception/interrupt/syscall
-        # Except we leave T on because we have to.
-
-    # EDG says: Note, due to the thing about class members being single objects, don't do this
-    # in the constructor, or you're gonna have a bad time
-
     def __init__(self, *args, **kwargs):
-        self.register_list += [
-            # Whether exceptions are masked or not. (e.g., everything but NMI)
-            Register(name='faultmask', size=4, default_value=(0, False, None)),
-            # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
-            # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
-            Register(name='basepri', size=4, default_value=(0, False, None)),
-            # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
-            # Configures whether interrupt priorities are respected or not.
-            Register(name='primask', size=4, default_value=(0, False, None)),
-            # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
-            # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
-            # We only keep here the data not computed via CCalls
-            # The default is to have the T bit on.
-            Register(name='iepsr', size=4, default_value=(0x01000000, False, None)),
-            # CONTROL:
-            # Bit 2: Whether the FPU is active or not
-            # Bit 1: Whether we use MSP (0) or PSP (1)
-            # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
-            Register(name='control', size=4, default_value=(0, False, None))
-        ]
-
         super(ArchARMCortexM, self).__init__(*args, **kwargs)
 
     # TODO: Make arm_spotter use these
