@@ -374,12 +374,14 @@ class Arch:
                 res[reg] = (r.vex_offset + offset, size)
         return res
 
-    @property
-    def bytes(self):
-        """
-        The standard word size in bytes, calculated from the ``bits`` field
-        """
-        return self.bits // self.byte_width
+    def __getattr__(self, a):
+        if a == 'bytes':
+            # The standard word size in bytes, calculated from the ``bits`` field
+            v = self.bits // self.byte_width
+        else:
+            raise AttributeError(a)
+        setattr(self, a, v)
+        return v
 
     # e.g. sizeof['int'] = 4
     sizeof = {}
