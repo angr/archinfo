@@ -158,6 +158,8 @@ class Arch:
 
     def __init__(self, endness, instruction_endness=None):
 
+        self.bytes = self.bits // self.byte_width
+
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
             raise ArchError('Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME')
 
@@ -373,15 +375,6 @@ class Arch:
             for reg, offset, size in r.subregisters:
                 res[reg] = (r.vex_offset + offset, size)
         return res
-
-    def __getattr__(self, a):
-        if a == 'bytes':
-            # The standard word size in bytes, calculated from the ``bits`` field
-            v = self.bits // self.byte_width
-        else:
-            raise AttributeError(a)
-        setattr(self, a, v)
-        return v
 
     # e.g. sizeof['int'] = 4
     sizeof = {}
