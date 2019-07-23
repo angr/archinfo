@@ -188,6 +188,7 @@ class ArchARM(Arch):
         br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx}
         br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
+
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
@@ -329,7 +330,7 @@ class ArchARMCortexM(ArchARMEL):
 
     thumb_prologs = {
         br"[\x00-\xff]\xb5",  # push {xxx,lr}
-        br"[\x00-\xff][\x00-\xff]\x2d\xe9",  # push.w {xxx, lr}
+        br"\x2d\xe9[\x00-\xff][\x00-\xff]"  # push.w {xxx, lr}
     }
     function_epilogs = {
         br"[\x00-\xff]\xbd"  # pop {xxx, pc}
