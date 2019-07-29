@@ -455,6 +455,13 @@ class Arch:
 
         return encoding
 
+    def disasm(self, bytestring, addr=0, thumb=False):
+        if thumb and not hasattr(self, 'keystone_thumb'):
+            l.warning("Specified thumb=True on non-ARM architecture")
+            thumb = False
+        cs = self.capstone_thumb if thumb else self.capstone # pylint: disable=no-member
+        return '\n'.join('%#x:\t%s %s' % (insn.address, insn.mnemonic, insn.op_str) for insn in cs.disasm(bytestring, addr))
+
     def translate_dynamic_tag(self, tag):
         try:
             return self.dynamic_tag_translation[tag]
