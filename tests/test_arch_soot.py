@@ -1,6 +1,5 @@
 from archinfo.arch import Endness
 from nose.tools import raises
-from archinfo.archerror import ArchError
 from archinfo.arch_soot import SootAddressDescriptor, SootMethodDescriptor, SootAddressTerminator, SootFieldDescriptor, SootClassDescriptor, SootNullConstant, SootArgument, ArchSoot
 import nose.tools
 
@@ -289,7 +288,7 @@ def test_copy():
 def test_symbolic_soot_address_descriptor():
     method = SootMethodDescriptor(class_name='abc', name = 'abc', params = ('1', '2'), soot_method = None, ret_type = None)
     inst_1 = SootAddressDescriptor(method, block_idx = 2, stmt_idx = 2)
-    nose.tools.assert_equal(inst_1.symbolic, 3 > 3)
+    nose.tools.assert_equal(inst_1.symbolic, 2 > 3)
 
 
 def test_soot_address_terminator():
