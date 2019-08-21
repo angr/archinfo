@@ -1,1 +1,2 @@
-import archinfo
+def test_import(): 
+    import archinfo
