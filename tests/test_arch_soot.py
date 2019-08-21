@@ -108,8 +108,6 @@ def test_is_loaded():
 def test_attrs():
     inst_1 = SootMethodDescriptor(class_name = 'abc', name = 'abc', params = ('a', 'b'), soot_method = None, ret_type = None)
     nose.tools.assert_equal(inst_1.attrs, [])
-    # inst_2 = SootMethodDescriptor(class_name = 'abc', name = 'abc', params = ('a', 'b'), soot_method = not None, ret_type = None)
-    # nose.tools.assert_equal(inst_2.attrs, False)
 
 
 def test_exceptions():
@@ -129,7 +127,7 @@ def test_addr():
     inst_3 = SootAddressDescriptor(inst_1, block_idx = 3, stmt_idx = 4)
     nose.tools.assert_not_equal(inst_1.addr, inst_3)
 
-# Todo
+
 def test_matches_with_native_name():
     inst_1 = SootMethodDescriptor(class_name = 'abc', name = 'xyz', params = ('1', '2'), soot_method = None, ret_type = None)
     nose.tools.assert_equal(inst_1.matches_with_native_name(native_method='abc'), False)
@@ -151,19 +149,6 @@ def test_matches_with_native_name_fails():
     nose.tools.assert_raises(Exception, inst_1.matches_with_native_name(native_method))
     native_method = '__abc____'
     nose.tools.assert_raises(Exception, inst_1.matches_with_native_name(native_method))
-
-
-# def test_from_string():
-#     inst_1 = SootMethodDescriptor(class_name = 'abc', name = 'xyz', params = ('1', '2'), soot_method = None, ret_type = None)
-#     # assert inst_1.from_string('(inst_1)')
-#     inst_2 = SootMethodDescriptor(class_name = 'abc', name = 'xyz', params = ('1', '2'), soot_method = None, ret_type = None)
-#     nose.tools.assert_equal(inst_1.from_string('(tstr)'), (inst_2.class_name))
-
-
-# def test_from_soot_method():
-#     inst_1 = SootMethodDescriptor(class_name = 'abc', name = 'abc', params = ('a', 'b'),
-#                                   soot_method = None, ret_type = None)
-#     assert inst_1.from_soot_method(inst_1)
 
 
 def test_soot_address_descriptor():
@@ -307,13 +292,8 @@ def test_symbolic_soot_address_descriptor():
     nose.tools.assert_equal(inst_1.symbolic, 3 > 3)
 
 
-# Todo
 def test_soot_address_terminator():
     assert SootAddressTerminator()
-
-
-# def test_soot_address_terminator_repr():
-#     nose.tools.assert_equal(repr(SootAddressTerminator), '<Terminator>')
 
 
 def test_soot_field_descriptor():
@@ -368,8 +348,6 @@ def test_soot_class_descriptor_is_loaded():
 def test_soot_class_descriptor_fields():
     inst_1 = SootClassDescriptor(name = 'abc', soot_class = None)
     nose.tools.assert_equal(inst_1.fields, None)
-    # inst_2 = SootClassDescriptor(name = 'abc', soot_class = not None)
-    # nose.tools.assert_equal(inst_2.fields, None)
 
 
 def test_soot_class_descriptor_methods():
@@ -440,18 +418,13 @@ def test_archsoot_decode_type_signature_fails():
     nose.tools.assert_equal(ValueError, inst_1.decode_type_signature('AAA;'))
 
 
-# def test_archsoot_decode_parameter_list_signature():
-#     inst_1 = ArchSoot(endness=Endness.LE)
-#     nose.tools.assert_equal(inst_1.decode_parameter_list_signature('ZB'), (('boolean', 'byte')))
-
-
 def test_archsoot_decode_method_signature():
     inst_1 = ArchSoot(endness=Endness.LE)
     nose.tools.assert_equal(inst_1.decode_method_signature('(aaa)'), ((), None))
     nose.tools.assert_equal(inst_1.decode_method_signature('(ZZZ)'), (('boolean','boolean', 'boolean'), None))
     nose.tools.assert_equal(inst_1.decode_method_signature('(ZBCSIJFDV)'), (('boolean','byte','char','short','int','long','float','double','void'), None))
     nose.tools.assert_equal(inst_1.decode_method_signature('((B./))(Laaa;)'), (('byte','aaa'), None))
-    #todo why is the second argument None
+
 
 def test_archsoot_library_search_path():
     inst_1 = ArchSoot(endness=Endness.LE)
