@@ -1,7 +1,7 @@
-from archinfo.arch import Endness
-from nose.tools import raises
-from archinfo.arch_soot import SootAddressDescriptor, SootMethodDescriptor, SootAddressTerminator, SootFieldDescriptor, SootClassDescriptor, SootNullConstant, SootArgument, ArchSoot
 import nose.tools
+from nose.tools import raises
+from archinfo.arch import Endness
+from archinfo.arch_soot import SootAddressDescriptor, SootMethodDescriptor, SootAddressTerminator, SootFieldDescriptor, SootClassDescriptor, SootNullConstant, SootArgument, ArchSoot
 
 def test_soot_method_descriptor():
     assert SootMethodDescriptor(class_name = 'abc', name = 'pqr', params = ('a','b'), soot_method = None, ret_type = None)
