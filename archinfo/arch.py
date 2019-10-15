@@ -1,8 +1,12 @@
 import logging
+from typing import Dict
+
 import struct as _struct
 import platform as _platform
 import re
 from archinfo.archerror import ArchError
+from pyvex import RegisterOffset, RegisterName
+
 import copy
 
 l = logging.getLogger("archinfo.arch")
@@ -204,7 +208,7 @@ class Arch:
             self.default_register_values = [(r.name,) + r.default_value for r in self.register_list if r.default_value is not None]
             self.entry_register_values = {r.name: r.linux_entry_value for r in self.register_list if r.linux_entry_value is not None}
             self.default_symbolic_registers = [r.name for r in self.register_list if r.general_purpose]
-            self.register_names = {r.vex_offset: r.name for r in self.register_list}
+            self.register_names = {r.vex_offset: r.name for r in self.register_list} # type: Dict[RegisterOffset, RegisterName]
             self.registers = self._get_register_dict()
             self.argument_registers = set(r.vex_offset for r in self.register_list if r.argument)
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
@@ -694,7 +698,7 @@ class Arch:
     entry_register_values = {}
     default_symbolic_registers = []
     registers = {}
-    register_names = {}
+    register_names = {} # type: Dict[RegisterOffset, RegisterName]
     argument_registers = set()
     argument_register_positions = {}
     persistent_regs = []
@@ -765,7 +769,7 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident, endness='any', bits=''):
+def arch_from_id(ident, endness='any', bits='') -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 
