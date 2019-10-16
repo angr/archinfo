@@ -1,5 +1,5 @@
 import logging
-from typing import Dict
+from typing import Dict, List
 
 import struct as _struct
 import platform as _platform
@@ -693,7 +693,7 @@ class Arch:
     stack_size = 0x8000000
 
     # Register information
-    register_list = []
+    register_list = [] # type: List[Register]
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
