@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, Tuple, Any
 
 import struct as _struct
 import platform as _platform
@@ -77,11 +77,11 @@ class Register:
                  vector=False, argument=False, persistent=False, default_value=None,
                  linux_entry_value=None, concretize_unique=False, concrete=True,
                  artificial=False):
-        self.name = name
-        self.size = size
-        self.vex_offset = vex_offset
+        self.name = name # type: RegisterName
+        self.size = size # type: int
+        self.vex_offset = vex_offset # type: RegisterOffset
         self.vex_name = vex_name
-        self.subregisters = [] if subregisters is None else subregisters
+        self.subregisters = [] if subregisters is None else subregisters # type: List[Tuple[RegisterName, RegisterOffset, int]]
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
         self.floating_point = floating_point
@@ -208,7 +208,7 @@ class Arch:
             self.default_register_values = [(r.name,) + r.default_value for r in self.register_list if r.default_value is not None]
             self.entry_register_values = {r.name: r.linux_entry_value for r in self.register_list if r.linux_entry_value is not None}
             self.default_symbolic_registers = [r.name for r in self.register_list if r.general_purpose]
-            self.register_names = {r.vex_offset: r.name for r in self.register_list} # type: Dict[RegisterOffset, RegisterName]
+            self.register_names = {r.vex_offset: r.name for r in self.register_list}
             self.registers = self._get_register_dict()
             self.argument_registers = set(r.vex_offset for r in self.register_list if r.argument)
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
@@ -367,7 +367,7 @@ class Arch:
 
         return fmt_end + fmt_size
 
-    def _get_register_dict(self):
+    def _get_register_dict(self) ->  Dict[RegisterName, Tuple[RegisterOffset, int]]:
         res = {}
         for r in self.register_list:
             if r.vex_offset is None:
@@ -697,7 +697,7 @@ class Arch:
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registers = {}
+    registers = {} # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
     register_names = {} # type: Dict[RegisterOffset, RegisterName]
     argument_registers = set()
     argument_register_positions = {}
