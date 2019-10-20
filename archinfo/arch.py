@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
 
 import struct as _struct
 import platform as _platform
@@ -630,7 +630,7 @@ class Arch:
     function_address_types = (int,)
 
     # various names
-    name = None
+    name = None # type: str
     vex_arch = None
     qemu_name = None
     ida_processor = None
@@ -644,11 +644,11 @@ class Arch:
     instruction_alignment = None
 
     # register ofsets
-    ip_offset = None
-    sp_offset = None
-    bp_offset = None
-    ret_offset = None
-    lr_offset = None
+    ip_offset = None # type: RegisterOffset
+    sp_offset = None # type: RegisterOffset
+    bp_offset = None # type: RegisterOffset
+    ret_offset = None # type: RegisterOffset
+    lr_offset = None # type: RegisterOffset
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False
