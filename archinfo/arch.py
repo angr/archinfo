@@ -3,6 +3,7 @@ import struct as _struct
 import platform as _platform
 import re
 from archinfo.archerror import ArchError
+import copy
 
 l = logging.getLogger("archinfo.arch")
 l.addHandler(logging.NullHandler())
@@ -267,10 +268,7 @@ class Arch:
         """
         Produce a copy of this instance of this arch.
         """
-        new_arch = type(self)(self.memory_endness)
-        new_arch.vex_archinfo = self.vex_archinfo.copy() if self.vex_archinfo is not None else None
-
-        return new_arch
+        return copy.copy(self)
 
     def __repr__(self):
         return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
