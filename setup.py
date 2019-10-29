@@ -12,7 +12,7 @@ if bytes is str:
 
 setup(
     name='archinfo',
-    version='8.19.7.25',
+    version='8.19.10.29',
     python_requires='>=3.5',
     packages=packages,
 )
