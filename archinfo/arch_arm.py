@@ -55,6 +55,12 @@ class ArchARM(Arch):
                 br"\xe5\x2d\xe0\x04",                        # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
+            self.thumb_prologs = {
+                br"\xb5[\x00-\xff]\xb0[\x00-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+                br"\xb4[\x00-\xff]\xb5\x00\xb0[\x00-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
+                br"\xb0[\x00-\xff]\x90[\x00-\xff]",             # sub sp, sp, #??; str r0, [sp, ?]
+                br"\xb5[\x00-\xff]\x4c[\x00-\xff]\x44\xa5",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
+            }
             self.function_epilogs = {
                 br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
                 br"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
@@ -188,7 +194,12 @@ class ArchARM(Arch):
         br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx}
         br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
-
+    thumb_prologs = {
+        br"[\x00-\xff]\xb5[\x00-\xff]\xb0",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+        br"[\x00-\xff]\xb4\x00\xb5[\x00-\xff]\xb0",     # push {r?, r?}; push {lr}; sub sp, sp, #??
+        br"[\x00-\xff]\xb0[\x00-\xff]\x90",             # sub sp, sp, #??; str r0, [sp, ?]
+        br"[\x00-\xff]\xb5[\x00-\xff]\x4c\xa5\x44",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
+    }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
         br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
@@ -318,7 +329,7 @@ class ArchARMCortexM(ArchARMEL):
     * CONTROL
     * SP, banked as PSP or MSP
     * PSR, now just one PSR, with a few meta-registers APSR, IPSR, and EPSR which take a chunk of that each
-    
+
     """
 
     name = "ARMCortexM"
