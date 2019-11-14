@@ -55,7 +55,7 @@ class ArchARM(Arch):
                 br"\xe5\x2d\xe0\x04",                        # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
-            thumb_prologs = {
+            self.thumb_prologs = {
                 br"\xb5[\x00-\xff]\xb0[\x00-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
                 br"\xb4[\x00-\xff]\xb5\x00\xb0[\x00-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
                 br"\xb0[\x00-\xff]\x90[\x00-\xff]",             # sub sp, sp, #??; str r0, [sp, ?]
@@ -329,7 +329,7 @@ class ArchARMCortexM(ArchARMEL):
     * CONTROL
     * SP, banked as PSP or MSP
     * PSR, now just one PSR, with a few meta-registers APSR, IPSR, and EPSR which take a chunk of that each
-    
+
     """
 
     name = "ARMCortexM"
