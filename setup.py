@@ -15,4 +15,6 @@ setup(
     version='8.19.10.30',
     python_requires='>=3.5',
     packages=packages,
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )
