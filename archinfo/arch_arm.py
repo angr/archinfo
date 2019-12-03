@@ -56,10 +56,10 @@ class ArchARM(Arch):
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.thumb_prologs = {
-                br"\xb5[\x00-\xff]\xb0[\x00-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
-                br"\xb4\x80\xb0[\x00-\xff]",                    # push {r7}; sub sp, sp, #??
-                br"\xb4[\x00-\xff]\xb5\x00\xb0[\x00-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
-                br"\xb0[\x00-\xff]\x90[\x00-\xff]",             # sub sp, sp, #??; str r0, [sp, ?]
+                br"\xb5[\x00-\xff]\xb0[\x80-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+                br"\xb4\x80\xb0[\x80-\xff]",                    # push {r7}; sub sp, sp, #??
+                br"\xb4[\x00-\xff]\xb5\x00\xb0[\x80-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
+                br"\xb0[\x80-\xff]\x90[\x00-\xff]",             # sub sp, sp, #??; str r0, [sp, ?]
                 br"\xb5[\x00-\xff]\x4c[\x00-\xff]\x44\xa5",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
             }
             self.function_epilogs = {
@@ -196,10 +196,10 @@ class ArchARM(Arch):
         br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
     thumb_prologs = {
-        br"[\x00-\xff]\xb5[\x00-\xff]\xb0",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
-        br"[\x00-\xff]\xb0\x80\xb4",                    # push {r7}; sub sp, sp, #??
-        br"[\x00-\xff]\xb4\x00\xb5[\x00-\xff]\xb0",     # push {r?, r?}; push {lr}; sub sp, sp, #??
-        br"[\x00-\xff]\xb0[\x00-\xff]\x90",             # sub sp, sp, #??; str r0, [sp, ?]
+        br"[\x00-\xff]\xb5[\x80-\xff]\xb0",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+        br"[\x80-\xff]\xb0\x80\xb4",                    # push {r7}; sub sp, sp, #??
+        br"[\x00-\xff]\xb4\x00\xb5[\x80-\xff]\xb0",     # push {r?, r?}; push {lr}; sub sp, sp, #??
+        br"[\x80-\xff]\xb0[\x00-\xff]\x90",             # sub sp, sp, #??; str r0, [sp, ?]
         br"[\x00-\xff]\xb5[\x00-\xff]\x4c\xa5\x44",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
     }
     function_epilogs = {
