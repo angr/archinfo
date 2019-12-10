@@ -131,7 +131,7 @@ class ArchPPC64(Arch):
         Register(name='gpr11', size=8, alias_names=('r11',),
                  general_purpose=True),
         Register(name='gpr12', size=8, alias_names=('r12',),
-                 general_purpose=True),
+                 general_purpose=True, linux_entry_value='entry'),
         Register(name='gpr13', size=8, alias_names=('r13',),
                  general_purpose=True),
         Register(name='gpr14', size=8, alias_names=('r14',),
