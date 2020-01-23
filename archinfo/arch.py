@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple, Any, Optional
+from typing import Dict, List, Tuple
 
 import struct as _struct
 import platform as _platform
@@ -306,9 +306,8 @@ class Arch:
 
         For example, if you are operating in a platform-independent
         setting, and wish to address "whatever the stack pointer is"
-        you could pass 'sp' here, and get Register(...r13...) back 
+        you could pass 'sp' here, and get Register(...r13...) back
         on an ARM platform.
-        
         """
         for r in self.register_list:
             if reg_name == r.name or reg_name in r.alias_names:
