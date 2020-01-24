@@ -16,6 +16,4 @@ setup(
     python_requires='>=3.5',
     packages=packages,
     package_data={'archinfo': ['py.typed']},
-    test_suite='nose.collector',
-    tests_require=['nose'],
 )
