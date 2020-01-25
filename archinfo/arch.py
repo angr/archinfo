@@ -5,7 +5,7 @@ import struct as _struct
 import platform as _platform
 import re
 from archinfo.archerror import ArchError
-from pyvex import RegisterOffset, RegisterName
+from archinfo import RegisterOffset, RegisterName
 
 import copy
 
