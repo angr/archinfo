@@ -1,8 +1,12 @@
 import logging
+from typing import Dict, List, Tuple
+
 import struct as _struct
 import platform as _platform
 import re
 from archinfo.archerror import ArchError
+from archinfo import RegisterOffset, RegisterName
+
 import copy
 
 l = logging.getLogger("archinfo.arch")
@@ -73,11 +77,11 @@ class Register:
                  vector=False, argument=False, persistent=False, default_value=None,
                  linux_entry_value=None, concretize_unique=False, concrete=True,
                  artificial=False):
-        self.name = name
-        self.size = size
-        self.vex_offset = vex_offset
+        self.name = name # type: RegisterName
+        self.size = size # type: int
+        self.vex_offset = vex_offset # type: RegisterOffset
         self.vex_name = vex_name
-        self.subregisters = [] if subregisters is None else subregisters
+        self.subregisters = [] if subregisters is None else subregisters # type: List[Tuple[RegisterName, RegisterOffset, int]]
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
         self.floating_point = floating_point
@@ -302,9 +306,8 @@ class Arch:
 
         For example, if you are operating in a platform-independent
         setting, and wish to address "whatever the stack pointer is"
-        you could pass 'sp' here, and get Register(...r13...) back 
+        you could pass 'sp' here, and get Register(...r13...) back
         on an ARM platform.
-        
         """
         for r in self.register_list:
             if reg_name == r.name or reg_name in r.alias_names:
@@ -363,7 +366,7 @@ class Arch:
 
         return fmt_end + fmt_size
 
-    def _get_register_dict(self):
+    def _get_register_dict(self) ->  Dict[RegisterName, Tuple[RegisterOffset, int]]:
         res = {}
         for r in self.register_list:
             if r.vex_offset is None:
@@ -626,7 +629,7 @@ class Arch:
     function_address_types = (int,)
 
     # various names
-    name = None
+    name = None # type: str
     vex_arch = None
     qemu_name = None
     ida_processor = None
@@ -640,11 +643,11 @@ class Arch:
     instruction_alignment = None
 
     # register ofsets
-    ip_offset = None
-    sp_offset = None
-    bp_offset = None
-    ret_offset = None
-    lr_offset = None
+    ip_offset = None # type: RegisterOffset
+    sp_offset = None # type: RegisterOffset
+    bp_offset = None # type: RegisterOffset
+    ret_offset = None # type: RegisterOffset
+    lr_offset = None # type: RegisterOffset
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False
@@ -689,12 +692,12 @@ class Arch:
     stack_size = 0x8000000
 
     # Register information
-    register_list = []
+    register_list = [] # type: List[Register]
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registers = {}
-    register_names = {}
+    registers = {} # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
+    register_names = {} # type: Dict[RegisterOffset, RegisterName]
     argument_registers = set()
     argument_register_positions = {}
     persistent_regs = []
@@ -765,7 +768,7 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident, endness='any', bits=''):
+def arch_from_id(ident, endness='any', bits='') -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 

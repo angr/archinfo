@@ -15,4 +15,5 @@ setup(
     version='8.20.1.7',
     python_requires='>=3.5',
     packages=packages,
+    package_data={'archinfo': ['py.typed']},
 )
