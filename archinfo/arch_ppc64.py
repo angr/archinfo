@@ -311,6 +311,14 @@ class ArchPPC64(Arch):
         Register(name='pspb', size=4),
     ]
 
+    # see https://github.com/riscv/riscv-binutils-gdb/blob/82dcb8613e1b1fb2989deffde1d3c9729695ff9c/include/elf/ppc64.h
+    dynamic_tag_translation = {
+        0x70000000: 'DT_PPC64_GLINK',
+        0x70000001: 'DT_PPC64_OPD',
+        0x70000002: 'DT_PPC64_OPDSZ',
+        0x70000003: 'DT_PPC64_OPT',
+    }
+
     function_prologs = {
         br"[\x00-\xff]{2}\x21\x94\xa6\x02\x08\x7c",                        # stwu r1, -off(r1); mflr r0
     }
