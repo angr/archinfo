@@ -1,11 +1,12 @@
 import logging
 from typing import Dict, List, Tuple
-
 import struct as _struct
 import platform as _platform
 import re
-from archinfo.archerror import ArchError
-from archinfo import RegisterOffset, RegisterName
+
+from .archerror import ArchError
+from . import RegisterOffset, RegisterName
+from .tls import TLSArchInfo
 
 import copy
 
@@ -160,6 +161,7 @@ class Arch:
     """
     byte_width = 8
     instruction_endness = "Iend_BE"
+    elf_tls = None  # type: TLSArchInfo
 
     def __init__(self, endness, instruction_endness=None):
 
