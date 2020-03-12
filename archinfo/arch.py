@@ -460,7 +460,7 @@ class Arch:
         return encoding
 
     def disasm(self, bytestring, addr=0, thumb=False):
-        if thumb and not hasattr(self, 'keystone_thumb'):
+        if thumb and not hasattr(self, 'capstone_thumb'):
             l.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
         cs = self.capstone_thumb if thumb else self.capstone # pylint: disable=no-member
