@@ -16,4 +16,5 @@ setup(
     python_requires='>=3.5',
     packages=packages,
     package_data={'archinfo': ['py.typed']},
+    url="https://github.com/angr/archinfo",
 )
