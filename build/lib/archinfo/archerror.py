@@ -1,2 +1,0 @@
-class ArchError(Exception):
-    pass
