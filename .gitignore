@@ -5,4 +5,4 @@ dist
 MANIFEST
 Pipfile
 Pipfile.lock
-**/build、**
+**/build/**
