@@ -31,10 +31,10 @@ class ArchRISCV(Arch):
     sp_offset = None
     bp_offset = None
     lr_offset = None
-    ret_offset = 8 # FIXME: may incorrect
+    ret_offset = 11 # a0(x10) For return value
 
     vex_conditional_helpers = False
-    syscall_num_offset = 8 # FIXME: may incorrect
+    syscall_num_offset = 8  # a7(x17) For syscall number (http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch05s03.html)
     call_pushes_ret = False
     stack_change = -4
 
@@ -128,9 +128,8 @@ class ArchRISCV(Arch):
         Register(name='pc', size=4, alias_names=("ip",)),
     ]  # type: List[Register]
 
-    lib_paths = None # FIXME: unkown
     got_section_name = ".got"
-    ld_linux_name = "ld-linux-riscv32-ilp32d.so.1" # FIXME: maybe incorrect
+    ld_linux_name = "ld-linux-riscv32-ilp32d.so.1"
     byte_width = 8
     elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0) # FIXME: Copy from x86, incorrect (I know nothing about TLS)
 
