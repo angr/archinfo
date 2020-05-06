@@ -8,7 +8,13 @@ __version__ = (8, 20, 1, 7)
 if bytes is str:
     raise Exception("This module is designed for python 3 only. Please install an older version to use python 2.")
 
-# pylint:disable=wildcard-import
+# Type Aliases
+from typing import NewType
+RegisterOffset = NewType('RegisterOffset', int)
+RegisterName = NewType('RegisterName', str)
+TmpVar = NewType('TmpVar', int)
+
+# pylint: disable=wildcard-import
 from .arch import *
 from .defines import defines
 from .arch_amd64    import ArchAMD64

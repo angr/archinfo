@@ -5,6 +5,7 @@ import platform as _platform
 import re
 
 from .archerror import ArchError
+from . import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
 
 import copy
@@ -77,11 +78,11 @@ class Register:
                  vector=False, argument=False, persistent=False, default_value=None,
                  linux_entry_value=None, concretize_unique=False, concrete=True,
                  artificial=False):
-        self.name = name  # type: str
-        self.size = size  # type: int
-        self.vex_offset = vex_offset  # type: int
-        self.vex_name = vex_name  # type: str
-        self.subregisters = [] if subregisters is None else subregisters # type: List[Tuple[str, int, int]]
+        self.name = name # type: RegisterName
+        self.size = size # type: int
+        self.vex_offset = vex_offset # type: RegisterOffset
+        self.vex_name = vex_name
+        self.subregisters = [] if subregisters is None else subregisters # type: List[Tuple[RegisterName, RegisterOffset, int]]
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
         self.floating_point = floating_point
@@ -367,7 +368,7 @@ class Arch:
 
         return fmt_end + fmt_size
 
-    def _get_register_dict(self) ->  Dict[str, Tuple[int, int]]:
+    def _get_register_dict(self) ->  Dict[RegisterName, Tuple[RegisterOffset, int]]:
         res = {}
         for r in self.register_list:
             if r.vex_offset is None:
@@ -644,11 +645,11 @@ class Arch:
     instruction_alignment = None
 
     # register ofsets
-    ip_offset = None # type: int
-    sp_offset = None # type: int
-    bp_offset = None # type: int
-    ret_offset = None # type: int
-    lr_offset = None # type: int
+    ip_offset = None # type: RegisterOffset
+    sp_offset = None # type: RegisterOffset
+    bp_offset = None # type: RegisterOffset
+    ret_offset = None # type: RegisterOffset
+    lr_offset = None # type: RegisterOffset
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False
