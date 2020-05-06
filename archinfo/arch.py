@@ -654,7 +654,7 @@ class Arch:
     vex_conditional_helpers = False
 
     # memory stuff
-    bits = None  # type: int
+    bits = None
     memory_endness = Endness.LE
     register_endness = Endness.LE
     stack_change = None
@@ -697,8 +697,8 @@ class Arch:
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registers = {}  # type: Dict[str, Tuple[int, int]]
-    register_names = {}  # type: Dict[int, str]
+    registers = {} # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
+    register_names = {} # type: Dict[RegisterOffset, RegisterName]
     argument_registers = set()
     argument_register_positions = {}
     persistent_regs = []
