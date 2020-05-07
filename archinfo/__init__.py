@@ -8,7 +8,19 @@ __version__ = (8, 20, 1, 7)
 if bytes is str:
     raise Exception("This module is designed for python 3 only. Please install an older version to use python 2.")
 
-# pylint:disable=wildcard-import
+# NewType Declaration, see https://docs.python.org/3/library/typing.html#newtype
+from typing import NewType
+RegisterOffset = NewType('RegisterOffset', int)
+TmpVar = NewType('TmpVar', int)
+
+# This causes too much issues as a NewType, sot is a simple alias instead
+# This means that is still legal to pass any str where a RegisterName is expected.
+# The downside is that PyCharm will show the type as `str` when displaying the signature
+RegisterName = str
+
+
+
+# pylint: disable=wildcard-import
 from .arch import *
 from .defines import defines
 from .arch_amd64    import ArchAMD64
