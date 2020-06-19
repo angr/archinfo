@@ -263,6 +263,11 @@ class Arch:
             # map register names to Unicorn const
             for r in self.register_names.values():
                 reg_name = self.uc_prefix + 'REG_' + r.upper()
+                if self.name == 'X86':
+                    # Unicorn and x86 archinfo use different names for GDT/LDT registers
+                    if r in {'ldt', 'gdt'}:
+                        reg_name += 'R'
+
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
