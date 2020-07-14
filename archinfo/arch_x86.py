@@ -21,6 +21,26 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
+
+_NATIVE_FUNCTION_PROLOGS = [
+        br"\x8b\xff\x55\x8b\xec", # mov edi, edi; push ebp; mov ebp, esp
+        br"\x55\x8b\xec", # push ebp; mov ebp, esp
+        br"\x55\x89\xe5",  # push ebp; mov ebp, esp
+        br"\x55\x57\x56",  # push ebp; push edi; push esi
+        # mov eax, 0x000000??; (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
+        br"\xb8[\x00-\xff]\x00\x00\x00[\x50\x51\x52\x53\x55\x56\x57]{0,7}\x8b[\x00-\xff]{2}",
+        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
+        br"[\x50\x51\x52\x53\x55\x56\x57]{1,7}\x83\xec[\x00-\xff]{2,4}",
+        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) mov xxx, xxx
+        br"[\x50\x51\x52\x53\x55\x56\x57]{1,7}\x8b[\x00-\xff]{2}",
+        br"(\x81|\x83)\xec",  # sub xxx %esp
+    ]
+# every function prolog can potentially be prefixed with endbr32
+_endbr32 = b"\xf3\x0f\x1e\xfb"
+_prefixed = [(_endbr32 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
+_FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
+
+
 class ArchX86(Arch):
     def __init__(self, endness=Endness.LE):
         if endness != Endness.LE:
@@ -125,19 +145,7 @@ class ArchX86(Arch):
     uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.x86_const if _unicorn else None
     uc_prefix = "UC_X86_" if _unicorn else None
-    function_prologs = [
-        br"\x8b\xff\x55\x8b\xec", # mov edi, edi; push ebp; mov ebp, esp
-        br"\x55\x8b\xec", # push ebp; mov ebp, esp
-        br"\x55\x89\xe5",  # push ebp; mov ebp, esp
-        br"\x55\x57\x56",  # push ebp; push edi; push esi
-        # mov eax, 0x000000??; (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
-        br"\xb8[\x00-\xff]\x00\x00\x00[\x50\x51\x52\x53\x55\x56\x57]{0,7}\x8b[\x00-\xff]{2}",
-        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) sub esp
-        br"[\x50\x51\x52\x53\x55\x56\x57]{1,7}\x83\xec[\x00-\xff]{2,4}",
-        # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) mov xxx, xxx
-        br"[\x50\x51\x52\x53\x55\x56\x57]{1,7}\x8b[\x00-\xff]{2}",
-        br"(\x81|\x83)\xec",  # sub xxx %esp
-    ]
+    function_prologs = _FUNCTION_PROLOGS
     function_epilogs = {
         br"\xc9\xc3", # leave; ret
         br"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; ret
