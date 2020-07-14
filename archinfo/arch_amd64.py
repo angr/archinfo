@@ -26,6 +26,17 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
+
+_NATIVE_FUNCTION_PROLOGS = [
+        br"\x55\x48\x89\xe5", # push rbp; mov rbp, rsp
+        br"\x48[\x83,\x81]\xec[\x00-\xff]", # sub rsp, xxx
+    ]
+# every function prolog can potentially be prefixed with endbr64
+_endbr64 = b"\xf3\x0f\x1e\xfa"
+_prefixed = [(_endbr64 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
+_FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
+
+
 class ArchAMD64(Arch):
     def __init__(self, endness=Endness.LE):
         if endness != Endness.LE:
@@ -132,10 +143,7 @@ class ArchAMD64(Arch):
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.x86_const if _unicorn else None
     uc_prefix = "UC_X86_" if _unicorn else None
-    function_prologs = {
-        br"\x55\x48\x89\xe5", # push rbp; mov rbp, rsp
-        br"\x48[\x83,\x81]\xec[\x00-\xff]", # sub rsp, xxx
-    }
+    function_prologs = _FUNCTION_PROLOGS
     function_epilogs = {
         br"\xc9\xc3", # leaveq; retq
         br"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3", # pop <reg>; retq
