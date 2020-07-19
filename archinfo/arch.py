@@ -389,8 +389,7 @@ class Arch:
         A Capstone instance for this arch
         """
         if _capstone is None:
-            l.warning("Capstone is not installed!")
-            return None
+            raise Exception("Capstone is not installed!")
         if self.cs_arch is None:
             raise ArchError("Arch %s does not support disassembly with Capstone" % self.name)
         if self._cs is None:
@@ -406,8 +405,7 @@ class Arch:
         """
         if self._ks is None:
             if _keystone is None:
-                l.warning("Keystone is not installed!")
-                return None
+                raise Exception("Keystone is not installed!")
             if self.ks_arch is None:
                 raise ArchError("Arch %s does not support disassembly with Keystone" % self.name)
             self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
