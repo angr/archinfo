@@ -228,7 +228,7 @@ class ArchX86(Arch):
         Register(name='ss', size=2),
         Register(name='ldt', size=8, default_value=(0, False, None), concrete=False),
         Register(name='gdt', size=8, default_value=(0, False, None), concrete=False),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cmstart', size=4),
         Register(name='cmlen', size=4),
         Register(name='nraddr', size=4),

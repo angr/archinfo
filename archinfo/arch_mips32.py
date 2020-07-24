@@ -179,7 +179,7 @@ class ArchMIPS32(Arch):
         Register(name='fenr', size=4, floating_point=True),
         Register(name='fcsr', size=4, floating_point=True),
         Register(name='ulr', size=4),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cmstart', size=4),
         Register(name='cmlen', size=4),
         Register(name='nraddr', size=4),

@@ -337,7 +337,7 @@ class ArchAMD64(Arch):
                  floating_point=True, default_value=(0, False, None)),
         Register(name='fpround', size=8, floating_point=True, default_value=(0, False, None)),
         Register(name='fc3210', size=8, floating_point=True),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),

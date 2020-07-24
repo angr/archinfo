@@ -303,7 +303,7 @@ class ArchAArch64(Arch):
                                                     ('b31', 0, 1)],
                  alias_names=('v31',), floating_point=True, vector=True),
         Register(name='qcflag', size=16, floating_point=True),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),
