@@ -269,7 +269,7 @@ class ArchPPC32(Arch):
         Register(name='c_fpcc', size=1, floating_point=True),
         Register(name='vrsave', size=4, vector=True),
         Register(name='vscr', size=4, vector=True),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cmstart', size=4),
         Register(name='cmlen', size=4),
         Register(name='nraddr', size=4),

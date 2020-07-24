@@ -175,7 +175,7 @@ class ArchMIPS64(Arch):
         Register(name='fcsr', size=4, floating_point=True),
         Register(name='cp0_status', size=4),
         Register(name='ulr', size=8),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
         Register(name='cond', size=4),
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),

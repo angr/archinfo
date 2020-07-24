@@ -180,7 +180,7 @@ class ArchS390X(Arch):
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='ip_at_syscall', size=8, artificial=True),
-        Register(name='emnote', size=4),
+        Register(name='emnote', size=4, artificial=True),
     ]
 
     function_prologs = {
