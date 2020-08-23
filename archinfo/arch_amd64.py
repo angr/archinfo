@@ -60,6 +60,8 @@ class ArchAMD64(Arch):
             self.registers['xmm6'][0]: 6,
             self.registers['xmm7'][0]: 7
         } if _pyvex is not None else None
+        if _unicorn:
+            self.unicorn_flag_register = _unicorn.x86_const.UC_X86_REG_EFLAGS
 
     @property
     def capstone_x86_syntax(self):
