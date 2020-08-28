@@ -49,6 +49,9 @@ class ArchX86(Arch):
         if self.vex_archinfo:
             self.vex_archinfo['x86_cr0'] = 0xFFFFFFFF
 
+        if _unicorn:
+            self.unicorn_flag_register = _unicorn.x86_const.UC_X86_REG_EFLAGS
+
     @property
     def capstone_x86_syntax(self):
         """

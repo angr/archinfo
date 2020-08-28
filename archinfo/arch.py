@@ -266,6 +266,52 @@ class Arch:
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
+            # Register blacklist
+            reg_blacklist = ('cs', 'ds', 'es', 'fs', 'gs', 'ss', 'mm0', 'mm1', 'mm2', 'mm3', 'mm4', 'mm5', 'mm6', 'mm7', 'gdt', 'ldt')
+            self.reg_blacklist = []
+            self.reg_blacklist_offsets = []
+            for register in self.register_list:
+                if register.name in reg_blacklist:
+                    self.reg_blacklist.append(register.name)
+                    self.reg_blacklist_offsets.append(register.vex_offset)
+
+            # Artificial registers offsets
+            self.artificial_registers_offsets = []
+            self.vex_reg_to_size_map = {}
+            for reg_name in self.artificial_registers:
+                reg = self.get_register_by_name(reg_name)
+                self.vex_reg_to_size_map[reg.vex_offset] = reg.size
+                self.artificial_registers_offsets.extend(range(reg.vex_offset, reg.vex_offset + reg.size))
+
+            # VEX register offset to unicorn register ID and to name maps
+            self.vex_reg_offset_to_name = {}
+            self.vex_to_unicorn_map = {}
+            self.vex_sub_reg_to_reg_map = {}
+            pc_reg_name = self.get_register_by_name("pc")
+            for reg_name, unicorn_reg_id in self.uc_regs.items():
+                if reg_name == pc_reg_name:
+                    continue
+
+                vex_reg = self.get_register_by_name(reg_name)
+                self.vex_reg_offset_to_name[vex_reg.vex_offset] = (reg_name, vex_reg.size)
+                self.vex_to_unicorn_map[vex_reg.vex_offset] = unicorn_reg_id
+                self.vex_reg_to_size_map[vex_reg.vex_offset] = vex_reg.size
+                for vex_sub_reg in vex_reg.subregisters:
+                    vex_sub_reg_offset = self.get_register_offset(vex_sub_reg[0])
+                    if vex_sub_reg_offset not in self.vex_reg_offset_to_name:
+                        self.vex_reg_offset_to_name[vex_sub_reg_offset] = (reg_name, vex_reg.size)
+
+                    self.vex_sub_reg_to_reg_map[vex_sub_reg_offset] = vex_reg.vex_offset
+
+            # CPU flag registers
+            cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
+            self.cpu_flag_register_offsets_and_bitmasks_map = {}
+            for flag_reg, bitmask in cpu_flag_registers.items():
+                if flag_reg in self.registers:
+                    flag_reg_offset = self.get_register_offset(flag_reg)
+                    flag_bitmask = (1 << bitmask)
+                    self.cpu_flag_register_offsets_and_bitmasks_map[flag_reg_offset] = flag_bitmask
+
 
     def copy(self):
         """
@@ -682,6 +728,15 @@ class Arch:
     uc_const = None
     uc_prefix = None
     uc_regs = None
+    artificial_registers_offsets = None
+    cpu_flag_register_offsets_and_bitmasks_map = None
+    reg_blacklist = None
+    reg_blacklist_offsets = None
+    unicorn_flag_register = None
+    vex_reg_offset_to_name = None
+    vex_reg_to_size_map = None
+    vex_sub_reg_to_reg_map = None
+    vex_to_unicorn_map = None
 
     call_pushes_ret = False
     initial_sp = 0x7fff0000
