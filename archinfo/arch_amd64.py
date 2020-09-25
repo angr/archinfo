@@ -325,7 +325,7 @@ class ArchAMD64(Arch):
                                                       ('xmm15hq', 8, 8),
                                                       ('ymm15hx', 16, 16)],
                  vector=True),
-        Register(name='ftop', size=4, floating_point=True, default_value=(0, False, None)),
+        Register(name='ftop', size=4, floating_point=True, default_value=(0, False, None), artificial=True),
         Register(name='fpreg', size=64, subregisters=[('mm0', 0, 8),
                                                       ('mm1', 8, 8),
                                                       ('mm2', 16, 8),
