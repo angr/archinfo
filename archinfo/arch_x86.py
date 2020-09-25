@@ -212,7 +212,7 @@ class ArchX86(Arch):
                  default_value=(0, False, None)),
         Register(name='fc3210', size=4, floating_point=True),
         Register(name='ftop', size=4, floating_point=True,
-                 default_value=(0, False, None)),
+                 default_value=(0, False, None), artificial=True),
         Register(name='sseround', size=4, vector=True,
                  default_value=(0, False, None)),
         Register(name='xmm0', size=16, vector=True),
