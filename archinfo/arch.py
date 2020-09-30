@@ -729,6 +729,7 @@ class Arch:
     uc_prefix = None
     uc_regs = None
     artificial_registers_offsets = None
+    artificial_registers = set()
     cpu_flag_register_offsets_and_bitmasks_map = None
     reg_blacklist = None
     reg_blacklist_offsets = None

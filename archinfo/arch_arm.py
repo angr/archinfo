@@ -184,7 +184,7 @@ class ArchARM(Arch):
     _ks_thumb = None
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
-    uc_mode_thumb = _unicorn.UC_MODE_LITTLE_ENDIAN + _unicorn.UC_MODE_THUMB
+    uc_mode_thumb = _unicorn.UC_MODE_LITTLE_ENDIAN + _unicorn.UC_MODE_THUMB if _unicorn else None
     uc_const = _unicorn.arm_const if _unicorn else None
     uc_prefix = "UC_ARM_" if _unicorn else None
     #self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
@@ -439,9 +439,9 @@ class ArchARMCortexM(ArchARMEL):
         ks_arch = _keystone.KS_ARCH_ARM
         ks_mode = _keystone.KS_MODE_THUMB + _keystone.KS_MODE_LITTLE_ENDIAN
     _ks_thumb = None
-    uc_arch = _unicorn.UC_ARCH_ARM
-    uc_mode = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN
-    uc_mode_thumb = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN
+    uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
+    uc_mode = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
+    uc_mode_thumb = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
 
     @property
     def capstone_thumb(self):
