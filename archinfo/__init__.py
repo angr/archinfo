@@ -27,6 +27,7 @@ from .arch_amd64    import ArchAMD64
 from .arch_x86      import ArchX86
 from .arch_arm      import ArchARM, ArchARMEL, ArchARMHF, ArchARMCortexM
 from .arch_aarch64  import ArchAArch64
+from .arch_avr      import ArchAVR8
 from .arch_ppc32    import ArchPPC32
 from .arch_ppc64    import ArchPPC64
 from .arch_mips32   import ArchMIPS32
