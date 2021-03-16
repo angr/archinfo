@@ -302,6 +302,8 @@ class Arch:
                         self.vex_reg_offset_to_name[vex_sub_reg_offset] = (reg_name, vex_reg.size)
 
                     self.vex_sub_reg_to_reg_map[vex_sub_reg_offset] = vex_reg.vex_offset
+                    if vex_sub_reg_offset not in self.vex_reg_to_size_map:
+                        self.vex_reg_to_size_map[vex_sub_reg_offset] = vex_sub_reg[2]
 
             # CPU flag registers
             cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
