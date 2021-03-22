@@ -277,33 +277,19 @@ class Arch:
 
             # Artificial registers offsets
             self.artificial_registers_offsets = []
-            self.vex_reg_to_size_map = {}
             for reg_name in self.artificial_registers:
                 reg = self.get_register_by_name(reg_name)
-                self.vex_reg_to_size_map[reg.vex_offset] = reg.size
                 self.artificial_registers_offsets.extend(range(reg.vex_offset, reg.vex_offset + reg.size))
 
-            # VEX register offset to unicorn register ID and to name maps
-            self.vex_reg_offset_to_name = {}
+            # VEX register offset to unicorn register ID map
             self.vex_to_unicorn_map = {}
-            self.vex_sub_reg_to_reg_map = {}
             pc_reg_name = self.get_register_by_name("pc")
             for reg_name, unicorn_reg_id in self.uc_regs.items():
                 if reg_name == pc_reg_name:
                     continue
 
                 vex_reg = self.get_register_by_name(reg_name)
-                self.vex_reg_offset_to_name[vex_reg.vex_offset] = (reg_name, vex_reg.size)
                 self.vex_to_unicorn_map[vex_reg.vex_offset] = unicorn_reg_id
-                self.vex_reg_to_size_map[vex_reg.vex_offset] = vex_reg.size
-                for vex_sub_reg in vex_reg.subregisters:
-                    vex_sub_reg_offset = self.get_register_offset(vex_sub_reg[0])
-                    if vex_sub_reg_offset not in self.vex_reg_offset_to_name:
-                        self.vex_reg_offset_to_name[vex_sub_reg_offset] = (reg_name, vex_reg.size)
-
-                    self.vex_sub_reg_to_reg_map[vex_sub_reg_offset] = vex_reg.vex_offset
-                    if vex_sub_reg_offset not in self.vex_reg_to_size_map:
-                        self.vex_reg_to_size_map[vex_sub_reg_offset] = vex_sub_reg[2]
 
             # CPU flag registers
             cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
@@ -736,9 +722,6 @@ class Arch:
     reg_blacklist = None
     reg_blacklist_offsets = None
     unicorn_flag_register = None
-    vex_reg_offset_to_name = None
-    vex_reg_to_size_map = None
-    vex_sub_reg_to_reg_map = None
     vex_to_unicorn_map = None
 
     call_pushes_ret = False
