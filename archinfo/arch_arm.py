@@ -51,11 +51,12 @@ class ArchARM(Arch):
                                       )
         if endness == Endness.BE:
             self.function_prologs = {
-                br"\xe9\x2d[\x00-\xff][\x00-\xff]",          # stmfd sp!, {xxxxx}
+                br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
                 br"\xe5\x2d\xe0\x04",                        # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.thumb_prologs = {
+                br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]"     # push.w {xxxxx, lr}
                 br"\xb5[\x00-\xff]\xb0[\x80-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
                 br"\xb4\x80\xb0[\x80-\xff]",                    # push {r7}; sub sp, sp, #??
                 br"\xb4[\x00-\xff]\xb5\x00\xb0[\x80-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
@@ -191,12 +192,13 @@ class ArchARM(Arch):
     ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
-        br"[\x00-\xff][\x00-\xff]\x2d\xe9",                # stmfd sp!, {xxxxx}
+        br"[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",       # stmfd sp!, {xxxxx,lr}
         br"\x04\xe0\x2d\xe5",                              # push {lr}
-        br"\r\xc0\xa0\xe1[\x00-\xff][\x00-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx}
+        br"\r\xc0\xa0\xe1[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx,lr}
         br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
     thumb_prologs = {
+        br"\x2d\xe9[\x00-\xff][\x40-\x7f\xc0-\xff]"     # push.w {xxxxx, lr}
         br"[\x00-\xff]\xb5[\x80-\xff]\xb0",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
         br"\x80\xb4[\x80-\xff]\xb0",                    # push {r7}; sub sp, sp, #??
         br"[\x00-\xff]\xb4\x00\xb5[\x80-\xff]\xb0",     # push {r?, r?}; push {lr}; sub sp, sp, #??
