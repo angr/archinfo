@@ -1,11 +1,7 @@
-from archinfo.arch import Endness
-from archinfo import ArchAMD64, ArchError
 import unittest
 
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
+from archinfo.arch import Endness
+from archinfo import ArchAMD64, ArchError
 
 
 class TestAmd64(unittest.TestCase):
