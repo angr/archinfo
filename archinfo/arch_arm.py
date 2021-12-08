@@ -51,17 +51,45 @@ class ArchARM(Arch):
                                       )
         if endness == Endness.BE:
             self.function_prologs = {
-                br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
+                # br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
                 br"\xe5\x2d\xe0\x04",                        # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.thumb_prologs = {
-                br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]"     # push.w {xxxxx, lr}
-                br"\xb5[\x00-\xff]\xb0[\x80-\xff]",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
-                br"\xb4\x80\xb0[\x80-\xff]",                    # push {r7}; sub sp, sp, #??
-                br"\xb4[\x00-\xff]\xb5\x00\xb0[\x80-\xff]",     # push {r?, r?}; push {lr}; sub sp, sp, #??
-                br"\xb0[\x80-\xff]\x90[\x00-\xff]",             # sub sp, sp, #??; str r0, [sp, ?]
-                br"\xb5[\x00-\xff]\x4c[\x00-\xff]\x44\xa5",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
+                # push.w {r4, r5, r7, r8, lr}
+                br"\xe9\x2d\x41\xb0",
+                # push.w {r4-r7, r8, lr} | push.w {r4-r9, lr} | push.w {r4-r7, r9, r10, lr} | push.w {r4-r10, lr} |
+                # push.w {r4-r8, r10, r11, lr} | push.w {r4-r11, lr}
+                br"\xe9\x2d[\x41\x43\x46\x47\x4d\x4f]\xf0",
+                # push.w {r3-r9, lr} | push.w {r3-r7, r9, r10, lr} | push.w {r3-r11, lr}
+                br"\xe9\x2d[\x43\x46\x4f]\xf8",
+
+                br"[\xb4\xb5][\x00\x10\x30\x70\xf0]\xb0[\x80-\x8f\xa3\xa8]",
+                # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+                br"\xb4\x80\xb0[\x80-\xff]",  # push {r7}; sub sp, sp, #??
+                br"\xb4[\x00-\xff]\xb5\x00\xb0[\x80-\xff]",  # push {r?, r?}; push {lr}; sub sp, sp, #??
+                br"\xb0[\x80-\xff]\x90[\x00-\xff]",  # sub sp, sp, #??; str r0, [sp, ?]
+
+                # stmt0: push {lr} | push {r3, lr} | push {r4, lr} | push {r4, r5, lr} | push {r3, r4, r5, lr} |
+                #        push {r4, r5, r6, lr} | push {r4, r5, r6, r7, lr} | push {r3, r4, r5, r6, r7, lr}
+                # stmt1: ldr r4, [pc, #??]
+                # stmt2: add sp, r4
+                br"\xb5[\x00\x08\x10\x30\x38\x70\xf0\xf8]\x4c[\x00-\xff]\x44\xa5",
+
+                # stmt0: push {lr} | push {r3, lr} | push {r4, lr} | push {r4, r5, lr} | push {r3, r4, r5, lr} |
+                #        push {r4, r5, r6, lr} | push {r4, r5, r6, r7, lr} | push {r3, r4, r5, r6, r7, lr}
+                # stmt1: mov r3/r4/r5/r6/r7, r0 | mov r4/r5/r6/r7, r1 | mov r6/r7, r3
+                br"\xb5[\x00\x08\x10\x30\x38\x70\xf0\xf8]\x46[\x03-\x07\x0c-\x0f\x1e-\x1f]",
+
+                # stmt0: push {r3, lr}
+                # stmt1: movs r2/r3, #0
+                br"\xb5\x08[\x22\x23]\x00",
+
+                # ldr r3, [pc, #??]; ldr r2, [pc, #??]; add r3, pc; push {r4,r5,lr}
+                br"\x4b[\x00-\xff]\x4a[\x00-\xff]\x44\x7b\xb5\x30",
+
+                # push {r3,r4,r5,lr}; mov r3, #0;
+                br"\xb5\x38\xf2\x40\x03\x00\xf2\xc0\x03\x00",
             }
             self.function_epilogs = {
                 br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
@@ -192,18 +220,45 @@ class ArchARM(Arch):
     ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
-        br"[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",       # stmfd sp!, {xxxxx,lr}
+        # br"[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",       # stmfd sp!, {xxxxx,lr}
         br"\x04\xe0\x2d\xe5",                              # push {lr}
         br"\r\xc0\xa0\xe1[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx,lr}
         br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
     }
     thumb_prologs = {
-        br"\x2d\xe9[\x00-\xff][\x40-\x7f\xc0-\xff]"     # push.w {xxxxx, lr}
-        br"[\x00-\xff]\xb5[\x80-\xff]\xb0",             # push {??, ??, ..., ??, lr}; sub sp, sp, #??
-        br"\x80\xb4[\x80-\xff]\xb0",                    # push {r7}; sub sp, sp, #??
-        br"[\x00-\xff]\xb4\x00\xb5[\x80-\xff]\xb0",     # push {r?, r?}; push {lr}; sub sp, sp, #??
-        br"[\x80-\xff]\xb0[\x00-\xff]\x90",             # sub sp, sp, #??; str r0, [sp, ?]
-        br"[\x00-\xff]\xb5[\x00-\xff]\x4c\xa5\x44",     # push {??, ..., ??, lr}; ldr r4, [pc, #??]; add sp, r4
+        # push.w {r4, r5, r7, r8, lr}
+        br"\x2d\xe9\xb0\x41",
+        # push.w {r4-r7, r8, lr} | push.w {r4-r9, lr} | push.w {r4-r7, r9, r10, lr} | push.w {r4-r10, lr} |
+        # push.w {r4-r8, r10, r11, lr} | push.w {r4-r11, lr}
+        br"\x2d\xe9\xf0[\x41\x43\x46\x47\x4d\x4f]",
+        # push.w {r3-r9, lr} | push.w {r3-r7, r9, r10, lr} | push.w {r3-r11, lr}
+        br"\x2d\xe9\xf8[\x43\x46\x4f]",
+
+        br"[\x00\x10\x30\x70\xf0][\xb4\xb5][\x80-\x8f\xa3\xa8]\xb0",  # push {??, ??, ..., ??, lr}; sub sp, sp, #??
+        br"\x80\xb4[\x80-\xff]\xb0",  # push {r7}; sub sp, sp, #??
+        br"[\x00-\xff]\xb4\x00\xb5[\x80-\xff]\xb0",  # push {r?, r?}; push {lr}; sub sp, sp, #??
+        br"[\x80-\xff]\xb0[\x00-\xff]\x90",  # sub sp, sp, #??; str r0, [sp, ?]
+
+        # stmt0: push {lr} | push {r3, lr} | push {r4, lr} | push {r4, r5, lr} | push {r3, r4, r5, lr} |
+        #        push {r4, r5, r6, lr} | push {r4, r5, r6, r7, lr} | push {r3, r4, r5, r6, r7, lr}
+        # stmt1: ldr r4, [pc, #??]
+        # stmt2: add sp, r4
+        br"[\x00\x08\x10\x30\x38\x70\xf0\xf8]\xb5[\x00-\xff]\x4c\xa5\x44",
+
+        # stmt0: push {lr} | push {r3, lr} | push {r4, lr} | push {r4, r5, lr} | push {r3, r4, r5, lr} |
+        #        push {r4, r5, r6, lr} | push {r4, r5, r6, r7, lr} | push {r3, r4, r5, r6, r7, lr}
+        # stmt1: mov r3/r4/r5/r6/r7, r0 | mov r4/r5/r6/r7, r1 | mov r6/r7, r3
+        br"[\x00\x08\x10\x30\x38\x70\xf0\xf8]\xb5[\x03-\x07\x0c-\x0f\x1e-\x1f]\x46",
+
+        # stmt0: push {r3, lr}
+        # stmt1: movs r2/r3, #0
+        br"\x08\xb5\x00[\x22\x23]",
+
+        # ldr r3, [pc, #??]; ldr r2, [pc, #??]; add r3, pc; push {r4,r5,lr}
+        br"[\x00-\xff]\x4b[\x00-\xff]\x4a\x7b\x44\x30\xb5",
+
+        # push {r3,r4,r5,lr}; mov r3, #0;
+        br"\x38\xb5\x40\xf2\x00\x03\xc0\xf2\x00\x03",
     }
     function_epilogs = {
         br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
