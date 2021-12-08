@@ -414,7 +414,7 @@ class Arch:
                 res[reg] = (r.vex_offset + offset, size)
         return res
 
-    # e.g. sizeof['int'] = 4
+    # e.g. sizeof['int'] = 32
     sizeof = {}
 
     @property
