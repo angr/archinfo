@@ -63,6 +63,24 @@ class ArchAMD64(Arch):
         if _unicorn:
             self.unicorn_flag_register = _unicorn.x86_const.UC_X86_REG_EFLAGS
 
+        # Register blacklist
+        reg_blacklist = ('fs', 'gs')
+        self.reg_blacklist = []
+        self.reg_blacklist_offsets = []
+        for register in self.register_list:
+            if register.name in reg_blacklist:
+                self.reg_blacklist.append(register.name)
+                self.reg_blacklist_offsets.append(register.vex_offset)
+
+        # CPU flag registers
+        cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
+        self.cpu_flag_register_offsets_and_bitmasks_map = {}
+        for flag_reg, bitmask in cpu_flag_registers.items():
+            if flag_reg in self.registers:
+                flag_reg_offset = self.get_register_offset(flag_reg)
+                flag_bitmask = (1 << bitmask)
+                self.cpu_flag_register_offsets_and_bitmasks_map[flag_reg_offset] = flag_bitmask
+
     @property
     def capstone_x86_syntax(self):
         """
