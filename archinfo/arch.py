@@ -266,15 +266,6 @@ class Arch:
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
-            # Register blacklist
-            reg_blacklist = ('cs', 'ds', 'es', 'fs', 'gs', 'ss', 'mm0', 'mm1', 'mm2', 'mm3', 'mm4', 'mm5', 'mm6', 'mm7', 'gdt', 'ldt')
-            self.reg_blacklist = []
-            self.reg_blacklist_offsets = []
-            for register in self.register_list:
-                if register.name in reg_blacklist:
-                    self.reg_blacklist.append(register.name)
-                    self.reg_blacklist_offsets.append(register.vex_offset)
-
             # Artificial registers offsets
             self.artificial_registers_offsets = []
             for reg_name in self.artificial_registers:
@@ -290,16 +281,6 @@ class Arch:
 
                 vex_reg = self.get_register_by_name(reg_name)
                 self.vex_to_unicorn_map[vex_reg.vex_offset] = unicorn_reg_id
-
-            # CPU flag registers
-            cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
-            self.cpu_flag_register_offsets_and_bitmasks_map = {}
-            for flag_reg, bitmask in cpu_flag_registers.items():
-                if flag_reg in self.registers:
-                    flag_reg_offset = self.get_register_offset(flag_reg)
-                    flag_bitmask = (1 << bitmask)
-                    self.cpu_flag_register_offsets_and_bitmasks_map[flag_reg_offset] = flag_bitmask
-
 
     def copy(self):
         """
