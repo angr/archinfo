@@ -282,6 +282,14 @@ class Arch:
                 vex_reg = self.get_register_by_name(reg_name)
                 self.vex_to_unicorn_map[vex_reg.vex_offset] = unicorn_reg_id
 
+            # VEX registers used in lieu of flags register
+            self.vex_cc_regs = []
+            vex_cc_register_names = ["cc_op", "cc_dep1", "cc_dep2", "cc_ndep"]
+            for reg_name in vex_cc_register_names:
+                vex_flag_reg = self.get_register_by_name(reg_name)
+                if vex_flag_reg is not None:
+                    self.vex_cc_regs.append(vex_flag_reg)
+
     def copy(self):
         """
         Produce a copy of this instance of this arch.
@@ -704,6 +712,7 @@ class Arch:
     reg_blacklist_offsets = None
     unicorn_flag_register = None
     vex_to_unicorn_map = None
+    vex_cc_regs = None
 
     call_pushes_ret = False
     initial_sp = 0x7fff0000
