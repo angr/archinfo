@@ -65,8 +65,6 @@ class ArchAMD64(Arch):
 
         # Register blacklist
         reg_blacklist = ('fs', 'gs')
-        self.reg_blacklist = []
-        self.reg_blacklist_offsets = []
         for register in self.register_list:
             if register.name in reg_blacklist:
                 self.reg_blacklist.append(register.name)
