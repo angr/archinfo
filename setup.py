@@ -12,7 +12,7 @@ if bytes is str:
 
 setup(
     name='archinfo',
-    version='9.1.gitrolling',
+    version='9.1.11752',
     python_requires='>=3.6',
     packages=packages,
     package_data={'archinfo': ['py.typed']},
