@@ -280,7 +280,7 @@ class Arch:
                     continue
 
                 vex_reg = self.get_register_by_name(reg_name)
-                self.vex_to_unicorn_map[vex_reg.vex_offset] = unicorn_reg_id
+                self.vex_to_unicorn_map[vex_reg.vex_offset] = (unicorn_reg_id, vex_reg.size)
 
             # VEX registers used in lieu of flags register
             self.vex_cc_regs = []
