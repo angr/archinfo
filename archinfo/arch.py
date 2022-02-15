@@ -707,10 +707,9 @@ class Arch:
     uc_regs = None
     artificial_registers_offsets = None
     artificial_registers = set()
-    cpu_flag_register_offsets_and_bitmasks_map = None
+    cpu_flag_register_offsets_and_bitmasks_map = {}
     reg_blacklist = []
     reg_blacklist_offsets = []
-    unicorn_flag_register = None
     vex_to_unicorn_map = None
     vex_cc_regs = None
 

@@ -49,9 +49,6 @@ class ArchX86(Arch):
         if self.vex_archinfo:
             self.vex_archinfo['x86_cr0'] = 0xFFFFFFFF
 
-        if _unicorn:
-            self.unicorn_flag_register = _unicorn.x86_const.UC_X86_REG_EFLAGS
-
         # Register blacklist
         reg_blacklist = ('cs', 'ds', 'es', 'fs', 'gs', 'ss', 'gdt', 'ldt')
         for register in self.register_list:
@@ -59,14 +56,19 @@ class ArchX86(Arch):
                 self.reg_blacklist.append(register.name)
                 self.reg_blacklist_offsets.append(register.vex_offset)
 
-        # CPU flag registers
-        cpu_flag_registers = {'d': 10, 'ac': 18, 'id': 21}
-        self.cpu_flag_register_offsets_and_bitmasks_map = {}
-        for flag_reg, bitmask in cpu_flag_registers.items():
-            if flag_reg in self.registers:
-                flag_reg_offset = self.get_register_offset(flag_reg)
-                flag_bitmask = (1 << bitmask)
-                self.cpu_flag_register_offsets_and_bitmasks_map[flag_reg_offset] = flag_bitmask
+        if _unicorn:
+            # CPU flag registers
+            uc_flags_reg = _unicorn.x86_const.UC_X86_REG_EFLAGS
+            cpu_flag_registers = {"d": 1 << 10, "ac": 1 << 18, "id": 1 << 21}
+            for reg, reg_bitmask in cpu_flag_registers.items():
+                reg_offset = self.get_register_offset(reg)
+                self.cpu_flag_register_offsets_and_bitmasks_map[reg_offset] = (uc_flags_reg, reg_bitmask)
+
+            mxcsr_registers = {"sseround": 1 << 14 | 1 << 13}
+            uc_mxcsr_reg = _unicorn.x86_const.UC_X86_REG_MXCSR
+            for reg, reg_bitmask in mxcsr_registers.items():
+                reg_offset = self.get_register_offset(reg)
+                self.cpu_flag_register_offsets_and_bitmasks_map[reg_offset] = (uc_mxcsr_reg, reg_bitmask)
 
     @property
     def capstone_x86_syntax(self):
