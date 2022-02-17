@@ -216,6 +216,9 @@ class Arch:
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
             self.concretize_unique_registers = set(r.vex_offset for r in self.register_list if r.concretize_unique)
             self.artificial_registers = set(r.name for r in self.register_list if r.artificial)
+            self.cpu_flag_register_offsets_and_bitmasks_map = {}
+            self.reg_blacklist = []
+            self.reg_blacklist_offsets = []
 
             # Register offsets
             try:
@@ -706,10 +709,10 @@ class Arch:
     uc_prefix = None
     uc_regs = None
     artificial_registers_offsets = None
-    artificial_registers = set()
-    cpu_flag_register_offsets_and_bitmasks_map = {}
-    reg_blacklist = []
-    reg_blacklist_offsets = []
+    artificial_registers = None
+    cpu_flag_register_offsets_and_bitmasks_map = None
+    reg_blacklist = None
+    reg_blacklist_offsets = None
     vex_to_unicorn_map = None
     vex_cc_regs = None
 
