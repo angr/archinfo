@@ -322,6 +322,9 @@ class Arch:
     def __getstate__(self):
         self._cs = None
         self._ks = None
+        if self.vex_archinfo is not None:
+            # clear hwcacheinfo-caches because it may contain cffi.CData
+            self.vex_archinfo['hwcache_info']['caches'] = None
         return self.__dict__
 
     def __setstate__(self, data):
