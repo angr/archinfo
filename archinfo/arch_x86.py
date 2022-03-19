@@ -17,6 +17,11 @@ try:
 except ImportError:
     _unicorn = None
 
+try:
+    import pyvex as _pyvex
+except ImportError:
+    _pyvex = None
+
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 from .archerror import ArchError
@@ -51,12 +56,13 @@ class ArchX86(Arch):
 
         # Register blacklist
         reg_blacklist = ('cs', 'ds', 'es', 'fs', 'gs', 'ss', 'gdt', 'ldt')
-        for register in self.register_list:
-            if register.name in reg_blacklist:
-                self.reg_blacklist.append(register.name)
-                self.reg_blacklist_offsets.append(register.vex_offset)
+        if self.reg_blacklist is not None and self.reg_blacklist_offsets is not None:
+            for register in self.register_list:
+                if register.name in reg_blacklist:
+                    self.reg_blacklist.append(register.name)
+                    self.reg_blacklist_offsets.append(register.vex_offset)
 
-        if _unicorn:
+        if _unicorn and _pyvex:
             # CPU flag registers
             uc_flags_reg = _unicorn.x86_const.UC_X86_REG_EFLAGS
             cpu_flag_registers = {"d": 1 << 10, "ac": 1 << 18, "id": 1 << 21}
