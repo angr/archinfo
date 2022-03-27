@@ -114,7 +114,7 @@ class ArchARM(Arch):
         self._cs_thumb = None
         self._ks = None
         self._ks_thumb = None
-        return self.__dict__
+        return super().__getstate__()
 
     @property
     def capstone_thumb(self):
