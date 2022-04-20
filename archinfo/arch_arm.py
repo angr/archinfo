@@ -25,7 +25,7 @@ from .tls import TLSArchInfo
 # TODO: which endianness should be default?
 
 def is_arm_arch(a):
-    return a.name.startswith('ARM') or a.name.startswith("AArch")
+    return a.name.startswith('ARM')
 
 def get_real_address_if_arm(arch, addr):
     """
