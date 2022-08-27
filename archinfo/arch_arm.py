@@ -430,6 +430,7 @@ class ArchARMCortexM(ArchARMEL):
                  general_purpose=True),
         Register(name='r11', size=4, alias_names=('v8', 'fp', 'bp'),
                  general_purpose=True),
+        # r11 is used as frame pointer
         Register(name='r12', size=4, general_purpose=True),
         # r12 is sometimes known as "ip" (intraprocedural call scratch) but we can't have that...
         Register(name='sp', size=4, alias_names=('r13',),
@@ -437,6 +438,25 @@ class ArchARMCortexM(ArchARMEL):
         Register(name='lr', size=4, alias_names=('r14',),
                  general_purpose=True, concretize_unique=True),
         Register(name='pc', size=4, vex_name='r15t', alias_names=('r15', 'ip')),
+        # Control registers for Cortex-M33 with ArmV8 securtiy extension enabled (Trustzone)
+        Register(name='msp', size=4, general_purpose=True),
+        Register(name='msp_s', size=4, general_purpose=True),
+        Register(name='msp_ns', size=4, general_purpose=True),
+        Register(name='psp', size=4, general_purpose=True),
+        Register(name='psp_s', size=4, general_purpose=True),
+        Register(name='psp_ns', size=4, general_purpose=True),
+        Register(name='msplim', size=4, general_purpose=True),
+        Register(name='msplim_s', size=4, general_purpose=True),
+        Register(name='msplim_ns', size=4, general_purpose=True),
+        Register(name='msplim_ns', size=4, general_purpose=True),
+        # additional stack pointers for secure/non_secure world
+        Register(name='sp_process', size=4, general_purpose=True),
+        Register(name='sp_process_s', size=4, general_purpose=True),
+        Register(name='sp_process_ns', size=4, general_purpose=True),
+        Register(name='sp_main', size=4, general_purpose=True),
+        Register(name='sp_main_s', size=4, general_purpose=True),
+        Register(name='sp_main_ns', size=4, general_purpose=True),
+        
         Register(name='cc_op', size=4, default_value=(0, False, None), artificial=True, concrete=False),
         Register(name='cc_dep1', size=4, default_value=(0, False, None), artificial=True, concrete=False),
         Register(name='cc_dep2', size=4, default_value=(0, False, None), artificial=True, concrete=False),
@@ -460,18 +480,26 @@ class ArchARMCortexM(ArchARMEL):
         Register(name='d13', size=8, subregisters=[('s26', 0, 4), ('s27', 4, 4)], floating_point=True),
         Register(name='d14', size=8, subregisters=[('s28', 0, 4), ('s29', 4, 4)], floating_point=True),
         Register(name='d15', size=8, subregisters=[('s30', 0, 4), ('s31', 4, 4)], floating_point=True),
+        # xPSR register. Includes APSR, IPSR and EPSR.
+        Register(name='cpsr', size=4, default_value=(0, False, None)),
         # TODO: NOTE: This is technically part of the EPSR, not its own register
         Register(name='fpscr', size=4, floating_point=True),
         # TODO: NOTE: This is also part of EPSR
         Register(name='itstate', size=4, artificial=True, default_value=(0, False, None), concrete=False),
         # Whether exceptions are masked or not. (e.g., everything but NMI)
         Register(name='faultmask', size=4, default_value=(0, False, None)),
+        Register(name='faultmask_s', size=4, default_value=(0, False, None)),
+        Register(name='faultmask_ns', size=4, default_value=(0, False, None)),
         # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
         # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
         Register(name='basepri', size=4, default_value=(0, False, None)),
+        Register(name='basepri_s', size=4, default_value=(0, False, None)),
+        Register(name='basepri_ns', size=4, default_value=(0, False, None)),
         # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
         # Configures whether interrupt priorities are respected or not.
         Register(name='primask', size=4, default_value=(0, False, None)),
+        Register(name='primask_s', size=4, default_value=(0, False, None)),
+        Register(name='primask_ns', size=4, default_value=(0, False, None)),
         # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
         # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
         # We only keep here the data not computed via CCalls
