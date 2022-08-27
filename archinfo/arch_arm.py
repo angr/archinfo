@@ -1,3 +1,5 @@
+from .arch import Arch, register_arch, Endness, Register
+from .tls import TLSArchInfo
 import logging
 
 l = logging.getLogger("archinfo.arch_arm")
@@ -17,8 +19,6 @@ try:
 except ImportError:
     _unicorn = None
 
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 
 # TODO: determine proper base register (if it exists)
 # TODO: handle multiple return registers?
@@ -26,6 +26,7 @@ from .tls import TLSArchInfo
 
 def is_arm_arch(a):
     return a.name.startswith('ARM')
+
 
 def get_real_address_if_arm(arch, addr):
     """
@@ -39,20 +40,25 @@ def get_real_address_if_arm(arch, addr):
 
     return ((addr >> 1) << 1) if is_arm_arch(arch) else addr
 
+
 class ArchARM(Arch):
+    """
+    ARM architecture specific subclass
+    """
+
     def __init__(self, endness=Endness.LE):
 
         instruction_endness = None
         if endness == Endness.LE:
             instruction_endness = Endness.LE
 
-        super(ArchARM, self).__init__(endness,
-                                      instruction_endness=instruction_endness
-                                      )
+        super().__init__(endness,
+                         instruction_endness=instruction_endness
+                         )
         if endness == Endness.BE:
             self.function_prologs = {
                 # br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
-                br"\xe5\x2d\xe0\x04",                        # push {lr}
+                br"\xe5\x2d\xe0\x04",  # push {lr}
                 br"\xe1\xa0\xc0\x0c\xe5\x2d\xe0\x04"
             }
             self.thumb_prologs = {
@@ -92,8 +98,8 @@ class ArchARM(Arch):
                 br"\xb5\x38\xf2\x40\x03\x00\xf2\xc0\x03\x00",
             }
             self.function_epilogs = {
-                br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"   # pop {xxx}; bx lr
-                br"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"         # pop {xxx}; bx lr
+                br"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"  # pop {xxx}; bx lr
+                br"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"  # pop {xxx}; bx lr
             }
 
     # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
@@ -213,14 +219,14 @@ class ArchARM(Arch):
     uc_mode_thumb = _unicorn.UC_MODE_LITTLE_ENDIAN + _unicorn.UC_MODE_THUMB if _unicorn else None
     uc_const = _unicorn.arm_const if _unicorn else None
     uc_prefix = "UC_ARM_" if _unicorn else None
-    #self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
-    ret_instruction = b"\x1E\xFF\x2F\xE1" # this is bx lr
+    # self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
+    ret_instruction = b"\x1E\xFF\x2F\xE1"  # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
         # br"[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",       # stmfd sp!, {xxxxx,lr}
-        br"\x04\xe0\x2d\xe5",                              # push {lr}
+        br"\x04\xe0\x2d\xe5",  # push {lr}
         br"\r\xc0\xa0\xe1[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",  # mov r12, sp;  stmfd sp!, {xxxxx,lr}
-        br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",                # mov r12, sp; push {lr}
+        br"\r\xc0\xa0\xe1\x04\xe0\x2d\xe5",  # mov r12, sp; push {lr}
     }
     thumb_prologs = {
         # push.w {r4, r5, r7, r8, lr}
@@ -258,8 +264,8 @@ class ArchARM(Arch):
         br"\x38\xb5\x40\xf2\x00\x03\xc0\xf2\x00\x03",
     }
     function_epilogs = {
-        br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"   # pop {xxx}; bx lr
-        br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"         # pop {xxx}; bx lr
+        br"[\x00-\xff]{2}\xbd\xe8\x1e\xff\x2f\xe1"  # pop {xxx}; bx lr
+        br"\x04\xe0\x9d\xe4\x1e\xff\x2f\xe1"  # pop {xxx}; bx lr
     }
     instruction_alignment = 2  # cuz there is also thumb mode
     register_list = [
@@ -348,19 +354,30 @@ class ArchARM(Arch):
     got_section_name = '.got'
     ld_linux_name = 'ld-linux.so.3'
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
-    #elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
+    # elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
     # that line was lying in the original CLE code and I have no clue why it's different
 
+
 class ArchARMHF(ArchARM):
+    """
+    This is an architecture description for the ARM hard-float (armhf).
+    It supports at least an ARM 32-bit processor with ARMv7 architecture, Thumb-2 and VFP3D16.
+    """
     name = 'ARMHF'
     triplet = 'arm-linux-gnueabihf'
     ld_linux_name = 'ld-linux-armhf.so.3'
 
+
 class ArchARMEL(ArchARM):
+    """
+    This is an architecture description for ARM EABI (armel).
+    It targets a range of older 32-bit ARM devices without hardware FPUs.
+    """
     name = 'ARMEL'
     triplet = 'arm-linux-gnueabi'
     ld_linux_name = 'ld-linux.so.3'
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
+
 
 class ArchARMCortexM(ArchARMEL):
     """
@@ -430,6 +447,7 @@ class ArchARMCortexM(ArchARMEL):
                  general_purpose=True),
         Register(name='r11', size=4, alias_names=('v8', 'fp', 'bp'),
                  general_purpose=True),
+        # r11 is used as frame pointer
         Register(name='r12', size=4, general_purpose=True),
         # r12 is sometimes known as "ip" (intraprocedural call scratch) but we can't have that...
         Register(name='sp', size=4, alias_names=('r13',),
@@ -437,6 +455,24 @@ class ArchARMCortexM(ArchARMEL):
         Register(name='lr', size=4, alias_names=('r14',),
                  general_purpose=True, concretize_unique=True),
         Register(name='pc', size=4, vex_name='r15t', alias_names=('r15', 'ip')),
+        # Control registers for Cortex-M33 with ArmV8 securtiy extension enabled (Trustzone)
+        Register(name='msp', size=4, general_purpose=True),
+        Register(name='msp_s', size=4, general_purpose=True),
+        Register(name='msp_ns', size=4, general_purpose=True),
+        Register(name='psp', size=4, general_purpose=True),
+        Register(name='psp_s', size=4, general_purpose=True),
+        Register(name='psp_ns', size=4, general_purpose=True),
+        Register(name='msplim', size=4, general_purpose=True),
+        Register(name='msplim_s', size=4, general_purpose=True),
+        Register(name='msplim_ns', size=4, general_purpose=True),
+        Register(name='msplim_ns', size=4, general_purpose=True),
+        # additional stack pointers for secure/non_secure world
+        Register(name='sp_process', size=4, general_purpose=True),
+        Register(name='sp_process_s', size=4, general_purpose=True),
+        Register(name='sp_process_ns', size=4, general_purpose=True),
+        Register(name='sp_main', size=4, general_purpose=True),
+        Register(name='sp_main_s', size=4, general_purpose=True),
+        Register(name='sp_main_ns', size=4, general_purpose=True),
         Register(name='cc_op', size=4, default_value=(0, False, None), artificial=True, concrete=False),
         Register(name='cc_dep1', size=4, default_value=(0, False, None), artificial=True, concrete=False),
         Register(name='cc_dep2', size=4, default_value=(0, False, None), artificial=True, concrete=False),
@@ -460,18 +496,26 @@ class ArchARMCortexM(ArchARMEL):
         Register(name='d13', size=8, subregisters=[('s26', 0, 4), ('s27', 4, 4)], floating_point=True),
         Register(name='d14', size=8, subregisters=[('s28', 0, 4), ('s29', 4, 4)], floating_point=True),
         Register(name='d15', size=8, subregisters=[('s30', 0, 4), ('s31', 4, 4)], floating_point=True),
+        # xPSR register. Includes APSR, IPSR and EPSR.
+        Register(name='cpsr', size=4, default_value=(0, False, None)),
         # TODO: NOTE: This is technically part of the EPSR, not its own register
         Register(name='fpscr', size=4, floating_point=True),
         # TODO: NOTE: This is also part of EPSR
         Register(name='itstate', size=4, artificial=True, default_value=(0, False, None), concrete=False),
         # Whether exceptions are masked or not. (e.g., everything but NMI)
         Register(name='faultmask', size=4, default_value=(0, False, None)),
+        Register(name='faultmask_s', size=4, default_value=(0, False, None)),
+        Register(name='faultmask_ns', size=4, default_value=(0, False, None)),
         # The one-byte priority, above which interrupts will not be handled if PRIMASK is 1.
         # Yes, you can implement an RTOS scheduler in hardware with this and the NVIC, you monster!
         Register(name='basepri', size=4, default_value=(0, False, None)),
+        Register(name='basepri_s', size=4, default_value=(0, False, None)),
+        Register(name='basepri_ns', size=4, default_value=(0, False, None)),
         # Only the bottom bit of PRIMASK is relevant, even though the docs say its 32bit.
         # Configures whether interrupt priorities are respected or not.
         Register(name='primask', size=4, default_value=(0, False, None)),
+        Register(name='primask_s', size=4, default_value=(0, False, None)),
+        Register(name='primask_ns', size=4, default_value=(0, False, None)),
         # NOTE: We specifically declare IEPSR here.  Not PSR, .... variants.for
         # VEX already handles the content of APSR, and half of EPSR (as ITSTATE) above.
         # We only keep here the data not computed via CCalls
@@ -506,7 +550,7 @@ class ArchARMCortexM(ArchARMEL):
         return self.keystone
 
     def __init__(self, *args, **kwargs):
-        super(ArchARMCortexM, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     # TODO: Make arm_spotter use these
     # TODO: Make SimOS use these.
