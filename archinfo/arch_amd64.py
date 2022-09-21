@@ -365,6 +365,12 @@ class ArchAMD64(Arch):
         Register(name='nraddr', size=8),
         Register(name='gs', size=8, alias_names=('gs_const',), concrete=False),
         Register(name='ip_at_syscall', size=8, concrete=False, artificial=True),
+        Register(name='cs_seg', size=2, vex_name='cs'),
+        Register(name='ds_seg', size=2, vex_name='ds'),
+        Register(name='es_seg', size=2, vex_name='es'),
+        Register(name='fs_seg', size=2, vex_name='fs'),
+        Register(name='fs_seg', size=2, vex_name='gs'),
+        Register(name='ss_seg', size=2, vex_name='ss'),
     ]
 
     symbol_type_translation = {
