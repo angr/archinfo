@@ -256,7 +256,7 @@ class ArchAMD64(Arch):
                  general_purpose=True),
         Register(name='ac', size=8, alias_names=('acflag',),concrete=False),
         Register(name='id', size=8, alias_names=('idflag',)),
-        Register(name='fs', size=8, alias_names=('fs_const',),
+        Register(name='fs', size=8, vex_name='fs_const', alias_names=('fs_const',),
                  default_value=(0x9000000000000000, True, 'global'),concrete=False),
         Register(name='sseround', size=8, vector=True,
                  default_value=(0, False, None)),
@@ -363,8 +363,14 @@ class ArchAMD64(Arch):
         Register(name='cmstart', size=8),
         Register(name='cmlen', size=8),
         Register(name='nraddr', size=8),
-        Register(name='gs', size=8, alias_names=('gs_const',), concrete=False),
+        Register(name='gs', size=8, vex_name='gs_const', alias_names=('gs_const',), concrete=False),
         Register(name='ip_at_syscall', size=8, concrete=False, artificial=True),
+        Register(name='cs_seg', size=2, vex_name='cs'),
+        Register(name='ds_seg', size=2, vex_name='ds'),
+        Register(name='es_seg', size=2, vex_name='es'),
+        Register(name='fs_seg', size=2, vex_name='fs'),
+        Register(name='fs_seg', size=2, vex_name='gs'),
+        Register(name='ss_seg', size=2, vex_name='ss'),
     ]
 
     symbol_type_translation = {
