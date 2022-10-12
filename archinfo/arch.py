@@ -671,11 +671,12 @@ class Arch:
     nop_instruction = b''
     instruction_alignment = None
 
-    # register ofsets
+    # register offsets
     ip_offset = None # type: RegisterOffset
     sp_offset = None # type: RegisterOffset
     bp_offset = None # type: RegisterOffset
     ret_offset = None # type: RegisterOffset
+    fp_ret_offset = None # type: RegisterOffset
     lr_offset = None # type: RegisterOffset
 
     # whether or not VEX has ccall handlers for conditionals for this arch
