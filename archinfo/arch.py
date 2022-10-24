@@ -1,37 +1,17 @@
+import copy
 import logging
-from typing import Dict, List, Tuple
-import struct as _struct
 import platform as _platform
 import re
+import struct as _struct
+from typing import Dict, List, Tuple
 
+from ._imports import _capstone, _keystone, _pyvex, _unicorn
 from .archerror import ArchError
-from . import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
+from .types import RegisterName, RegisterOffset
 
-import copy
 
 l = logging.getLogger("archinfo.arch")
-l.addHandler(logging.NullHandler())
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
 
 
 class Endness: # pylint: disable=no-init

@@ -1,24 +1,12 @@
 import logging
 
+from ._imports import _capstone, _keystone, _unicorn
+from .arch import Arch, Endness, Register, register_arch
+from .tls import TLSArchInfo
+
+
 l = logging.getLogger("archinfo.arch_mips32")
 
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 
 # FIXME: Tell fish to fix whatever he was storing in info['current_function']
 # TODO: Only persist t9 in PIC programs

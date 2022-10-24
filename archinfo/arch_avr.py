@@ -1,9 +1,8 @@
 import logging
 
-from .arch import Arch, register_arch, Endness
+from .arch import Arch, Endness, register_arch
 from .archerror import ArchError
 from .tls import TLSArchInfo
-
 
 l = logging.getLogger(__name__)
 

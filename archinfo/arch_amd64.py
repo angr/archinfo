@@ -1,30 +1,12 @@
 import logging
 
-l = logging.getLogger("archinfo.arch_amd64")
-
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
+from ._imports import _capstone, _keystone, _unicorn
+from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
+from .tls import TLSArchInfo
+
+
+l = logging.getLogger("archinfo.arch_amd64")
 
 
 _NATIVE_FUNCTION_PROLOGS = [

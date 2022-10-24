@@ -1,29 +1,12 @@
 import logging
 
+from ._imports import _capstone, _keystone, _pyvex
+from .arch import Arch, Endness, Register, register_arch
+from .tls import TLSArchInfo
+
+
 l = logging.getLogger("archinfo.arch_ppc32")
 
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-#try:
-#    import unicorn as _unicorn
-#except ImportError:
-#    _unicorn = None
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # PowerPC doesn't have stack base pointer, so bp_offset is set to -1 below

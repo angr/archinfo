@@ -1,23 +1,11 @@
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 import logging
 
+from ._imports import _capstone, _keystone, _unicorn
+from .arch import Arch, Endness, Register, register_arch
+from .tls import TLSArchInfo
+
+
 l = logging.getLogger("archinfo.arch_arm")
-
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
 
 
 # TODO: determine proper base register (if it exists)
