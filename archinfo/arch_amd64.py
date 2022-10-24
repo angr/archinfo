@@ -1,6 +1,6 @@
 import logging
 
-from ._imports import _capstone, _keystone, _unicorn
+from ._imports import _capstone, _keystone, _pyvex, _unicorn
 from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
 from .tls import TLSArchInfo
