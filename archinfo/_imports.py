@@ -21,3 +21,6 @@ try:
     import unicorn as _unicorn
 except ImportError:
     _unicorn = None
+
+
+__all__ = ['_capstone', '_keystone', '_pyvex', '_unicorn']
