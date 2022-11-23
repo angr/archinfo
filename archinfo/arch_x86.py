@@ -151,7 +151,7 @@ class ArchX86(Arch):
     linux_name = 'i386'
     triplet = 'i386-linux-gnu'
     max_inst_bytes = 15
-    call_sp_fix = -8
+    call_sp_fix = -4
     ret_offset = 8
     vex_conditional_helpers = True
     syscall_num_offset = 8

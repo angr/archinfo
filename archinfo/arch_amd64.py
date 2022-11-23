@@ -100,7 +100,10 @@ class ArchAMD64(Arch):
             self._cs_x86_syntax = new_syntax
 
     def _configure_capstone(self):
-        self._cs.syntax = _capstone.CS_OPT_SYNTAX_ATT if self._cs_x86_syntax == 'at&t' else _capstone.CS_OPT_SYNTAX_INTEL
+        if self._cs_x86_syntax == 'at&t':
+            self._cs.syntax = _capstone.CS_OPT_SYNTAX_ATT
+        else:
+            self._cs.syntax = _capstone.CS_OPT_SYNTAX_INTEL
 
     @property
     def keystone_x86_syntax(self):
@@ -198,7 +201,10 @@ class ArchAMD64(Arch):
                  linux_entry_value=0),
         Register(name='rsp', size=8, subregisters=[('esp', 0, 4)], alias_names=('sp',),
                  general_purpose=True, default_value=(initial_sp, True, 'global')),
-        Register(name='rbp', size=8, subregisters=[('ebp', 0, 4), ('bpl', 0, 1), ('bph', 1, 1)], alias_names=('bp',),
+        Register(name='rbp', size=8, subregisters=[('ebp', 0, 4),
+                                                   ('_bp', 0, 2),
+                                                   ('bpl', 0, 1),
+                                                   ('bph', 1, 1)], alias_names=('bp',),
                  general_purpose=True, linux_entry_value=0),
         Register(name='rsi', size=8, subregisters=[('esi', 0, 4),
                                                    ('si', 0, 2),
