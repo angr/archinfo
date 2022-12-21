@@ -96,7 +96,7 @@ class Register:
         self.artificial = artificial
 
     def __repr__(self):
-        return '<Register %s>' % (self.name,)
+        return f'<Register {self.name}>'
 
 class Arch:
     """
@@ -212,10 +212,10 @@ class Arch:
             self.default_symbolic_registers = [r.name for r in self.register_list if r.general_purpose]
             self.register_names = {r.vex_offset: r.name for r in self.register_list}
             self.registers = self._get_register_dict()
-            self.argument_registers = set(r.vex_offset for r in self.register_list if r.argument)
+            self.argument_registers = {r.vex_offset for r in self.register_list if r.argument}
             self.persistent_regs = [r.name for r in self.register_list if r.persistent]
-            self.concretize_unique_registers = set(r.vex_offset for r in self.register_list if r.concretize_unique)
-            self.artificial_registers = set(r.name for r in self.register_list if r.artificial)
+            self.concretize_unique_registers = {r.vex_offset for r in self.register_list if r.concretize_unique}
+            self.artificial_registers = {r.name for r in self.register_list if r.artificial}
             self.cpu_flag_register_offsets_and_bitmasks_map = {}
             self.reg_blacklist = []
             self.reg_blacklist_offsets = []
@@ -304,7 +304,7 @@ class Arch:
         return res
 
     def __repr__(self):
-        return '<Arch %s (%s)>' % (self.name, self.memory_endness[-2:])
+        return f'<Arch {self.name} ({self.memory_endness[-2:]})>'
 
     def __hash__(self):
         return hash((self.name, self.bits, self.memory_endness))
@@ -491,7 +491,7 @@ class Arch:
             l.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
         cs = self.capstone_thumb if thumb else self.capstone # pylint: disable=no-member
-        return '\n'.join('%#x:\t%s %s' % (insn.address, insn.mnemonic, insn.op_str) for insn in cs.disasm(bytestring, addr))
+        return '\n'.join(f'{insn.address:#x}:\t{insn.mnemonic} {insn.op_str}' for insn in cs.disasm(bytestring, addr))
 
     def translate_dynamic_tag(self, tag):
         try:
@@ -856,7 +856,7 @@ def arch_from_id(ident, endness='any', bits='') -> Arch:
             cls = acls
             break
     if not cls:
-        raise ArchNotFound("Can't find architecture info for architecture %s with %s bits and %s endness" % (ident, repr(bits), endness))
+        raise ArchNotFound(f"Can't find architecture info for architecture {ident} with {repr(bits)} bits and {endness} endness")
     if endness == 'unsure':
         if aendness == 'any':
             # We really don't care, use default

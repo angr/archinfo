@@ -30,7 +30,7 @@ from .tls import TLSArchInfo
 
 class ArchPPC64(Arch):
     def __init__(self, endness=Endness.LE):
-        super(ArchPPC64, self).__init__(endness)
+        super().__init__(endness)
         if endness == Endness.BE:
             self.function_prologs = {
                 br"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6",                        # stwu r1, -off(r1); mflr r0
