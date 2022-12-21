@@ -20,7 +20,7 @@ from .tls import TLSArchInfo
 
 class ArchS390X(Arch):
     def __init__(self, endness=Endness.BE):
-        super(ArchS390X, self).__init__(endness)
+        super().__init__(endness)
         if endness != Endness.BE:
             raise ArchError('Arch s390x must be big endian')
         self.argument_register_positions = {

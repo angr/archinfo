@@ -52,7 +52,7 @@ for line in a:
                 arraylen = to_int(k.split('[')[1].split(']')[0])
             break
     else:
-        raise Exception("Could not find field in arch %s for %s" % (archname, fieldname))
+        raise Exception(f"Could not find field in arch {archname} for {fieldname}")
 
     fieldsize = type_sizes[typename] * (1 if arraylen is None else arraylen)
     arch_data[archname][fieldname] = (offset, fieldsize)
@@ -100,7 +100,7 @@ for archname in arch_data:
                 continue
             break
         else:
-            raise Exception('Arch %s: %s has no name that matches vex' % (arch.name, miss))
+            raise Exception(f'Arch {arch.name}: {miss} has no name that matches vex')
 
     # get ready to write back to archinfo source
     arch_fname = 'archinfo/%s.py' % arch.__class__.__module__.split('.')[-1]

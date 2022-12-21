@@ -22,15 +22,11 @@ from .tls import TLSArchInfo
 
 class ArchAArch64(Arch):
     def __init__(self, endness=Endness.LE):
-        super(ArchAArch64, self).__init__(endness)
+        super().__init__(endness)
         if endness == Endness.BE:
             self.ida_processor = 'armb'
-            self.function_prologs = set((
-                # TODO
-            ))
-            self.function_epilogs = set((
-                # TODO
-            ))
+            self.function_prologs = set()
+            self.function_epilogs = set()
 
     bits = 64
     vex_arch = "VexArchARM64"
@@ -63,13 +59,8 @@ class ArchAArch64(Arch):
 
     ret_instruction = b"\xC0\x03\x5F\xD6"    # ret
     nop_instruction = b"\x1F\x20\x03\xD5"    # nop
-    function_prologs = set((
-        #br"\xFD\x7B\xBE\xA9\xFD\x03\x00\x91"
-        # TODO
-    ))
-    function_epilogs = set((
-        # TODO
-    ))
+    function_prologs = set()
+    function_epilogs = set()
     instruction_alignment = 4
     register_list = [
         Register(name='x0', size=8, subregisters=[('w0', 0, 4)], alias_names=('r0',),

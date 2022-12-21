@@ -22,15 +22,11 @@ from .tls import TLSArchInfo
 
 class ArchMIPS64(Arch):
     def __init__(self, endness=Endness.BE):
-        super(ArchMIPS64, self).__init__(endness)
+        super().__init__(endness)
         if endness == Endness.BE:
 
-            self.function_prologs = set((
-                # TODO
-            ))
-            self.function_epilogs = set((
-                # TODO
-            ))
+            self.function_prologs = set()
+            self.function_epilogs = set()
             self.triplet = 'mips64-linux-gnu'
             self.linux_name = 'mips64'
             self.ida_name = 'mips64b'
@@ -59,12 +55,8 @@ class ArchMIPS64(Arch):
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.mips_const if _unicorn else None
     uc_prefix = "UC_MIPS_" if _unicorn else None
-    function_prologs = set((
-        # TODO
-    ))
-    function_epilogs = set((
-        # TODO
-    ))
+    function_prologs = set()
+    function_epilogs = set()
 
     ret_instruction = b"\x08\x00\xE0\x03" + b"\x25\x08\x20\x00"
     nop_instruction = b"\x00\x00\x00\x00"

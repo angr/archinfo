@@ -41,7 +41,7 @@ class ArchAMD64(Arch):
     def __init__(self, endness=Endness.LE):
         if endness != Endness.LE:
             raise ArchError('Arch AMD64 must be little endian')
-        super(ArchAMD64, self).__init__(endness)
+        super().__init__(endness)
         self.argument_register_positions = {
             self.registers['rdi'][0]: 0,
             self.registers['rsi'][0]: 1,

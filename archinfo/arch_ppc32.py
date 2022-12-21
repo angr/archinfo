@@ -31,7 +31,7 @@ from .tls import TLSArchInfo
 
 class ArchPPC32(Arch):
     def __init__(self, endness=Endness.LE):
-        super(ArchPPC32, self).__init__(endness)
+        super().__init__(endness)
         if endness == Endness.BE:
             self.function_prologs = {
                 # stwu r1, -off(r1); mflr r0

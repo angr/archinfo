@@ -25,7 +25,7 @@ from .tls import TLSArchInfo
 
 class ArchMIPS32(Arch):
     def __init__(self, endness=Endness.BE):
-        super(ArchMIPS32, self).__init__(endness)
+        super().__init__(endness)
         if endness == Endness.BE:
 
             self.function_prologs = {

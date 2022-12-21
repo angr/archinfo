@@ -1,4 +1,3 @@
-
 import logging
 import re
 
@@ -7,7 +6,7 @@ from .arch import Arch, Endness, register_arch
 l = logging.getLogger('archinfo.arch_soot')
 
 
-class SootMethodDescriptor(object):
+class SootMethodDescriptor:
 
     __slots__ = ['class_name', 'name', 'params', '_soot_method', 'ret']
 
@@ -19,7 +18,7 @@ class SootMethodDescriptor(object):
         self.ret = ret_type
 
     def __repr__(self):
-        return "%s.%s(%s)" % (self.class_name, self.name, ", ".join(self.params))
+        return "{}.{}({})".format(self.class_name, self.name, ", ".join(self.params))
 
     def __hash__(self):
         return hash((self.class_name, self.name, self.params))
@@ -57,7 +56,7 @@ class SootMethodDescriptor(object):
         """
         :return the full name of the method (class name + method name)
         """
-        return "%s.%s" % (self.class_name, self.name)
+        return f"{self.class_name}.{self.name}"
 
     @property
     def symbolic(self):
@@ -129,9 +128,9 @@ class SootMethodDescriptor(object):
         class_and_method, tparams = tstr.split("(")
         params_str = tparams.split(")")[0]
         if params_str == "":
-            params = tuple()
+            params = ()
         else:
-            params = tuple([t.strip() for t in params_str.split(",")])
+            params = tuple(t.strip() for t in params_str.split(","))
         class_name, _, method = class_and_method.rpartition(".")
         return cls(class_name, method, params)
 
@@ -144,7 +143,7 @@ class SootMethodDescriptor(object):
                    ret_type=soot_method.ret)
 
 
-class SootAddressDescriptor(object):
+class SootAddressDescriptor:
 
     __slots__ = ['method', 'block_idx', 'stmt_idx']
 
@@ -159,7 +158,7 @@ class SootAddressDescriptor(object):
         self.stmt_idx = stmt_idx
 
     def __repr__(self):
-        return "<%r+(%s:%s)>" % (self.method,
+        return "<{!r}+({}:{})>".format(self.method,
                                  self.block_idx,
                                  '%d' % self.stmt_idx if self.stmt_idx is not None else '[0]')
 
@@ -210,13 +209,13 @@ class SootAddressTerminator(SootAddressDescriptor):
 
     def __init__(self):
         dummy_method = SootMethodDescriptor("dummy", "dummy", tuple())
-        super(SootAddressTerminator, self).__init__(dummy_method, 0, 0)
+        super().__init__(dummy_method, 0, 0)
 
     def __repr__(self):
         return "<Terminator>"
 
 
-class SootFieldDescriptor(object):
+class SootFieldDescriptor:
 
     __slots__ = ['class_name', 'name', 'type']
 
@@ -226,7 +225,7 @@ class SootFieldDescriptor(object):
         self.type = type_
 
     def __repr__(self):
-        return "%s.%s" % (self.class_name, self.name)
+        return f"{self.class_name}.{self.name}"
 
     def __hash__(self):
         return hash((self.class_name, self.name, self.type))
@@ -241,7 +240,7 @@ class SootFieldDescriptor(object):
         return not self == other
 
 
-class SootClassDescriptor(object):
+class SootClassDescriptor:
 
     __slots__ = ['name', '_soot_class']
 
@@ -287,7 +286,7 @@ class SootClassDescriptor(object):
         return "java.lang.Class"
 
 
-class SootNullConstant(object):
+class SootNullConstant:
 
     def __init__(self):
         pass
@@ -305,7 +304,7 @@ class SootNullConstant(object):
         return not self == other
 
 
-class SootArgument(object):
+class SootArgument:
     """
     Typed Java argument.
     """
@@ -325,12 +324,12 @@ class SootArgument(object):
         self.is_this_ref = is_this_ref
 
     def __repr__(self):
-        return "%s (%s)" % (self.value, self.type)
+        return f"{self.value} ({self.type})"
 
 
 class ArchSoot(Arch):
     def __init__(self, endness=Endness.LE):
-        super(ArchSoot, self).__init__(endness)
+        super().__init__(endness)
 
     name = 'Soot'
 
