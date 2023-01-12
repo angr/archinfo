@@ -34,16 +34,17 @@ except ImportError:
     _keystone = None
 
 
-class Endness: # pylint: disable=no-init
-    """ Endness specifies the byte order for integer values
+class Endness:  # pylint: disable=no-init
+    """Endness specifies the byte order for integer values
 
     :cvar LE:      little endian, least significant byte is stored at lowest address
     :cvar BE:      big endian, most significant byte is stored at lowest address
     :cvar ME:      Middle-endian. Yep.
     """
+
     LE = "Iend_LE"
     BE = "Iend_BE"
-    ME = 'Iend_ME'
+    ME = "Iend_ME"
 
 
 class Register:
@@ -73,21 +74,38 @@ class Register:
                          of the process
     :ivar bool artificial: Whether this register is an artificial register added by VEX IR or other ILs.
     """
-    def __init__(self, name, size, vex_offset=None, vex_name=None, subregisters=None,
-                 alias_names=None, general_purpose=False, floating_point=False,
-                 vector=False, argument=False, persistent=False, default_value=None,
-                 linux_entry_value=None, concretize_unique=False, concrete=True,
-                 artificial=False):
-        self.name = name # type: RegisterName
-        self.size = size # type: int
-        self.vex_offset = vex_offset # type: RegisterOffset
+
+    def __init__(
+        self,
+        name,
+        size,
+        vex_offset=None,
+        vex_name=None,
+        subregisters=None,
+        alias_names=None,
+        general_purpose=False,
+        floating_point=False,
+        vector=False,
+        argument=False,
+        persistent=False,
+        default_value=None,
+        linux_entry_value=None,
+        concretize_unique=False,
+        concrete=True,
+        artificial=False,
+    ):
+        self.name = name  # type: RegisterName
+        self.size = size  # type: int
+        self.vex_offset = vex_offset  # type: RegisterOffset
         self.vex_name = vex_name
-        self.subregisters = [] if subregisters is None else subregisters # type: List[Tuple[RegisterName, RegisterOffset, int]]
+        self.subregisters = (
+            [] if subregisters is None else subregisters
+        )  # type: List[Tuple[RegisterName, RegisterOffset, int]]
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
         self.floating_point = floating_point
         self.vector = vector
-        self.argument= argument
+        self.argument = argument
         self.persistent = persistent
         self.default_value = default_value
         self.linux_entry_value = linux_entry_value
@@ -96,7 +114,8 @@ class Register:
         self.artificial = artificial
 
     def __repr__(self):
-        return f'<Register {self.name}>'
+        return f"<Register {self.name}>"
+
 
 class Arch:
     """
@@ -159,6 +178,7 @@ class Arch:
     :cvar int byte_width: the number of bits in a byte.
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
+
     byte_width = 8
     instruction_endness = "Iend_BE"
     elf_tls = None  # type: TLSArchInfo
@@ -168,7 +188,7 @@ class Arch:
         self.bytes = self.bits // self.byte_width
 
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
-            raise ArchError('Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME')
+            raise ArchError("Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME")
 
         if instruction_endness is not None:
             self.instruction_endness = instruction_endness
@@ -178,7 +198,7 @@ class Arch:
 
         if endness == Endness.BE:
             if self.vex_archinfo:
-                self.vex_archinfo['endness'] = _pyvex.vex_endness_from_string('VexEndnessBE')
+                self.vex_archinfo["endness"] = _pyvex.vex_endness_from_string("VexEndnessBE")
             self.memory_endness = Endness.BE
             self.register_endness = Endness.BE
             if _capstone and self.cs_mode is not None:
@@ -195,7 +215,7 @@ class Arch:
             max_offset += self.bits
             # Register collections
             if type(self.vex_arch) is str:
-                va = self.vex_arch[7:].lower() # pylint: disable=unsubscriptable-object
+                va = self.vex_arch[7:].lower()  # pylint: disable=unsubscriptable-object
                 for r in self.register_list:
                     if r.vex_offset is None:
                         for name in (r.vex_name, r.name) + r.alias_names:
@@ -207,8 +227,12 @@ class Arch:
                             else:
                                 break
 
-            self.default_register_values = [(r.name,) + r.default_value for r in self.register_list if r.default_value is not None]
-            self.entry_register_values = {r.name: r.linux_entry_value for r in self.register_list if r.linux_entry_value is not None}
+            self.default_register_values = [
+                (r.name,) + r.default_value for r in self.register_list if r.default_value is not None
+            ]
+            self.entry_register_values = {
+                r.name: r.linux_entry_value for r in self.register_list if r.linux_entry_value is not None
+            }
             self.default_symbolic_registers = [r.name for r in self.register_list if r.general_purpose]
             self.register_names = {r.vex_offset: r.name for r in self.register_list}
             self.registers = self._get_register_dict()
@@ -228,10 +252,10 @@ class Arch:
 
             # Register offsets
             try:
-                self.ip_offset = self.registers['ip'][0]
-                self.sp_offset = self.registers['sp'][0]
-                self.bp_offset = self.registers['bp'][0]
-                self.lr_offset = self.registers.get('lr', (None, None))[0]
+                self.ip_offset = self.registers["ip"][0]
+                self.sp_offset = self.registers["sp"][0]
+                self.bp_offset = self.registers["bp"][0]
+                self.lr_offset = self.registers.get("lr", (None, None))[0]
             except KeyError:
                 pass
 
@@ -243,12 +267,12 @@ class Arch:
             self.register_size_names[(reg.vex_offset, reg.size)] = reg.name
             for name, off, sz in reg.subregisters:
                 # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
-                if self.name in {'X86', 'AMD64'} and name in {'bp', 'sp', 'ip'}:
+                if self.name in {"X86", "AMD64"} and name in {"bp", "sp", "ip"}:
                     continue
                 self.register_size_names[(reg.vex_offset + off, sz)] = name
 
         # allow mapping a sub-register to its base register
-        self.subregister_map = { }
+        self.subregister_map = {}
         for reg in self.register_list:
             if reg.vex_offset is None:
                 continue
@@ -256,7 +280,7 @@ class Arch:
             self.subregister_map[(reg.vex_offset, reg.size)] = base_reg
             self.subregister_map[reg.vex_offset] = base_reg
             for name, off, sz in reg.subregisters:
-                if self.name in {'X86', 'AMD64'} and name in {'bp', 'sp', 'ip'}:
+                if self.name in {"X86", "AMD64"} and name in {"bp", "sp", "ip"}:
                     continue
                 subreg_offset = reg.vex_offset + off
                 self.subregister_map[(subreg_offset, sz)] = base_reg
@@ -268,10 +292,10 @@ class Arch:
             if endness == Endness.BE:
                 self.uc_mode -= _unicorn.UC_MODE_LITTLE_ENDIAN
                 self.uc_mode += _unicorn.UC_MODE_BIG_ENDIAN
-            self.uc_regs = { }
+            self.uc_regs = {}
             # map register names to Unicorn const
             for r in self.register_names.values():
-                reg_name = self.uc_prefix + 'REG_' + r.upper()
+                reg_name = self.uc_prefix + "REG_" + r.upper()
                 if hasattr(self.uc_const, reg_name):
                     self.uc_regs[r] = getattr(self.uc_const, reg_name)
 
@@ -304,7 +328,7 @@ class Arch:
         return res
 
     def __repr__(self):
-        return f'<Arch {self.name} ({self.memory_endness[-2:]})>'
+        return f"<Arch {self.name} ({self.memory_endness[-2:]})>"
 
     def __hash__(self):
         return hash((self.name, self.bits, self.memory_endness))
@@ -312,9 +336,7 @@ class Arch:
     def __eq__(self, other):
         if not isinstance(other, Arch):
             return False
-        return  self.name == other.name and \
-                self.bits == other.bits and \
-                self.memory_endness == other.memory_endness
+        return self.name == other.name and self.bits == other.bits and self.memory_endness == other.memory_endness
 
     def __ne__(self, other):
         return not self == other
@@ -324,7 +346,7 @@ class Arch:
         self._ks = None
         if self.vex_archinfo is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
-            self.vex_archinfo['hwcache_info']['caches'] = None
+            self.vex_archinfo["hwcache_info"]["caches"] = None
         return self.__dict__
 
     def __setstate__(self, data):
@@ -346,7 +368,7 @@ class Arch:
         return None
 
     def get_default_reg_value(self, register):
-        if register == 'sp':
+        if register == "sp":
             # Convert it to the corresponding register name
             registers = [r for r, v in self.registers.items() if v[0] == self.sp_offset]
             if len(registers) > 0:
@@ -467,18 +489,18 @@ class Arch:
         :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
         :return:            The assembled bytecode
         """
-        if thumb and not hasattr(self, 'keystone_thumb'):
+        if thumb and not hasattr(self, "keystone_thumb"):
             l.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
-        ks = self.keystone_thumb if thumb else self.keystone # pylint: disable=no-member
+        ks = self.keystone_thumb if thumb else self.keystone  # pylint: disable=no-member
 
         try:
-            encoding, _ = ks.asm(string, addr, as_bytes) # pylint: disable=too-many-function-args
+            encoding, _ = ks.asm(string, addr, as_bytes)  # pylint: disable=too-many-function-args
         except TypeError:
             bytelist, _ = ks.asm(string, addr)
             if as_bytes:
                 if bytes is str:
-                    encoding = ''.join(chr(c) for c in bytelist)
+                    encoding = "".join(chr(c) for c in bytelist)
                 else:
                     encoding = bytes(bytelist)
             else:
@@ -487,11 +509,11 @@ class Arch:
         return encoding
 
     def disasm(self, bytestring, addr=0, thumb=False):
-        if thumb and not hasattr(self, 'capstone_thumb'):
+        if thumb and not hasattr(self, "capstone_thumb"):
             l.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
-        cs = self.capstone_thumb if thumb else self.capstone # pylint: disable=no-member
-        return '\n'.join(f'{insn.address:#x}:\t{insn.mnemonic} {insn.op_str}' for insn in cs.disasm(bytestring, addr))
+        cs = self.capstone_thumb if thumb else self.capstone  # pylint: disable=no-member
+        return "\n".join(f"{insn.address:#x}:\t{insn.mnemonic} {insn.op_str}" for insn in cs.disasm(bytestring, addr))
 
     def translate_dynamic_tag(self, tag):
         try:
@@ -562,19 +584,19 @@ class Arch:
         """
         A list of paths in which to search for shared libraries.
         """
-        subfunc = lambda x: x.replace('${TRIPLET}', self.triplet).replace('${ARCH}', self.linux_name)
-        path = ['/lib/${TRIPLET}/', '/usr/lib/${TRIPLET}/', '/lib/', '/usr/lib', '/usr/${TRIPLET}/lib/']
+        subfunc = lambda x: x.replace("${TRIPLET}", self.triplet).replace("${ARCH}", self.linux_name)
+        path = ["/lib/${TRIPLET}/", "/usr/lib/${TRIPLET}/", "/lib/", "/usr/lib", "/usr/${TRIPLET}/lib/"]
         if self.bits == 64:
-            path.append('/usr/${TRIPLET}/lib64/')
-            path.append('/usr/lib64/')
-            path.append('/lib64/')
+            path.append("/usr/${TRIPLET}/lib64/")
+            path.append("/usr/lib64/")
+            path.append("/lib64/")
         elif self.bits == 32:
-            path.append('/usr/${TRIPLET}/lib32/')
-            path.append('/usr/lib32/')
-            path.append('/lib32/')
+            path.append("/usr/${TRIPLET}/lib32/")
+            path.append("/usr/lib32/")
+            path.append("/lib32/")
 
         if pedantic:
-            path = sum([[x + 'tls/${ARCH}/', x + 'tls/', x + '${ARCH}/', x] for x in path], [])
+            path = sum([[x + "tls/${ARCH}/", x + "tls/", x + "${ARCH}/", x] for x in path], [])
         return list(map(subfunc, path))
 
     def m_addr(self, addr, *args, **kwargs):
@@ -658,7 +680,7 @@ class Arch:
     function_address_types = (int,)
 
     # various names
-    name = None # type: str
+    name = None  # type: str
     vex_arch = None
     qemu_name = None
     ida_processor = None
@@ -667,17 +689,17 @@ class Arch:
 
     # instruction stuff
     max_inst_bytes = None
-    ret_instruction = b''
-    nop_instruction = b''
+    ret_instruction = b""
+    nop_instruction = b""
     instruction_alignment = None
 
     # register offsets
-    ip_offset = None # type: RegisterOffset
-    sp_offset = None # type: RegisterOffset
-    bp_offset = None # type: RegisterOffset
-    ret_offset = None # type: RegisterOffset
-    fp_ret_offset = None # type: RegisterOffset
-    lr_offset = None # type: RegisterOffset
+    ip_offset = None  # type: RegisterOffset
+    sp_offset = None  # type: RegisterOffset
+    bp_offset = None  # type: RegisterOffset
+    ret_offset = None  # type: RegisterOffset
+    fp_ret_offset = None  # type: RegisterOffset
+    lr_offset = None  # type: RegisterOffset
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False
@@ -721,7 +743,7 @@ class Arch:
     vex_cc_regs = None
 
     call_pushes_ret = False
-    initial_sp = 0x7fff0000
+    initial_sp = 0x7FFF0000
 
     # Difference of the stack pointer after a call instruction (or its equivalent) is executed
     call_sp_fix = 0
@@ -729,16 +751,18 @@ class Arch:
     stack_size = 0x8000000
 
     # Register information
-    register_list = [] # type: List[Register]
+    register_list = []  # type: List[Register]
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registers = {} # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
-    register_names = {} # type: Dict[RegisterOffset, RegisterName]
+    registers = {}  # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
+    register_names = {}  # type: Dict[RegisterOffset, RegisterName]
     argument_registers = set()
     argument_register_positions = {}
     persistent_regs = []
-    concretize_unique_registers = set() # this is a list of registers that should be concretized, if unique, at the end of each block
+    concretize_unique_registers = (
+        set()
+    )  # this is a list of registers that should be concretized, if unique, at the end of each block
 
     lib_paths = []
     reloc_s_a = []
@@ -750,7 +774,7 @@ class Arch:
     reloc_tls_offset = []
     dynamic_tag_translation = {}
     symbol_type_translation = {}
-    got_section_name = ''
+    got_section_name = ""
 
     vex_archinfo = None
 
@@ -780,21 +804,21 @@ def register_arch(regexes, bits, endness, my_arch):
     if not isinstance(regexes, list):
         raise TypeError("regexes must be a list")
     for rx in regexes:
-        if not isinstance(rx, str) and not isinstance(rx,re._pattern_type):
+        if not isinstance(rx, str) and not isinstance(rx, re._pattern_type):
             raise TypeError("Each regex must be a string or compiled regular expression")
         try:
             re.compile(rx)
         except:
-            raise ValueError('Invalid Regular Expression %s' % rx)
-    #if not isinstance(my_arch,Arch):
+            raise ValueError("Invalid Regular Expression %s" % rx)
+    # if not isinstance(my_arch,Arch):
     #    raise TypeError("Arch must be a subclass of archinfo.Arch")
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if endness is not None:
-        if endness not in (Endness.BE, Endness.LE, Endness.ME, 'any'):
+        if endness not in (Endness.BE, Endness.LE, Endness.ME, "any"):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
-    if endness == 'any':
+    if endness == "any":
         all_arches.append(my_arch(Endness.BE))
         all_arches.append(my_arch(Endness.LE))
     else:
@@ -805,40 +829,40 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident, endness='any', bits='') -> Arch:
+def arch_from_id(ident, endness="any", bits="") -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 
     You may optionally provide the ``endness`` and ``bits`` parameters (strings) to help this function out.
     """
-    if bits == 64 or (isinstance(bits, str) and '64' in bits):
+    if bits == 64 or (isinstance(bits, str) and "64" in bits):
         bits = 64
-    elif isinstance(bits,str) and '32' in bits:
+    elif isinstance(bits, str) and "32" in bits:
         bits = 32
-    elif not bits and '64' in ident:
+    elif not bits and "64" in ident:
         bits = 64
-    elif not bits and '32' in ident:
+    elif not bits and "32" in ident:
         bits = 32
 
     endness = endness.lower()
-    if 'lit' in endness:
+    if "lit" in endness:
         endness = Endness.LE
-    elif 'big' in endness:
+    elif "big" in endness:
         endness = Endness.BE
-    elif 'lsb' in endness:
+    elif "lsb" in endness:
         endness = Endness.LE
-    elif 'msb' in endness:
+    elif "msb" in endness:
         endness = Endness.BE
-    elif 'le' in endness:
+    elif "le" in endness:
         endness = Endness.LE
-    elif 'be' in endness:
+    elif "be" in endness:
         endness = Endness.BE
-    elif 'l' in endness:
-        endness = 'unsure'
-    elif 'b' in endness:
-        endness = 'unsure'
+    elif "l" in endness:
+        endness = "unsure"
+    elif "b" in endness:
+        endness = "unsure"
     else:
-        endness = 'unsure'
+        endness = "unsure"
     ident = ident.lower()
     cls = None
     aendness = ""
@@ -852,13 +876,15 @@ def arch_from_id(ident, endness='any', bits='') -> Arch:
             continue
         if bits and bits != abits:
             continue
-        if aendness == 'any' or endness == aendness or endness == 'unsure':
+        if aendness == "any" or endness == aendness or endness == "unsure":
             cls = acls
             break
     if not cls:
-        raise ArchNotFound(f"Can't find architecture info for architecture {ident} with {repr(bits)} bits and {endness} endness")
-    if endness == 'unsure':
-        if aendness == 'any':
+        raise ArchNotFound(
+            f"Can't find architecture info for architecture {ident} with {repr(bits)} bits and {endness} endness"
+        )
+    if endness == "unsure":
+        if aendness == "any":
             # We really don't care, use default
             return cls()
         else:
@@ -871,9 +897,9 @@ def arch_from_id(ident, endness='any', bits='') -> Arch:
 
 def reverse_ends(string):
     count = (len(string) + 3) // 4
-    ise = 'I' * count
-    string += b'\x00' * (count * 4 - len(string))
-    return _struct.pack('>' + ise, *_struct.unpack('<' + ise, string))
+    ise = "I" * count
+    string += b"\x00" * (count * 4 - len(string))
+    return _struct.pack(">" + ise, *_struct.unpack("<" + ise, string))
 
 
 def get_host_arch():
