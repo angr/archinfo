@@ -1,7 +1,3 @@
-import logging
-
-l = logging.getLogger("archinfo.arch_amd64")
-
 try:
     import capstone as _capstone
 except ImportError:
