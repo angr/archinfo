@@ -12,6 +12,15 @@ import copy
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
 
+RegisterOffset = NewType("RegisterOffset", int)
+TmpVar = NewType("TmpVar", int)
+
+# This causes too much issues as a NewType, sot is a simple alias instead
+# This means that is still legal to pass any str where a RegisterName is expected.
+# The downside is that PyCharm will show the type as `str` when displaying the signature
+RegisterName = str
+
+
 try:
     import pyvex as _pyvex
 except ImportError:
@@ -31,14 +40,6 @@ try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
-
-RegisterOffset = NewType("RegisterOffset", int)
-TmpVar = NewType("TmpVar", int)
-
-# This causes too much issues as a NewType, sot is a simple alias instead
-# This means that is still legal to pass any str where a RegisterName is expected.
-# The downside is that PyCharm will show the type as `str` when displaying the signature
-RegisterName = str
 
 
 class Endness:  # pylint: disable=no-init
@@ -189,7 +190,6 @@ class Arch:
     elf_tls: TLSArchInfo = None
 
     def __init__(self, endness, instruction_endness=None):
-
         self.bytes = self.bits // self.byte_width
 
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
@@ -764,7 +764,7 @@ class Arch:
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registerse: Dict[RegisterName, Tuple[RegisterOffset, int]] = {}
+    registers: Dict[RegisterName, Tuple[RegisterOffset, int]] = {}
     register_names: Dict[RegisterOffset, RegisterName] = {}
     argument_registers = set()
     argument_register_positions = {}
