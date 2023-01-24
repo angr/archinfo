@@ -31,6 +31,7 @@ from .arch_mips64 import ArchMIPS64
 from .arch_soot import ArchSoot
 from .archerror import ArchError
 from .arch_s390x import ArchS390X
+from .arch_pcode import ArchPcode
 
 
 __all__ = [
@@ -62,4 +63,5 @@ __all__ = [
     "ArchSoot",
     "ArchError",
     "ArchS390X",
+    "ArchPcode",
 ]
