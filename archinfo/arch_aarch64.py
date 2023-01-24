@@ -1,6 +1,5 @@
-import logging
-
-l = logging.getLogger("archinfo.arch_aarch64")
+from .arch import Arch, register_arch, Endness, Register
+from .tls import TLSArchInfo
 
 try:
     import capstone as _capstone
@@ -16,9 +15,6 @@ try:
     import unicorn as _unicorn
 except ImportError:
     _unicorn = None
-
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 
 
 class ArchAArch64(Arch):

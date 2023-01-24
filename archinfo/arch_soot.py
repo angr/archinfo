@@ -3,7 +3,7 @@ import re
 
 from .arch import Arch, Endness, register_arch
 
-l = logging.getLogger("archinfo.arch_soot")
+log = logging.getLogger("archinfo.arch_soot")
 
 
 class SootMethodDescriptor:
@@ -384,7 +384,7 @@ class ArchSoot(Arch):
         # decode types
         params_types = ArchSoot.decode_parameter_list_signature(param_sig)
         ret_type = ArchSoot.decode_type_signature(ret_sig)
-        l.debug("Decoded method signature '%s' as params=%s and ret=%s", method_sig, params_types, ret_type)
+        log.debug("Decoded method signature '%s' as params=%s and ret=%s", method_sig, params_types, ret_type)
         return params_types, ret_type
 
     def library_search_path(self, pedantic=False):
