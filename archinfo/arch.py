@@ -4,8 +4,8 @@ import struct as _struct
 import platform as _platform
 import re
 
+from archinfo.types import RegisterOffset, RegisterName
 from .archerror import ArchError
-from . import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
 
 import copy
