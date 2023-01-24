@@ -7,7 +7,17 @@ __version__ = "9.2.36.dev0"
 
 
 from .types import RegisterOffset, TmpVar, RegisterName
-from .arch import Endness, Register, Arch, register_arch, ArchNotFound, arch_from_id, reverse_ends, get_host_arch
+from .arch import (
+    Endness,
+    Register,
+    Arch,
+    register_arch,
+    ArchNotFound,
+    arch_from_id,
+    reverse_ends,
+    get_host_arch,
+    all_arches,
+)
 from .defines import defines
 from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
@@ -35,6 +45,7 @@ __all__ = [
     "arch_from_id",
     "reverse_ends",
     "get_host_arch",
+    "all_arches",
     "defines",
     "ArchAMD64",
     "ArchX86",
