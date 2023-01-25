@@ -34,7 +34,7 @@ def get_real_address_if_arm(arch, addr):
     """
     Obtain the real address of an instruction. ARM architectures are supported.
 
-    :param Arch arch:   The Arch object.
+    :param archinfo.Arch arch:   The Arch object.
     :param int addr:    The instruction address.
     :return:            The real address of an instruction.
     :rtype:             int
