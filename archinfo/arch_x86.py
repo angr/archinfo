@@ -1,6 +1,6 @@
-import logging
-
-l = logging.getLogger("archinfo.arch_x86")
+from .arch import Arch, register_arch, Endness, Register
+from .tls import TLSArchInfo
+from .archerror import ArchError
 
 try:
     import capstone as _capstone
@@ -21,10 +21,6 @@ try:
     import pyvex as _pyvex
 except ImportError:
     _pyvex = None
-
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
-from .archerror import ArchError
 
 
 _NATIVE_FUNCTION_PROLOGS = [

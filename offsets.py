@@ -1,5 +1,7 @@
 import pkg_resources
 
+import archinfo
+
 filecache = {}
 
 type_sizes = {"UChar": 1, "UShort": 2, "UInt": 4, "ULong": 8, "ULONG": 8, "U128": 16, "U256": 32}
@@ -49,8 +51,6 @@ for line in a:
 
     fieldsize = type_sizes[typename] * (1 if arraylen is None else arraylen)
     arch_data[archname][fieldname] = (offset, fieldsize)
-
-import archinfo
 
 
 def canon_name(archh, offseth):

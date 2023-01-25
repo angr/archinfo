@@ -1,17 +1,17 @@
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 import struct as _struct
 import platform as _platform
 import re
 
+from archinfo.types import RegisterOffset, RegisterName
 from .archerror import ArchError
-from . import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
 
 import copy
 
-l = logging.getLogger("archinfo.arch")
-l.addHandler(logging.NullHandler())
+log = logging.getLogger("archinfo.arch")
+log.addHandler(logging.NullHandler())
 
 try:
     import pyvex as _pyvex
@@ -94,13 +94,11 @@ class Register:
         concrete=True,
         artificial=False,
     ):
-        self.name = name  # type: RegisterName
-        self.size = size  # type: int
-        self.vex_offset = vex_offset  # type: RegisterOffset
+        self.name: RegisterName = name
+        self.size: int = size
+        self.vex_offset: RegisterOffset = vex_offset
         self.vex_name = vex_name
-        self.subregisters = (
-            [] if subregisters is None else subregisters
-        )  # type: List[Tuple[RegisterName, RegisterOffset, int]]
+        self.subregisters: List[Tuple[RegisterName, RegisterOffset, int]] = [] if subregisters is None else subregisters
         self.alias_names = () if alias_names is None else alias_names
         self.general_purpose = general_purpose
         self.floating_point = floating_point
@@ -181,7 +179,7 @@ class Arch:
 
     byte_width = 8
     instruction_endness = "Iend_BE"
-    elf_tls = None  # type: TLSArchInfo
+    elf_tls: TLSArchInfo = None
 
     def __init__(self, endness, instruction_endness=None):
 
@@ -483,14 +481,14 @@ class Arch:
         """
         Compile the assembly instruction represented by string using Keystone
 
-        :param string:      The textual assembly instructions, separated by semicolons
-        :param addr:        The address at which the text should be assembled, to deal with PC-relative access. Default 0
-        :param as_bytes:    Set to False to return a list of integers instead of a python byte string
-        :param thumb:       If working with an ARM processor, set to True to assemble in thumb mode.
-        :return:            The assembled bytecode
+        :param string:     The textual assembly instructions, separated by semicolons
+        :param addr:       The address at which the text should be assembled, to deal with PC-relative access. Default 0
+        :param as_bytes:   Set to False to return a list of integers instead of a python byte string
+        :param thumb:      If working with an ARM processor, set to True to assemble in thumb mode.
+        :return:           The assembled bytecode
         """
         if thumb and not hasattr(self, "keystone_thumb"):
-            l.warning("Specified thumb=True on non-ARM architecture")
+            log.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
         ks = self.keystone_thumb if thumb else self.keystone  # pylint: disable=no-member
 
@@ -510,7 +508,7 @@ class Arch:
 
     def disasm(self, bytestring, addr=0, thumb=False):
         if thumb and not hasattr(self, "capstone_thumb"):
-            l.warning("Specified thumb=True on non-ARM architecture")
+            log.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
         cs = self.capstone_thumb if thumb else self.capstone  # pylint: disable=no-member
         return "\n".join(f"{insn.address:#x}:\t{insn.mnemonic} {insn.op_str}" for insn in cs.disasm(bytestring, addr))
@@ -520,7 +518,7 @@ class Arch:
             return self.dynamic_tag_translation[tag]
         except KeyError:
             if isinstance(tag, int):
-                l.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
+                log.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
             return tag
 
     def translate_symbol_type(self, tag):
@@ -528,7 +526,7 @@ class Arch:
             return self.symbol_type_translation[tag]
         except KeyError:
             if isinstance(tag, int):
-                l.error("Please look up and add symbol type %#x for %s", tag, self.name)
+                log.error("Please look up and add symbol type %#x for %s", tag, self.name)
             return tag
 
     def translate_register_name(self, offset, size=None):
@@ -562,8 +560,8 @@ class Arch:
     def get_register_offset(self, name):
         try:
             return self.registers[name][0]
-        except:
-            raise ValueError("Register %s does not exist!" % name)
+        except KeyError as e:
+            raise ValueError("Register %s does not exist!" % name) from e
 
     def is_artificial_register(self, offset, size):
 
@@ -584,7 +582,10 @@ class Arch:
         """
         A list of paths in which to search for shared libraries.
         """
-        subfunc = lambda x: x.replace("${TRIPLET}", self.triplet).replace("${ARCH}", self.linux_name)
+
+        def subfunc(x):
+            return x.replace("${TRIPLET}", self.triplet).replace("${ARCH}", self.linux_name)
+
         path = ["/lib/${TRIPLET}/", "/usr/lib/${TRIPLET}/", "/lib/", "/usr/lib", "/usr/${TRIPLET}/lib/"]
         if self.bits == 64:
             path.append("/usr/${TRIPLET}/lib64/")
@@ -680,7 +681,7 @@ class Arch:
     function_address_types = (int,)
 
     # various names
-    name = None  # type: str
+    name: str
     vex_arch = None
     qemu_name = None
     ida_processor = None
@@ -694,12 +695,12 @@ class Arch:
     instruction_alignment = None
 
     # register offsets
-    ip_offset = None  # type: RegisterOffset
-    sp_offset = None  # type: RegisterOffset
-    bp_offset = None  # type: RegisterOffset
-    ret_offset = None  # type: RegisterOffset
-    fp_ret_offset = None  # type: RegisterOffset
-    lr_offset = None  # type: RegisterOffset
+    ip_offset: Optional[RegisterOffset] = None
+    sp_offset: Optional[RegisterOffset] = None
+    bp_offset: Optional[RegisterOffset] = None
+    ret_offset: Optional[RegisterOffset] = None
+    fp_ret_offset: Optional[RegisterOffset] = None
+    lr_offset: Optional[RegisterOffset] = None
 
     # whether or not VEX has ccall handlers for conditionals for this arch
     vex_conditional_helpers = False
@@ -751,12 +752,12 @@ class Arch:
     stack_size = 0x8000000
 
     # Register information
-    register_list = []  # type: List[Register]
+    register_list: List[Register] = []
     default_register_values = []
     entry_register_values = {}
     default_symbolic_registers = []
-    registers = {}  # type:  Dict[RegisterName, Tuple[RegisterOffset, int]]
-    register_names = {}  # type: Dict[RegisterOffset, RegisterName]
+    registers: Dict[RegisterName, Tuple[RegisterOffset, int]] = {}
+    register_names: Dict[RegisterOffset, RegisterName] = {}
     argument_registers = set()
     argument_register_positions = {}
     persistent_regs = []
@@ -808,8 +809,8 @@ def register_arch(regexes, bits, endness, my_arch):
             raise TypeError("Each regex must be a string or compiled regular expression")
         try:
             re.compile(rx)
-        except:
-            raise ValueError("Invalid Regular Expression %s" % rx)
+        except re.error as e:
+            raise ValueError("Invalid Regular Expression %s" % rx) from e
     # if not isinstance(my_arch,Arch):
     #    raise TypeError("Arch must be a subclass of archinfo.Arch")
     if not isinstance(bits, int):

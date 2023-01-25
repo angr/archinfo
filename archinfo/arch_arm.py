@@ -1,8 +1,9 @@
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
 import logging
 
-l = logging.getLogger("archinfo.arch_arm")
+from .arch import Arch, register_arch, Endness, Register
+from .tls import TLSArchInfo
+
+log = logging.getLogger("archinfo.arch_arm")
 
 try:
     import capstone as _capstone
@@ -33,7 +34,7 @@ def get_real_address_if_arm(arch, addr):
     """
     Obtain the real address of an instruction. ARM architectures are supported.
 
-    :param Arch arch:   The Arch object.
+    :param archinfo.Arch arch:   The Arch object.
     :param int addr:    The instruction address.
     :return:            The real address of an instruction.
     :rtype:             int
@@ -118,7 +119,7 @@ class ArchARM(Arch):
     @property
     def capstone_thumb(self):
         if _capstone is None:
-            l.warning("Capstone is not installed!")
+            log.warning("Capstone is not installed!")
             return None
         if self._cs_thumb is None:
             self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
@@ -128,7 +129,7 @@ class ArchARM(Arch):
     @property
     def keystone_thumb(self):
         if _keystone is None:
-            l.warning("Keystone is not installed!")
+            log.warning("Keystone is not installed!")
             return None
         if self._ks_thumb is None:
             self._ks_thumb = _keystone.Ks(self.ks_arch, _keystone.KS_MODE_THUMB)
@@ -137,7 +138,7 @@ class ArchARM(Arch):
     @property
     def unicorn_thumb(self):
         if _unicorn is None:
-            l.warning("Unicorn is not installed!")
+            log.warning("Unicorn is not installed!")
             return None
         return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_THUMB)
 
