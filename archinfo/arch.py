@@ -192,11 +192,11 @@ class Arch:
             self.instruction_endness = instruction_endness
 
         if self.vex_support and _pyvex:
-            self.vex_archinfo = _pyvex.default_vex_archinfo()
+            self.vex_archinfo = _pyvex.enums.default_vex_archinfo()
 
         if endness == Endness.BE:
             if self.vex_archinfo:
-                self.vex_archinfo["endness"] = _pyvex.vex_endness_from_string("VexEndnessBE")
+                self.vex_archinfo["endness"] = _pyvex.enums.vex_endness_from_string("VexEndnessBE")
             self.memory_endness = Endness.BE
             self.register_endness = Endness.BE
             if _capstone and self.cs_mode is not None:
