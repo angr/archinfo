@@ -1,0 +1,4 @@
+# Black + pre-commit
+f8a9955bd494cb61fea6341d9ce46ca7083e827a # ruff
+71c2a0f95babcbc4fa547d2eaa3b747c577f36db # Black
+f612c4d639e35ae78c671e107a319acec48aa012 # Trailing whitespace, pyupgrade, prefer builtin constructors
