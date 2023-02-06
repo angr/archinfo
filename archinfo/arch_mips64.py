@@ -21,7 +21,6 @@ class ArchMIPS64(Arch):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
-
             self.function_prologs = set()
             self.function_epilogs = set()
             self.triplet = "mips64-linux-gnu"
