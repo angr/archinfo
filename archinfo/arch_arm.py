@@ -49,7 +49,6 @@ class ArchARM(Arch):
     """
 
     def __init__(self, endness=Endness.LE):
-
         instruction_endness = None
         if endness == Endness.LE:
             instruction_endness = Endness.LE

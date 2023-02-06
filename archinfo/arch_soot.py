@@ -7,7 +7,6 @@ log = logging.getLogger("archinfo.arch_soot")
 
 
 class SootMethodDescriptor:
-
     __slots__ = ["class_name", "name", "params", "_soot_method", "ret"]
 
     def __init__(self, class_name, name, params, soot_method=None, ret_type=None):
@@ -147,11 +146,9 @@ class SootMethodDescriptor:
 
 
 class SootAddressDescriptor:
-
     __slots__ = ["method", "block_idx", "stmt_idx"]
 
     def __init__(self, method, block_idx, stmt_idx):
-
         if not isinstance(method, SootMethodDescriptor):
             raise ValueError('The parameter "method" must be an ' "instance of SootMethodDescriptor.")
 
@@ -206,7 +203,6 @@ class SootAddressDescriptor:
 
 
 class SootAddressTerminator(SootAddressDescriptor):
-
     __slots__ = []
 
     def __init__(self):
@@ -218,7 +214,6 @@ class SootAddressTerminator(SootAddressDescriptor):
 
 
 class SootFieldDescriptor:
-
     __slots__ = ["class_name", "name", "type"]
 
     def __init__(self, class_name, name, type_):
@@ -245,7 +240,6 @@ class SootFieldDescriptor:
 
 
 class SootClassDescriptor:
-
     __slots__ = ["name", "_soot_class"]
 
     def __init__(self, name, soot_class=None):

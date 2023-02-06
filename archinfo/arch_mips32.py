@@ -24,7 +24,6 @@ class ArchMIPS32(Arch):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
-
             self.function_prologs = {
                 rb"\x27\xbd\xff[\x00-\xff]"  # addiu $sp, xxx
                 rb"\x3c\x1c[\x00-\xff][\x00-\xff]\x9c\x27[\x00-\xff][\x00-\xff]"  # lui $gp, xxx; addiu $gp, $gp, xxxx

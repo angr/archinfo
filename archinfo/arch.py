@@ -182,7 +182,6 @@ class Arch:
     elf_tls: TLSArchInfo = None
 
     def __init__(self, endness, instruction_endness=None):
-
         self.bytes = self.bits // self.byte_width
 
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
@@ -564,7 +563,6 @@ class Arch:
             raise ValueError("Register %s does not exist!" % name) from e
 
     def is_artificial_register(self, offset, size):
-
         r = self.get_base_register(offset, size)
         if r is None:
             return False
