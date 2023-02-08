@@ -3,11 +3,6 @@ from .tls import TLSArchInfo
 from .archerror import ArchError
 
 try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
@@ -47,59 +42,6 @@ class ArchX86(Arch):
         if endness != Endness.LE:
             raise ArchError("Arch i386 must be little endian")
         super().__init__(endness)
-        if self.vex_archinfo:
-            self.vex_archinfo["x86_cr0"] = 0xFFFFFFFF
-
-        # Register blacklist
-        reg_blacklist = ("cs", "ds", "es", "fs", "gs", "ss", "gdt", "ldt")
-        if self.reg_blacklist is not None and self.reg_blacklist_offsets is not None:
-            for register in self.register_list:
-                if register.name in reg_blacklist:
-                    self.reg_blacklist.append(register.name)
-                    self.reg_blacklist_offsets.append(register.vex_offset)
-
-        if _unicorn and _pyvex:
-            # CPU flag registers
-            uc_flags_reg = _unicorn.x86_const.UC_X86_REG_EFLAGS
-            cpu_flag_registers = {"d": 1 << 10, "ac": 1 << 18, "id": 1 << 21}
-            for reg, reg_bitmask in cpu_flag_registers.items():
-                reg_offset = self.get_register_offset(reg)
-                self.cpu_flag_register_offsets_and_bitmasks_map[reg_offset] = (uc_flags_reg, reg_bitmask)
-
-            mxcsr_registers = {"sseround": 1 << 14 | 1 << 13}
-            uc_mxcsr_reg = _unicorn.x86_const.UC_X86_REG_MXCSR
-            for reg, reg_bitmask in mxcsr_registers.items():
-                reg_offset = self.get_register_offset(reg)
-                self.cpu_flag_register_offsets_and_bitmasks_map[reg_offset] = (uc_mxcsr_reg, reg_bitmask)
-
-    @property
-    def capstone_x86_syntax(self):
-        """
-        Get the current syntax Capstone uses for x86. It can be 'intel' or 'at&t'
-
-        :return: Capstone's current x86 syntax
-        :rtype: str
-        """
-
-        return self._cs_x86_syntax
-
-    @capstone_x86_syntax.setter
-    def capstone_x86_syntax(self, new_syntax):
-        """
-        Set the syntax that Capstone outputs for x86.
-        """
-
-        if new_syntax not in ("intel", "at&t"):
-            raise ArchError('Unsupported Capstone x86 syntax. It must be either "intel" or "at&t".')
-
-        if new_syntax != self._cs_x86_syntax:
-            self._cs = None
-            self._cs_x86_syntax = new_syntax
-
-    def _configure_capstone(self):
-        self._cs.syntax = (
-            _capstone.CS_OPT_SYNTAX_ATT if self._cs_x86_syntax == "at&t" else _capstone.CS_OPT_SYNTAX_INTEL
-        )
 
     @property
     def keystone_x86_syntax(self):
@@ -144,7 +86,6 @@ class ArchX86(Arch):
             self._ks.syntax = _keystone.KS_OPT_SYNTAX_INTEL
 
     bits = 32
-    vex_arch = "VexArchX86"
     name = "X86"
     qemu_name = "i386"
     ida_processor = "metapc"
@@ -152,18 +93,11 @@ class ArchX86(Arch):
     triplet = "i386-linux-gnu"
     max_inst_bytes = 15
     call_sp_fix = -4
-    ret_offset = 8
-    vex_conditional_helpers = True
-    syscall_num_offset = 8
     call_pushes_ret = True
     stack_change = -4
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_X86
-        cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
-    _cs_x86_syntax = None  # Set it to 'att' in order to use AT&T syntax for x86
     if _keystone:
         ks_arch = _keystone.KS_ARCH_X86
         ks_mode = _keystone.KS_MODE_32 + _keystone.KS_MODE_LITTLE_ENDIAN
@@ -234,10 +168,6 @@ class ArchX86(Arch):
             general_purpose=True,
             argument=True,
         ),
-        Register(name="cc_op", size=4, default_value=(0, False, None), concrete=False, artificial=True),
-        Register(name="cc_dep1", size=4, concrete=False, artificial=True),
-        Register(name="cc_dep2", size=4, concrete=False, artificial=True),
-        Register(name="cc_ndep", size=4, concrete=False, artificial=True),
         Register(name="d", size=4, alias_names=("dflag",), default_value=(1, False, None), concrete=False),
         Register(name="id", size=4, alias_names=("idflag",), default_value=(1, False, None), concrete=False),
         Register(name="ac", size=4, alias_names=("acflag",), default_value=(0, False, None), concrete=False),
@@ -280,12 +210,10 @@ class ArchX86(Arch):
         Register(name="ss", size=2),
         Register(name="ldt", size=8, default_value=(0, False, None), concrete=False),
         Register(name="gdt", size=8, default_value=(0, False, None), concrete=False),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=4),
         Register(name="cmlen", size=4),
         Register(name="nraddr", size=4),
         Register(name="sc_class", size=4),
-        Register(name="ip_at_syscall", size=4, concrete=False, artificial=True),
     ]
 
     symbol_type_translation = {10: "STT_GNU_IFUNC", "STT_LOOS": "STT_GNU_IFUNC"}

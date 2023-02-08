@@ -2,11 +2,6 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
 try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
@@ -42,9 +37,6 @@ class ArchAArch64(Arch):
     register_endness = Endness.LE
     instruction_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_ARM64
-        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM64
         ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN

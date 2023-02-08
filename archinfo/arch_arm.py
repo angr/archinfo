@@ -6,11 +6,6 @@ from .tls import TLSArchInfo
 log = logging.getLogger("archinfo.arch_arm")
 
 try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
@@ -116,16 +111,6 @@ class ArchARM(Arch):
         return super().__getstate__()
 
     @property
-    def capstone_thumb(self):
-        if _capstone is None:
-            log.warning("Capstone is not installed!")
-            return None
-        if self._cs_thumb is None:
-            self._cs_thumb = _capstone.Cs(self.cs_arch, self.cs_mode + _capstone.CS_MODE_THUMB)
-            self._cs_thumb.detail = True
-        return self._cs_thumb
-
-    @property
     def keystone_thumb(self):
         if _keystone is None:
             log.warning("Keystone is not installed!")
@@ -184,26 +169,17 @@ class ArchARM(Arch):
         return bool(addr & 1)
 
     bits = 32
-    vex_arch = "VexArchARM"
     name = "ARMEL"
     qemu_name = "arm"
     ida_processor = "armb"
     linux_name = "arm"
     triplet = "arm-linux-gnueabihf"
     max_inst_bytes = 4
-    ret_offset = 8
-    fp_ret_offset = 8
-    vex_conditional_helpers = True
-    syscall_num_offset = 36
     call_pushes_ret = False
     stack_change = -4
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_ARM
-        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
-    _cs_thumb = None
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM
         ks_mode = _keystone.KS_MODE_ARM + _keystone.KS_MODE_LITTLE_ENDIAN
@@ -286,21 +262,7 @@ class ArchARM(Arch):
             default_value=(Arch.initial_sp, True, "global"),
         ),
         Register(name="lr", size=4, alias_names=("r14",), general_purpose=True, concretize_unique=True),
-        Register(name="pc", size=4, vex_name="r15t", alias_names=("r15", "ip")),
-        Register(name="cc_op", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_dep1", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_dep2", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_ndep", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="qflag32", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="geflag0", size=4, vector=True, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="geflag1", size=4, vector=True, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="geflag2", size=4, vector=True, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="geflag3", size=4, vector=True, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="emnote", size=4, vector=True, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cmstart", size=4, artificial=True, vector=True, default_value=(0, False, None), concrete=False),
-        Register(name="cmlen", size=4, artificial=True, default_value=(0, False, None), concrete=False),
-        Register(name="nraddr", size=4, artificial=True, default_value=(0, False, None), concrete=False),
-        Register(name="ip_at_syscall", size=4, artificial=True, concrete=False),
+        Register(name="pc", size=4, alias_names=("r15", "ip")),
         Register(name="d0", size=8, floating_point=True, vector=True, subregisters=[("s0", 0, 4), ("s1", 4, 4)]),
         Register(name="d1", size=8, floating_point=True, vector=True, subregisters=[("s2", 0, 4), ("s3", 4, 4)]),
         Register(name="d2", size=8, floating_point=True, vector=True, subregisters=[("s4", 0, 4), ("s5", 4, 4)]),
@@ -440,7 +402,7 @@ class ArchARMCortexM(ArchARMEL):
             default_value=(Arch.initial_sp, True, "global"),
         ),
         Register(name="lr", size=4, alias_names=("r14",), general_purpose=True, concretize_unique=True),
-        Register(name="pc", size=4, vex_name="r15t", alias_names=("r15", "ip")),
+        Register(name="pc", size=4, alias_names=("r15", "ip")),
         # Control registers for Cortex-M33 with ArmV8 securtiy extension enabled (Trustzone)
         Register(name="msp", size=4, general_purpose=True),
         Register(name="msp_s", size=4, general_purpose=True),
@@ -459,12 +421,6 @@ class ArchARMCortexM(ArchARMEL):
         Register(name="sp_main", size=4, general_purpose=True),
         Register(name="sp_main_s", size=4, general_purpose=True),
         Register(name="sp_main_ns", size=4, general_purpose=True),
-        Register(name="cc_op", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_dep1", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_dep2", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="cc_ndep", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="qflag32", size=4, default_value=(0, False, None), artificial=True, concrete=False),
-        Register(name="ip_at_syscall", size=4, artificial=True, concrete=False),
         # Cortex-M Has a different FPU from all other ARMs.
         Register(name="d0", size=8, subregisters=[("s0", 0, 4), ("s1", 4, 4)], floating_point=True),
         Register(name="d1", size=8, subregisters=[("s2", 0, 4), ("s3", 4, 4)], floating_point=True),
@@ -515,10 +471,6 @@ class ArchARMCortexM(ArchARMEL):
     ]
 
     # Special handling of CM mode in *stone
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_ARM
-        cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN + _capstone.CS_MODE_THUMB + _capstone.CS_MODE_MCLASS
-    _cs_thumb = None
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM
         ks_mode = _keystone.KS_MODE_THUMB + _keystone.KS_MODE_LITTLE_ENDIAN
@@ -526,10 +478,6 @@ class ArchARMCortexM(ArchARMEL):
     uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
     uc_mode = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_mode_thumb = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
-
-    @property
-    def capstone_thumb(self):
-        return self.capstone
 
     @property
     def keystone_thumb(self):
