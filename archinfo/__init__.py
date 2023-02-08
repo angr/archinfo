@@ -34,6 +34,16 @@ from .archerror import ArchError
 from .arch_s390x import ArchS390X
 from .arch_pcode import ArchPcode
 
+try:
+    from .plugin_pyvex import PyvexPlugin
+except ImportError:
+    PyvexPlugin = None
+
+try:
+    from .plugin_capstone import CapstonePlugin
+except ImportError:
+    CapstonePlugin = None
+
 
 __all__ = [
     "RegisterOffset",
@@ -65,4 +75,6 @@ __all__ = [
     "ArchError",
     "ArchS390X",
     "ArchPcode",
+    "PyvexPlugin",
+    "CapstonePlugin",
 ]

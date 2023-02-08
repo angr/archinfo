@@ -12,11 +12,6 @@ try:
 except ImportError:
     _unicorn = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 
 _NATIVE_FUNCTION_PROLOGS = [
     rb"\x8b\xff\x55\x8b\xec",  # mov edi, edi; push ebp; mov ebp, esp

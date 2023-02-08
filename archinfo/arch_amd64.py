@@ -12,12 +12,6 @@ try:
 except ImportError:
     _unicorn = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
-
 _NATIVE_FUNCTION_PROLOGS = [
     rb"\x55\x48\x89\xe5",  # push rbp; mov rbp, rsp
     rb"\x48[\x83,\x81]\xec[\x00-\xff]",  # sub rsp, xxx
@@ -33,28 +27,6 @@ class ArchAMD64(Arch):
         if endness != Endness.LE:
             raise ArchError("Arch AMD64 must be little endian")
         super().__init__(endness)
-        self.argument_register_positions = (
-            {
-                self.registers["rdi"][0]: 0,
-                self.registers["rsi"][0]: 1,
-                self.registers["rdx"][0]: 2,
-                self.registers["rcx"][0]: 3,  # Used for user calls
-                self.registers["r10"][0]: 3,  # Used for Linux kernel calls
-                self.registers["r8"][0]: 4,
-                self.registers["r9"][0]: 5,
-                # fp registers
-                self.registers["xmm0"][0]: 0,
-                self.registers["xmm1"][0]: 1,
-                self.registers["xmm2"][0]: 2,
-                self.registers["xmm3"][0]: 3,
-                self.registers["xmm4"][0]: 4,
-                self.registers["xmm5"][0]: 5,
-                self.registers["xmm6"][0]: 6,
-                self.registers["xmm7"][0]: 7,
-            }
-            if _pyvex is not None
-            else None
-        )
 
     @property
     def keystone_x86_syntax(self):

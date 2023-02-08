@@ -243,6 +243,28 @@ class PyvexAMD64(PyvexPlugin, patches=ArchAMD64):
         Register(name="ip_at_syscall", size=8, concrete=False, artificial=True),
     ]
 
+    @classmethod
+    def _init(cls, arch, endness, instruction_endness):
+        super()._init(arch, endness, instruction_endness)
+        arch.argument_register_positions = {
+            arch.registers["rdi"][0]: 0,
+            arch.registers["rsi"][0]: 1,
+            arch.registers["rdx"][0]: 2,
+            arch.registers["rcx"][0]: 3,  # Used for user calls
+            arch.registers["r10"][0]: 3,  # Used for Linux kernel calls
+            arch.registers["r8"][0]: 4,
+            arch.registers["r9"][0]: 5,
+            # fp registers
+            arch.registers["xmm0"][0]: 0,
+            arch.registers["xmm1"][0]: 1,
+            arch.registers["xmm2"][0]: 2,
+            arch.registers["xmm3"][0]: 3,
+            arch.registers["xmm4"][0]: 4,
+            arch.registers["xmm5"][0]: 5,
+            arch.registers["xmm6"][0]: 6,
+            arch.registers["xmm7"][0]: 7,
+        }
+
 
 class PyvexX86(PyvexPlugin, patches=ArchX86):
     vex_arch = "VexArchX86"

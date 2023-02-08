@@ -19,6 +19,11 @@ REGISTERED_ARCH_PLUGINS = defaultdict(list)
 REGISTERED_REGISTER_PLUGINS = []
 
 
+def _get_plugins(arch: "Arch"):
+    for cls in reversed(type(arch).mro()):
+        yield from REGISTERED_ARCH_PLUGINS[cls]
+
+
 class Arch:
     """
     A collection of information about a given architecture. This class should be subclassed for each different
@@ -59,8 +64,6 @@ class Arch:
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
 
-    plugins = []
-
     byte_width = 8
     instruction_endness = "Iend_BE"
     elf_tls: TLSArchInfo = None
@@ -75,11 +78,8 @@ class Arch:
         if instruction_endness is not None:
             self.instruction_endness = instruction_endness
 
-        plugins = []
         register_plugins = defaultdict(dict)
-        for cls in reversed(type(self).mro()):
-            plugins.extend(REGISTERED_ARCH_PLUGINS[cls])
-        for plugin in plugins:
+        for plugin in _get_plugins(self):
             new_regs = vars(plugin).get(f"_{plugin.__name__}__new_registers", [])
             self.register_list.extend(new_regs)
             patch_regs = vars(plugin).get(f"_{plugin.__name__}__patched_registers", [])
@@ -95,7 +95,7 @@ class Arch:
                         raise TypeError(f"Register plugin property {k} would overwrite existing property")
                     setattr(reg, k, v)
 
-        for plugin in plugins:
+        for plugin in _get_plugins(self):
             plugin._init(self, endness, instruction_endness)
 
         if endness == Endness.BE:
@@ -129,9 +129,8 @@ class Arch:
         Produce a copy of this instance of this arch.
         """
         res = copy.copy(self)
-        for plugin in REGISTERED_ARCH_PLUGINS:
-            child_plugin = plugin._children.get(self.name, None) or plugin
-            child_plugin._prep_copy(res)
+        for plugin in _get_plugins(self):
+            plugin._prep_copy(res)
         return res
 
     def __repr__(self):
@@ -149,9 +148,8 @@ class Arch:
         return not self == other
 
     def __getstate__(self):
-        for plugin in REGISTERED_ARCH_PLUGINS:
-            child_plugin = plugin._children.get(self.name, None) or plugin
-            child_plugin._prep_getstate(self)
+        for plugin in _get_plugins(self):
+            plugin._prep_getstate(self)
         return self.__dict__
 
     def __setstate__(self, data):
