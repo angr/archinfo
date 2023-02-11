@@ -8,6 +8,9 @@ from .register import RegisterOffset, RegisterName
 from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
 from .arch_arm import ArchARM, ArchARMHF
+from .arch_aarch64 import ArchAArch64
+from .arch_mips32 import ArchMIPS32
+from .arch_mips64 import ArchMIPS64
 
 
 class PyvexRegisterPlugin(RegisterPlugin):
@@ -325,3 +328,41 @@ class PyvexARMHF(PyvexPlugin, patches=ArchARMHF):
 #    __new_registers = [
 #        Register(name="qflag32", size=4, default_value=(0, False, None), artificial=True, concrete=False),
 #    ]
+
+
+class PyvexAArch64(PyvexPlugin, patches=ArchAArch64):
+    vex_arch = "VexArchARM64"
+    vex_conditional_helpers = True
+    ret_offset = 16
+    syscall_num_offset = 80
+
+    __add_registers = [
+        Register(name="cc_op", size=8, artificial=True),
+        Register(name="cc_dep1", size=8, artificial=True),
+        Register(name="cc_dep2", size=8, artificial=True),
+        Register(name="cc_ndep", size=8, artificial=True),
+        Register(name="emnote", size=4, artificial=True),
+        Register(name="ip_at_syscall", size=8, artificial=True),
+    ]
+
+
+class PyvexMIPS32(PyvexPlugin, patches=ArchMIPS32):
+    vex_arch = "VexArchMIPS32"
+    ret_offset = 16
+    syscall_num_offset = 16
+
+    __add_registers = [
+        Register(name="emnote", size=4, artificial=True),
+        Register(name="ip_at_syscall", size=4, artificial=True),
+    ]
+
+
+class PyvexMIPS64(PyvexPlugin, patches=ArchMIPS64):
+    vex_arch = "VexArchMIPS64"
+    ret_offset = 32
+    syscall_register_offset = 16
+
+    __add_registers = [
+        Register(name="emnote", size=4, artificial=True),
+        Register(name="ip_at_syscall", size=8, artificial=True),
+    ]

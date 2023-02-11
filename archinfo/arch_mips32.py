@@ -2,11 +2,6 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
 try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
@@ -36,22 +31,16 @@ class ArchMIPS32(Arch):
             self.linux_name = "mips"
 
     bits = 32
-    vex_arch = "VexArchMIPS32"
     name = "MIPS32"
     ida_processor = "mipsb"
     qemu_name = "mipsel"
     linux_name = "mipsel"  # ???
     triplet = "mipsel-linux-gnu"
     max_inst_bytes = 4
-    ret_offset = 16
-    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
     branch_delay_slot = True
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_MIPS
-        cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
     if _keystone:
         ks_arch = _keystone.KS_ARCH_MIPS
         ks_mode = _keystone.KS_MODE_32 + _keystone.KS_MODE_LITTLE_ENDIAN
@@ -144,7 +133,6 @@ class ArchMIPS32(Arch):
         Register(name="fenr", size=4, floating_point=True),
         Register(name="fcsr", size=4, floating_point=True),
         Register(name="ulr", size=4),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=4),
         Register(name="cmlen", size=4),
         Register(name="nraddr", size=4),
@@ -155,7 +143,6 @@ class ArchMIPS32(Arch):
         Register(name="ac2", size=8),
         Register(name="ac3", size=8),
         Register(name="cp0_status", size=4),
-        Register(name="ip_at_syscall", size=4, artificial=True),
     ]
 
     # see https://github.com/radare/radare/blob/master/src/include/elf/mips.h

@@ -8,6 +8,8 @@ from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
 from .arch_arm import ArchARM, ArchARMCortexM
 from .arch_aarch64 import ArchAArch64
+from .arch_mips32 import ArchMIPS32
+from .arch_mips64 import ArchMIPS64
 
 log = logging.getLogger(__name__)
 
@@ -163,3 +165,13 @@ class CapstoneARMCortexM(CapstoneARM, patches=ArchARMCortexM):
 class CapstoneAArch64(CapstonePlugin, patches=ArchAArch64):
     cs_arch = capstone.CS_ARCH_ARM64
     cs_mode = capstone.CS_MODE_LITTLE_ENDIAN
+
+
+class CapstoneMIPS32(CapstonePlugin, patches=ArchMIPS32):
+    cs_arch = capstone.CS_ARCH_MIPS
+    cs_mode = capstone.CS_MODE_32 + capstone.CS_MODE_LITTLE_ENDIAN
+
+
+class CapstoneMIPS64(CapstonePlugin, patches=ArchMIPS64):
+    cs_arch = capstone.CS_ARCH_MIPS
+    cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN

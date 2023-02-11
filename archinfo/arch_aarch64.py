@@ -21,16 +21,12 @@ class ArchAArch64(Arch):
             self.function_epilogs = set()
 
     bits = 64
-    vex_arch = "VexArchARM64"
     name = "AARCH64"
     qemu_name = "aarch64"
     ida_processor = "arm"
     linux_name = "aarch64"
     triplet = "aarch64-linux-gnueabihf"
     max_inst_bytes = 4
-    ret_offset = 16
-    vex_conditional_helpers = True
-    syscall_num_offset = 80
     call_pushes_ret = False
     stack_change = -8
     memory_endness = Endness.LE
@@ -114,10 +110,6 @@ class ArchAArch64(Arch):
             default_value=(initial_sp, True, "global"),
         ),
         Register(name="pc", size=8, alias_names=("ip",)),
-        Register(name="cc_op", size=8, artificial=True),
-        Register(name="cc_dep1", size=8, artificial=True),
-        Register(name="cc_dep2", size=8, artificial=True),
-        Register(name="cc_ndep", size=8, artificial=True),
         Register(name="tpidr_el0", size=8),
         Register(
             name="q0",
@@ -376,11 +368,9 @@ class ArchAArch64(Arch):
             vector=True,
         ),
         Register(name="qcflag", size=16, floating_point=True),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=8),
         Register(name="cmlen", size=8),
         Register(name="nraddr", size=8),
-        Register(name="ip_at_syscall", size=8, artificial=True),
         Register(name="fpcr", size=4, floating_point=True, default_value=(initial_sp, True, "global")),
     ]
 

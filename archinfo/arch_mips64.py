@@ -2,11 +2,6 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
 try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
@@ -28,22 +23,16 @@ class ArchMIPS64(Arch):
             self.ida_name = "mips64b"
 
     bits = 64
-    vex_arch = "VexArchMIPS64"
     name = "MIPS64"
     qemu_name = "mips64el"
     ida_processor = "mips64"
     linux_name = "mips64el"  # ???
     triplet = "mips64el-linux-gnu"
     max_inst_bytes = 4
-    ret_offset = 32
-    syscall_register_offset = 16
     call_pushes_ret = False
     stack_change = -8
     branch_delay_slot = True
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_MIPS
-        cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     if _keystone:
         ks_arch = _keystone.KS_ARCH_MIPS
         ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
@@ -166,12 +155,10 @@ class ArchMIPS64(Arch):
         Register(name="fcsr", size=4, floating_point=True),
         Register(name="cp0_status", size=4),
         Register(name="ulr", size=8),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cond", size=4),
         Register(name="cmstart", size=8),
         Register(name="cmlen", size=8),
         Register(name="nraddr", size=8),
-        Register(name="ip_at_syscall", size=8, artificial=True),
     ]
 
     # http://techpubs.sgi.com/library/manuals/4000/007-4658-001/pdf/007-4658-001.pdf
