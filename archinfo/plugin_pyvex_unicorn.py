@@ -1,17 +1,17 @@
 from typing import TYPE_CHECKING
 import unicorn
 
-from .plugin import ArchPlugin, Arch
+from .arch import Arch
+from .plugin_unicorn import UnicornPlugin
+from .plugin_pyvex import PyvexPlugin
 from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
 
 if TYPE_CHECKING:
     from .plugin_pyvex import PyvexRegisterPlugin
 
-__import__("pyvex")
 
-
-class PyvexUnicornPlugin(ArchPlugin, patches=Arch):
+class PyvexUnicornPlugin(PyvexPlugin, UnicornPlugin, patches=Arch):
     cpu_flag_register_offsets_and_bitmasks_map = {}
     reg_blacklist = []
     reg_blacklist_offsets = []

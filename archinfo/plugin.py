@@ -15,7 +15,7 @@ class ArchPlugin:
         if patches is None or not issubclass(patches, Arch):
             raise TypeError("Cannot create an ArchPlugin subclass without specifying which arch class to patch")
 
-        REGISTERED_ARCH_PLUGINS[patches].append(cls)
+        REGISTERED_ARCH_PLUGINS[patches].insert(0, cls)
 
         unused = object()
         for k, v in vars(cls).items():
