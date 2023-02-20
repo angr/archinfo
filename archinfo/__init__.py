@@ -36,14 +36,28 @@ from .arch_pcode import ArchPcode
 
 try:
     from .plugin_pyvex import PyvexPlugin
-except ImportError:
+except ModuleNotFoundError:
     PyvexPlugin = None
 
 try:
     from .plugin_capstone import CapstonePlugin
-except ImportError:
+except ModuleNotFoundError:
     CapstonePlugin = None
 
+try:
+    from .plugin_keystone import KeystonePlugin
+except ModuleNotFoundError:
+    KeystonePlugin = None
+
+try:
+    from .plugin_unicorn import UnicornPlugin
+except ModuleNotFoundError:
+    UnicornPlugin = None
+
+try:
+    from .plugin_pyvex_unicorn import PyvexUnicornPlugin
+except ModuleNotFoundError:
+    PyvexUnicornPlugin = None
 
 __all__ = [
     "RegisterOffset",
@@ -77,4 +91,7 @@ __all__ = [
     "ArchPcode",
     "PyvexPlugin",
     "CapstonePlugin",
+    "KeystonePlugin",
+    "UnicornPlugin",
+    "PyvexUnicornPlugin",
 ]

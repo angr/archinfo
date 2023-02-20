@@ -1,16 +1,6 @@
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
 
 class ArchMIPS64(Arch):
     def __init__(self, endness=Endness.BE):
@@ -33,13 +23,6 @@ class ArchMIPS64(Arch):
     stack_change = -8
     branch_delay_slot = True
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_MIPS
-        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
-    uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
-    uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
-    uc_const = _unicorn.mips_const if _unicorn else None
-    uc_prefix = "UC_MIPS_" if _unicorn else None
     function_prologs = set()
     function_epilogs = set()
 

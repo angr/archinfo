@@ -1,18 +1,3 @@
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 from .arch import Arch, register_arch, Endness, Register
 from .archerror import ArchError
 from .tls import TLSArchInfo
@@ -23,42 +8,17 @@ class ArchS390X(Arch):
         super().__init__(endness)
         if endness != Endness.BE:
             raise ArchError("Arch s390x must be big endian")
-        self.argument_register_positions = (
-            {
-                self.registers["r2"][0]: 0,
-                self.registers["r3"][0]: 1,
-                self.registers["r4"][0]: 2,
-                self.registers["r5"][0]: 3,
-                self.registers["r6"][0]: 4,
-                # fp registers
-                self.registers["f0"][0]: 0,
-                self.registers["f2"][0]: 1,
-                self.registers["f4"][0]: 2,
-                self.registers["f6"][0]: 3,
-            }
-            if _pyvex is not None
-            else None
-        )
 
     bits = 64
-    vex_arch = "VexArchS390X"  # enum VexArch
     name = "S390X"
     qemu_name = "s390x"  # target/s390x
     triplet = "s390x-linux-gnu"
     linux_name = "s390"  # arch/s390
     max_inst_bytes = 6
-    ret_offset = 584  # offsetof(VexGuestS390XState, guest_r2)
-    syscall_num_offset = 576  # offsetof(VexGuestS390XState, guest_r1)
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0x40000000000
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_SYSZ
-        cs_mode = _capstone.CS_MODE_BIG_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_SYSTEMZ
-        ks_mode = _keystone.KS_MODE_BIG_ENDIAN
     ret_instruction = b"\x07\xf4"  # br %r14
     nop_instruction = b"\x07\x07"  # nopr %r7
     instruction_alignment = 2
@@ -172,8 +132,6 @@ class ArchS390X(Arch):
         Register(name="nraddr", size=8),
         Register(name="cmstart", size=8),
         Register(name="cmlen", size=8),
-        Register(name="ip_at_syscall", size=8, artificial=True),
-        Register(name="emnote", size=4, artificial=True),
     ]
 
     function_prologs = {

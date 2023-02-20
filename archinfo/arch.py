@@ -20,7 +20,7 @@ REGISTERED_REGISTER_PLUGINS = []
 
 
 def _get_plugins(arch: "Arch"):
-    for cls in reversed(type(arch).mro()):
+    for cls in type(arch).mro():
         yield from REGISTERED_ARCH_PLUGINS[cls]
 
 
@@ -64,24 +64,25 @@ class Arch:
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
     """
 
-    byte_width = 8
-    instruction_endness = "Iend_BE"
-    elf_tls: TLSArchInfo = None
-
     def __init__(self, endness, instruction_endness=None):
         if endness not in (Endness.LE, Endness.BE, Endness.ME):
             raise ArchError("Must pass a valid endness: Endness.LE, Endness.BE, or Endness.ME")
 
         self.bytes = self.bits // self.byte_width
-        self.register_list = list(self.register_list)
+        self.register_list = [copy.copy(reg) for reg in self.register_list]
 
-        if instruction_endness is not None:
-            self.instruction_endness = instruction_endness
+        self.instruction_endness = instruction_endness or endness
+        if endness == Endness.BE:
+            self.memory_endness = Endness.BE
+            self.register_endness = Endness.BE
+            self.ret_instruction = reverse_ends(self.ret_instruction)
+            self.nop_instruction = reverse_ends(self.nop_instruction)
 
         register_plugins = defaultdict(dict)
-        for plugin in _get_plugins(self):
+        plugins = list(_get_plugins(self))
+        for plugin in plugins:
             new_regs = vars(plugin).get(f"_{plugin.__name__}__new_registers", [])
-            self.register_list.extend(new_regs)
+            self.register_list.extend(copy.copy(reg) for reg in new_regs)
             patch_regs = vars(plugin).get(f"_{plugin.__name__}__patched_registers", [])
             for reg in patch_regs:
                 register_plugins[type(reg)][reg.name] = reg
@@ -95,14 +96,12 @@ class Arch:
                         raise TypeError(f"Register plugin property {k} would overwrite existing property")
                     setattr(reg, k, v)
 
-        for plugin in _get_plugins(self):
-            plugin._init(self, endness, instruction_endness)
-
-        if endness == Endness.BE:
-            self.memory_endness = Endness.BE
-            self.register_endness = Endness.BE
-            self.ret_instruction = reverse_ends(self.ret_instruction)
-            self.nop_instruction = reverse_ends(self.nop_instruction)
+        for plugin in plugins:
+            if "_init_1" in vars(plugin):
+                plugin._init_1(self)
+        for plugin in reversed(plugins):
+            if "_init_2" in vars(plugin):
+                plugin._init_2(self)
 
     @cached_property
     def default_register_values(self):
@@ -308,12 +307,14 @@ class Arch:
     triplet = None
 
     # instruction stuff
+    instruction_endness = "Iend_LE"
     max_inst_bytes = None
     ret_instruction = b""
     nop_instruction = b""
     instruction_alignment = None
 
     # memory stuff
+    byte_width = 8
     bits = None
     memory_endness = Endness.LE
     register_endness = Endness.LE
@@ -349,6 +350,7 @@ class Arch:
     dynamic_tag_translation = {}
     symbol_type_translation = {}
     got_section_name = ""
+    elf_tls: TLSArchInfo = None
 
 
 arch_id_map = []

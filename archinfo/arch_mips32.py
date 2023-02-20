@@ -1,16 +1,6 @@
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
 # FIXME: Tell fish to fix whatever he was storing in info['current_function']
 # TODO: Only persist t9 in PIC programs
 
@@ -41,13 +31,6 @@ class ArchMIPS32(Arch):
     stack_change = -4
     branch_delay_slot = True
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_MIPS
-        ks_mode = _keystone.KS_MODE_32 + _keystone.KS_MODE_LITTLE_ENDIAN
-    uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
-    uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
-    uc_const = _unicorn.mips_const if _unicorn else None
-    uc_prefix = "UC_MIPS_" if _unicorn else None
     function_prologs = {
         rb"[\x00-\xff]\xff\xbd\x27",  # addiu $sp, xxx
         rb"[\x00-\xff][\x00-\xff]\x1c\x3c[\x00-\xff][\x00-\xff]\x9c\x27",  # lui $gp, xxx; addiu $gp, $gp, xxxx

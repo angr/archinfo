@@ -2,16 +2,6 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
 _NATIVE_FUNCTION_PROLOGS = [
     rb"\x55\x48\x89\xe5",  # push rbp; mov rbp, rsp
     rb"\x48[\x83,\x81]\xec[\x00-\xff]",  # sub rsp, xxx
@@ -27,40 +17,6 @@ class ArchAMD64(Arch):
         if endness != Endness.LE:
             raise ArchError("Arch AMD64 must be little endian")
         super().__init__(endness)
-
-    @property
-    def keystone_x86_syntax(self):
-        """
-        The current syntax Keystone uses for x86. It can be 'intel',
-        'at&t', 'nasm', 'masm', 'gas' or 'radix16'
-        """
-        return self._ks_x86_syntax
-
-    @keystone_x86_syntax.setter
-    def keystone_x86_syntax(self, new_syntax):
-        if new_syntax not in ("intel", "at&t", "nasm", "masm", "gas", "radix16"):
-            raise ArchError(
-                "Unsupported Keystone x86 syntax. It must be one of the following: "
-                '"intel", "at&t", "nasm", "masm", "gas" or "radix16".'
-            )
-
-        if new_syntax != self._ks_x86_syntax:
-            self._ks = None
-            self._ks_x86_syntax = new_syntax
-
-    def _configure_keystone(self):
-        if self._ks_x86_syntax == "at&t":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_ATT
-        elif self._ks_x86_syntax == "nasm":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_NASM
-        elif self._ks_x86_syntax == "masm":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_MASM
-        elif self._ks_x86_syntax == "gas":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_GAS
-        elif self._ks_x86_syntax == "radix16":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_RADIX16
-        else:
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_INTEL
 
     bits = 64
     vex_endness = "VexEndnessLE"
@@ -78,14 +34,6 @@ class ArchAMD64(Arch):
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_X86
-        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
-    _ks_x86_syntax = None
-    uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
-    uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
-    uc_const = _unicorn.x86_const if _unicorn else None
-    uc_prefix = "UC_X86_" if _unicorn else None
     function_prologs = _FUNCTION_PROLOGS
     function_epilogs = {
         rb"\xc9\xc3",  # leaveq; retq

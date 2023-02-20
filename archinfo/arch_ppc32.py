@@ -1,21 +1,6 @@
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # PowerPC doesn't have stack base pointer, so bp_offset is set to -1 below
 # Normally r1 is used as stack pointer
@@ -34,23 +19,7 @@ class ArchPPC32(Arch):
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"
             }
 
-        self.argument_register_positions = (
-            {
-                self.registers["r3"][0]: 0,
-                self.registers["r4"][0]: 1,
-                self.registers["r5"][0]: 2,
-                self.registers["r6"][0]: 3,
-                self.registers["r7"][0]: 4,
-                self.registers["r8"][0]: 5,
-                self.registers["r9"][0]: 6,
-                self.registers["r10"][0]: 7,
-            }
-            if _pyvex is not None
-            else None
-        )
-
     bits = 32
-    vex_arch = "VexArchPPC32"
     name = "PPC32"
     qemu_name = "ppc"
     ida_processor = "ppc"
@@ -59,17 +28,9 @@ class ArchPPC32(Arch):
     max_inst_bytes = 4
     # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
     # claims that r15 is the base pointer but that is NOT what I see in practice
-    ret_offset = 28
-    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_PPC
-        cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_PPC
-        ks_mode = _keystone.KS_MODE_32 + _keystone.KS_MODE_LITTLE_ENDIAN
     # Unicorn not supported
     # uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     # uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
@@ -222,14 +183,12 @@ class ArchPPC32(Arch):
         Register(name="c_fpcc", size=1, floating_point=True),
         Register(name="vrsave", size=4, vector=True),
         Register(name="vscr", size=4, vector=True),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=4),
         Register(name="cmlen", size=4),
         Register(name="nraddr", size=4),
         Register(name="nraddr_gpr2", size=4),
         Register(name="redir_sp", size=4),
         Register(name="redir_stack", size=128),
-        Register(name="ip_at_syscall", size=4, artificial=True),
         Register(name="sprg3_ro", size=4),
         Register(name="tfhar", size=8),
         Register(name="texasr", size=8),

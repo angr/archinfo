@@ -3,13 +3,16 @@ import capstone
 
 from .archerror import ArchError
 from .plugin import ArchPlugin
-from .arch import Arch
+from .arch import Arch, Endness
 from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
 from .arch_arm import ArchARM, ArchARMCortexM
 from .arch_aarch64 import ArchAArch64
 from .arch_mips32 import ArchMIPS32
 from .arch_mips64 import ArchMIPS64
+from .arch_ppc32 import ArchPPC32
+from .arch_ppc64 import ArchPPC64
+from .arch_s390x import ArchS390X
 
 log = logging.getLogger(__name__)
 
@@ -21,8 +24,8 @@ class CapstonePlugin(ArchPlugin, patches=Arch):
     _cs_thumb = None
 
     @classmethod
-    def _init(cls, arch, endness, instruction_endness):
-        if arch.cs_mode is not None:
+    def _init_1(cls, arch):
+        if arch.cs_mode is not None and arch.instruction_endness == Endness.BE:
             arch.cs_mode -= capstone.CS_MODE_LITTLE_ENDIAN
             arch.cs_mode += capstone.CS_MODE_BIG_ENDIAN
         arch._cs = None
@@ -82,9 +85,7 @@ class CapstoneAMD64(CapstonePlugin, patches=ArchAMD64):
     cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN
 
     @classmethod
-    def _init(cls, arch, endness, instruction_endness):
-        super()._init(arch, endness, instruction_endness)
-
+    def _init_1(cls, arch):
         arch._cs_x86_syntax = None
 
     @property
@@ -175,3 +176,18 @@ class CapstoneMIPS32(CapstonePlugin, patches=ArchMIPS32):
 class CapstoneMIPS64(CapstonePlugin, patches=ArchMIPS64):
     cs_arch = capstone.CS_ARCH_MIPS
     cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN
+
+
+class CapstonePPC32(CapstonePlugin, patches=ArchPPC32):
+    cs_arch = capstone.CS_ARCH_PPC
+    cs_mode = capstone.CS_MODE_32 + capstone.CS_MODE_LITTLE_ENDIAN
+
+
+class CapstonePPC64(CapstonePlugin, patches=ArchPPC64):
+    cs_arch = capstone.CS_ARCH_PPC
+    cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN
+
+
+class CapstoneS390X(CapstonePlugin, patches=ArchS390X):
+    cs_arch = capstone.CS_ARCH_SYSZ
+    cs_mode = capstone.CS_MODE_BIG_ENDIAN

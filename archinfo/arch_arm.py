@@ -5,17 +5,6 @@ from .tls import TLSArchInfo
 
 log = logging.getLogger("archinfo.arch_arm")
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import unicorn as _unicorn
-except ImportError:
-    _unicorn = None
-
-
 # TODO: determine proper base register (if it exists)
 # TODO: handle multiple return registers?
 # TODO: which endianness should be default?
@@ -103,29 +92,6 @@ class ArchARM(Arch):
             return True
         return False
 
-    def __getstate__(self):
-        self._cs = None
-        self._cs_thumb = None
-        self._ks = None
-        self._ks_thumb = None
-        return super().__getstate__()
-
-    @property
-    def keystone_thumb(self):
-        if _keystone is None:
-            log.warning("Keystone is not installed!")
-            return None
-        if self._ks_thumb is None:
-            self._ks_thumb = _keystone.Ks(self.ks_arch, _keystone.KS_MODE_THUMB)
-        return self._ks_thumb
-
-    @property
-    def unicorn_thumb(self):
-        if _unicorn is None:
-            log.warning("Unicorn is not installed!")
-            return None
-        return _unicorn.Uc(self.uc_arch, self.uc_mode + _unicorn.UC_MODE_THUMB)
-
     def m_addr(self, addr, *args, **kwargs):
         """
         Given the address of some code block, convert it to the address where this block
@@ -180,15 +146,6 @@ class ArchARM(Arch):
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_ARM
-        ks_mode = _keystone.KS_MODE_ARM + _keystone.KS_MODE_LITTLE_ENDIAN
-    _ks_thumb = None
-    uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
-    uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
-    uc_mode_thumb = _unicorn.UC_MODE_LITTLE_ENDIAN + _unicorn.UC_MODE_THUMB if _unicorn else None
-    uc_const = _unicorn.arm_const if _unicorn else None
-    uc_prefix = "UC_ARM_" if _unicorn else None
     # self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
     ret_instruction = b"\x1E\xFF\x2F\xE1"  # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
@@ -469,19 +426,6 @@ class ArchARMCortexM(ArchARMEL):
         # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
         Register(name="control", size=4, default_value=(0, False, None)),
     ]
-
-    # Special handling of CM mode in *stone
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_ARM
-        ks_mode = _keystone.KS_MODE_THUMB + _keystone.KS_MODE_LITTLE_ENDIAN
-    _ks_thumb = None
-    uc_arch = _unicorn.UC_ARCH_ARM if _unicorn else None
-    uc_mode = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
-    uc_mode_thumb = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
-
-    @property
-    def keystone_thumb(self):
-        return self.keystone
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,11 +1,8 @@
-from typing import TYPE_CHECKING, List, Dict, Type
+from typing import List
 import logging
 
 from .arch import Arch, REGISTERED_ARCH_PLUGINS, REGISTERED_REGISTER_PLUGINS
 from .register import Register
-
-if TYPE_CHECKING:
-    from .arch import Endness
 
 log = logging.getLogger(__name__)
 
@@ -13,7 +10,6 @@ log = logging.getLogger(__name__)
 class ArchPlugin:
     _new_registers: List[Register]
     _patched_registers: List["RegisterPlugin"]
-    _children: Dict[str, Type["ArchPlugin"]]
 
     def __init_subclass__(cls, patches=None, **kwargs):
         if patches is None or not issubclass(patches, Arch):
@@ -32,7 +28,14 @@ class ArchPlugin:
                 raise TypeError(f"Conflict between plugin and patchee ({k})")
 
     @classmethod
-    def _init(cls, arch: Arch, endness: "Endness", instruction_endness: "Endness"):
+    def _init_1(cls, arch: Arch):
+        # DO NOT EVER CALL SUPER
+        # TODO enforce this
+        pass
+
+    @classmethod
+    def _init_2(cls, arch: Arch):
+        # DO NOT EVER CALL SUPER
         pass
 
     @classmethod

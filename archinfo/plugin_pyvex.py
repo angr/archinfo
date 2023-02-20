@@ -11,6 +11,9 @@ from .arch_arm import ArchARM, ArchARMHF
 from .arch_aarch64 import ArchAArch64
 from .arch_mips32 import ArchMIPS32
 from .arch_mips64 import ArchMIPS64
+from .arch_ppc32 import ArchPPC32
+from .arch_ppc64 import ArchPPC64
+from .arch_s390x import ArchS390X
 
 
 class PyvexRegisterPlugin(RegisterPlugin):
@@ -60,12 +63,10 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
     argument_register_positions = {}
 
     @classmethod
-    def _init(cls, arch, endness, instruction_endness):
-        super()._init(arch, endness, instruction_endness)
-
+    def _init_1(cls, arch):
         if arch.vex_support:
             arch.vex_archinfo = pyvex.enums.default_vex_archinfo()
-            if endness == Endness.BE:
+            if arch.instruction_endness == Endness.BE:
                 arch.vex_archinfo["endness"] = pyvex.enums.vex_endness_from_string("VexEndnessBE")
 
         if arch.register_list:
@@ -247,8 +248,7 @@ class PyvexAMD64(PyvexPlugin, patches=ArchAMD64):
     ]
 
     @classmethod
-    def _init(cls, arch, endness, instruction_endness):
-        super()._init(arch, endness, instruction_endness)
+    def _init_2(cls, arch):
         arch.argument_register_positions = {
             arch.registers["rdi"][0]: 0,
             arch.registers["rsi"][0]: 1,
@@ -285,8 +285,7 @@ class PyvexX86(PyvexPlugin, patches=ArchX86):
     ]
 
     @classmethod
-    def _init(cls, arch, endness, instruction_endness):
-        super()._init(arch, endness, instruction_endness)
+    def _init_2(cls, arch):
         arch.vex_archinfo["x86_cr0"] = 0xFFFFFFFF
 
 
@@ -336,7 +335,7 @@ class PyvexAArch64(PyvexPlugin, patches=ArchAArch64):
     ret_offset = 16
     syscall_num_offset = 80
 
-    __add_registers = [
+    __new_registers = [
         Register(name="cc_op", size=8, artificial=True),
         Register(name="cc_dep1", size=8, artificial=True),
         Register(name="cc_dep2", size=8, artificial=True),
@@ -351,7 +350,7 @@ class PyvexMIPS32(PyvexPlugin, patches=ArchMIPS32):
     ret_offset = 16
     syscall_num_offset = 16
 
-    __add_registers = [
+    __new_registers = [
         Register(name="emnote", size=4, artificial=True),
         Register(name="ip_at_syscall", size=4, artificial=True),
     ]
@@ -362,7 +361,108 @@ class PyvexMIPS64(PyvexPlugin, patches=ArchMIPS64):
     ret_offset = 32
     syscall_register_offset = 16
 
-    __add_registers = [
+    __new_registers = [
         Register(name="emnote", size=4, artificial=True),
         Register(name="ip_at_syscall", size=8, artificial=True),
     ]
+
+
+class PyvexPPC32(PyvexPlugin, patches=ArchPPC32):
+    vex_arch = "VexArchPPC32"
+    ret_offset = 28
+    syscall_num_offset = 16
+
+    __new_registers = [
+        Register(name="emnote", size=4, artificial=True),
+        Register(name="ip_at_syscall", size=4, artificial=True),
+    ]
+
+    @classmethod
+    def _init_2(cls, arch):
+        arch.argument_register_positions = {
+            arch.registers["r3"][0]: 0,
+            arch.registers["r4"][0]: 1,
+            arch.registers["r5"][0]: 2,
+            arch.registers["r6"][0]: 3,
+            arch.registers["r7"][0]: 4,
+            arch.registers["r8"][0]: 5,
+            arch.registers["r9"][0]: 6,
+            arch.registers["r10"][0]: 7,
+        }
+
+
+class PyvexPPC64(PyvexPlugin, patches=ArchPPC64):
+    vex_arch = "VexArchPPC64"
+    ret_offset = 40
+    syscall_num_offset = 16
+
+    __new_registers = [
+        Register(name="emnote", size=4, artificial=True),
+        Register(name="ip_at_syscall", size=8, artificial=True),
+    ]
+
+    @classmethod
+    def _init_2(cls, arch):
+        arch.argument_register_positions = {
+            arch.registers["r3"][0]: 0,
+            arch.registers["r4"][0]: 1,
+            arch.registers["r5"][0]: 2,
+            arch.registers["r6"][0]: 3,
+            arch.registers["r7"][0]: 4,
+            arch.registers["r8"][0]: 5,
+            arch.registers["r9"][0]: 6,
+            arch.registers["r10"][0]: 7,
+            # fp registers
+            arch.registers["vsr1"][0]: 0,
+            arch.registers["vsr2"][0]: 1,
+            arch.registers["vsr3"][0]: 2,
+            arch.registers["vsr4"][0]: 3,
+            arch.registers["vsr5"][0]: 4,
+            arch.registers["vsr6"][0]: 5,
+            arch.registers["vsr7"][0]: 6,
+            arch.registers["vsr8"][0]: 7,
+            arch.registers["vsr9"][0]: 8,
+            arch.registers["vsr10"][0]: 9,
+            arch.registers["vsr11"][0]: 10,
+            arch.registers["vsr12"][0]: 11,
+            arch.registers["vsr13"][0]: 12,
+            # vector registers
+            arch.registers["vsr2"][0]: 0,
+            arch.registers["vsr3"][0]: 1,
+            arch.registers["vsr4"][0]: 2,
+            arch.registers["vsr5"][0]: 3,
+            arch.registers["vsr6"][0]: 4,
+            arch.registers["vsr7"][0]: 5,
+            arch.registers["vsr8"][0]: 6,
+            arch.registers["vsr9"][0]: 7,
+            arch.registers["vsr10"][0]: 8,
+            arch.registers["vsr11"][0]: 9,
+            arch.registers["vsr12"][0]: 10,
+            arch.registers["vsr13"][0]: 11,
+        }
+
+
+class PyvexS390X(PyvexPlugin, patches=ArchS390X):
+    vex_arch = "VexArchS390X"  # enum VexArch
+    ret_offset = 584  # offsetof(VexGuestS390XState, guest_r2)
+    syscall_num_offset = 576  # offsetof(VexGuestS390XState, guest_r1)
+
+    __new_registers = [
+        Register(name="ip_at_syscall", size=8, artificial=True),
+        Register(name="emnote", size=4, artificial=True),
+    ]
+
+    @classmethod
+    def _init_2(cls, arch):
+        arch.argument_register_positions = {
+            arch.registers["r2"][0]: 0,
+            arch.registers["r3"][0]: 1,
+            arch.registers["r4"][0]: 2,
+            arch.registers["r5"][0]: 3,
+            arch.registers["r6"][0]: 4,
+            # fp registers
+            arch.registers["f0"][0]: 0,
+            arch.registers["f2"][0]: 1,
+            arch.registers["f4"][0]: 2,
+            arch.registers["f6"][0]: 3,
+        }

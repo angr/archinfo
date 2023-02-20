@@ -1,21 +1,6 @@
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
-try:
-    import capstone as _capstone
-except ImportError:
-    _capstone = None
-
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # Normally r1 is used as stack pointer
 
@@ -33,68 +18,18 @@ class ArchPPC64(Arch):
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"  # mtlr reg; ... ; blr
             }
             self.triplet = "powerpc-linux-gnu"
-        self.argument_register_positions = (
-            {
-                self.registers["r3"][0]: 0,
-                self.registers["r4"][0]: 1,
-                self.registers["r5"][0]: 2,
-                self.registers["r6"][0]: 3,
-                self.registers["r7"][0]: 4,
-                self.registers["r8"][0]: 5,
-                self.registers["r9"][0]: 6,
-                self.registers["r10"][0]: 7,
-                # fp registers
-                self.registers["vsr1"][0]: 0,
-                self.registers["vsr2"][0]: 1,
-                self.registers["vsr3"][0]: 2,
-                self.registers["vsr4"][0]: 3,
-                self.registers["vsr5"][0]: 4,
-                self.registers["vsr6"][0]: 5,
-                self.registers["vsr7"][0]: 6,
-                self.registers["vsr8"][0]: 7,
-                self.registers["vsr9"][0]: 8,
-                self.registers["vsr10"][0]: 9,
-                self.registers["vsr11"][0]: 10,
-                self.registers["vsr12"][0]: 11,
-                self.registers["vsr13"][0]: 12,
-                # vector registers
-                self.registers["vsr2"][0]: 0,
-                self.registers["vsr3"][0]: 1,
-                self.registers["vsr4"][0]: 2,
-                self.registers["vsr5"][0]: 3,
-                self.registers["vsr6"][0]: 4,
-                self.registers["vsr7"][0]: 5,
-                self.registers["vsr8"][0]: 6,
-                self.registers["vsr9"][0]: 7,
-                self.registers["vsr10"][0]: 8,
-                self.registers["vsr11"][0]: 9,
-                self.registers["vsr12"][0]: 10,
-                self.registers["vsr13"][0]: 11,
-            }
-            if _pyvex is not None
-            else None
-        )
 
     bits = 64
-    vex_arch = "VexArchPPC64"
     name = "PPC64"
     qemu_name = "ppc64"
     ida_processor = "ppc64"
     triplet = "powerpc64le-linux-gnu"
     linux_name = "ppc750"
     max_inst_bytes = 4
-    ret_offset = 40
-    syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8
     initial_sp = 0xFFFFFFFFFF000000
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _capstone:
-        cs_arch = _capstone.CS_ARCH_PPC
-        cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_PPC
-        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
     # Unicorn not supported
     # uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     # uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
@@ -254,14 +189,12 @@ class ArchPPC64(Arch):
         Register(name="c_fpcc", size=1, floating_point=True),
         Register(name="vrsave", size=4, vector=True),
         Register(name="vscr", size=4, vector=True),
-        Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=8),
         Register(name="cmlen", size=8),
         Register(name="nraddr", size=8),
         Register(name="nraddr_gpr2", size=8),
         Register(name="redir_sp", size=8),
         Register(name="redir_stack", size=256),
-        Register(name="ip_at_syscall", size=8, artificial=True),
         Register(name="sprg3_ro", size=8),
         Register(name="tfhar", size=8),
         Register(name="texasr", size=8),
