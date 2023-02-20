@@ -83,6 +83,7 @@ class CapstonePlugin(ArchPlugin, patches=Arch):
 class CapstoneAMD64(CapstonePlugin, patches=ArchAMD64):
     cs_arch = capstone.CS_ARCH_X86
     cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN
+    _cs_x86_syntax = None
 
     @classmethod
     def _init_1(cls, arch):
@@ -114,6 +115,7 @@ class CapstoneAMD64(CapstonePlugin, patches=ArchAMD64):
 class CapstoneX86(CapstonePlugin, patches=ArchX86):
     cs_arch = capstone.CS_ARCH_X86
     cs_mode = capstone.CS_MODE_32 + capstone.CS_MODE_LITTLE_ENDIAN
+    _cs_x86_syntax = None
 
     @property
     def capstone_x86_syntax(self):
