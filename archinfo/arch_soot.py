@@ -329,8 +329,6 @@ class ArchSoot(Arch):
 
     name = "Soot"
 
-    vex_arch = None  # No VEX support
-    qemu_name = None  # No Qemu/Unicorn-engine support
     bits = 64
     address_types = (SootAddressDescriptor,)
     function_address_types = (SootMethodDescriptor,)

@@ -42,6 +42,7 @@ class UnicornPlugin(ArchPlugin, patches=Arch):
         # always create a new Unicorn instance
         return unicorn.Uc(self.uc_arch, self.uc_mode)
 
+    @property
     def unicorn_support(self):
         """
         Whether the architecture is supported by Unicorn engine or not,
