@@ -1,17 +1,28 @@
 import logging
-from typing import Union
+from typing import Union, Dict, Tuple
 
-try:
-    import pypcode
-except ImportError:
-    pypcode = None
+import pypcode
 
 from .arch import Arch, Endness, Register
+from .types import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
 from .archerror import ArchError
 
 
 log = logging.getLogger("__name__")
+
+
+def get_register_dict(arch) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
+    res = {}
+    for r in arch.register_list:
+        if r.vex_offset is None:
+            continue
+        res[r.name] = (r.vex_offset, r.size)
+        for i in r.alias_names:
+            res[i] = (r.vex_offset, r.size)
+        for reg, offset, size in r.subregisters:
+            res[reg] = (r.vex_offset + offset, size)
+    return res
 
 
 class ArchPcode(Arch):
@@ -38,7 +49,7 @@ class ArchPcode(Arch):
 
         # Build registers list
         ctx = pypcode.Context(language)
-        archinfo_regs = {rname.lower(): Register(rname.lower(), r.size, r.offset) for rname, r in ctx.registers.items()}
+        archinfo_regs = {rname.lower(): Register(rname.lower(), r.size) for rname, r in ctx.registers.items()}
 
         # Get program counter register
         pc_offset = None
@@ -98,6 +109,14 @@ class ArchPcode(Arch):
         self.triplet = ""  # FIXME
 
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
+
+        name_case_map = {rname.lower(): rname for rname in ctx.registers}
+        for reg in self.register_list:
+            reg.vex_offset = ctx.registers[name_case_map[reg.name]].offset
+        self.register_names = {r.vex_offset: r.name for r in self.register_list}
+        self.registers = get_register_dict(self)
+        self.argument_registers = {r.vex_offset for r in self.register_list if r.argument}
+        self.concretize_unique_registers = {r.vex_offset for r in self.register_list if r.concretize_unique}
 
     @staticmethod
     def _get_language_by_id(lang_id) -> "pypcode.ArchLanguage":

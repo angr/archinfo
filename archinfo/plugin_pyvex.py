@@ -87,7 +87,7 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
                                 break
 
             arch.register_names = {r.vex_offset: r.name for r in arch.register_list}
-            arch.registers = _get_register_dict(arch)
+            arch.registers = get_register_dict(arch)
             arch.argument_registers = {r.vex_offset for r in arch.register_list if r.argument}
             arch.concretize_unique_registers = {r.vex_offset for r in arch.register_list if r.concretize_unique}
 
@@ -208,7 +208,7 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
         return self.vex_arch is not None
 
 
-def _get_register_dict(arch) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
+def get_register_dict(arch) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
     res = {}
     for r in arch.register_list:
         if r.vex_offset is None:

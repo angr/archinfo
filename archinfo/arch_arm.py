@@ -32,11 +32,7 @@ class ArchARM(Arch):
     ARM architecture specific subclass
     """
 
-    def __init__(self, endness=Endness.LE):
-        instruction_endness = None
-        if endness == Endness.LE:
-            instruction_endness = Endness.LE
-
+    def __init__(self, endness=Endness.LE, instruction_endness=None):
         super().__init__(endness, instruction_endness=instruction_endness)
         if endness == Endness.BE:
             self.function_prologs = {

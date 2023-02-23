@@ -4,8 +4,6 @@ def test_register():
     register = Register(
         name="MIPS",
         size=8,
-        vex_offset=10,
-        vex_name="xyz",
         subregisters=["a", "b"],
         alias_names=("r0"),
         general_purpose=True,
@@ -21,8 +19,6 @@ def test_register():
     )
     assert register.name == "MIPS"
     assert register.size == 8
-    assert register.vex_offset == 10
-    assert register.vex_name == "xyz"
     assert register.subregisters == ["a", "b"]
     assert register.alias_names == ("r0")
     assert register.general_purpose
