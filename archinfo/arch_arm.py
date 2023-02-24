@@ -108,6 +108,9 @@ class ArchARM(Arch):
             return True
         return False
 
+    def __hash__(self):
+        return super().__hash__()
+
     def __getstate__(self):
         self._cs = None
         self._cs_thumb = None

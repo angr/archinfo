@@ -780,7 +780,16 @@ class Arch:
 
 arch_id_map = []
 
+_all_arches_set = set()  # for deduplication
 all_arches = []
+
+
+def _append_arch_unique(my_arch: Arch) -> bool:
+    if my_arch in _all_arches_set:
+        return False
+    _all_arches_set.add(my_arch)
+    all_arches.append(my_arch)
+    return True
 
 
 def register_arch(regexes, bits, endness, my_arch):
@@ -818,10 +827,10 @@ def register_arch(regexes, bits, endness, my_arch):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
     if endness == "any":
-        all_arches.append(my_arch(Endness.BE))
-        all_arches.append(my_arch(Endness.LE))
+        _append_arch_unique(my_arch(Endness.BE))
+        _append_arch_unique(my_arch(Endness.LE))
     else:
-        all_arches.append(my_arch(endness))
+        _append_arch_unique(my_arch(endness))
 
 
 class ArchNotFound(Exception):
