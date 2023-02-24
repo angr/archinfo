@@ -36,6 +36,7 @@ class ArchPPC64(Arch):
     ret_instruction = b"\x20\x00\x80\x4e"
     nop_instruction = b"\x00\x00\x00\x60"
     instruction_alignment = 4
+    word_instructions = True
     register_list = [
         Register(name="gpr0", size=8, alias_names=("r0",), general_purpose=True),
         Register(

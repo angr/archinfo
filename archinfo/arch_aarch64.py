@@ -21,7 +21,7 @@ class ArchAArch64(Arch):
     stack_change = -8
     memory_endness = Endness.LE
     register_endness = Endness.LE
-    instruction_endness = Endness.LE
+    word_instructions = True
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
     initial_sp = 0x7FFFFFFFFFF0000
 

@@ -73,8 +73,8 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
             (_, _), max_offset = max(pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
             max_offset += arch.bits
             # Register collections
-            if isinstance(arch.vex_arch, str):
-                va = arch.vex_arch[7:].lower()
+            if isinstance(arch.vex_arch, str) or getattr(arch, "_please_allocate_registers", False):
+                va = arch.vex_arch[7:].lower() if isinstance(arch.vex_arch, str) else None
                 for r in arch.register_list:
                     if r.vex_offset is None:
                         for name in (r.vex_name, r.name) + r.alias_names:

@@ -141,6 +141,7 @@ class ArchARM(Arch):
     stack_change = -4
     memory_endness = Endness.LE
     register_endness = Endness.LE
+    word_instructions = True
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
     # self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
     ret_instruction = b"\x1E\xFF\x2F\xE1"  # this is bx lr

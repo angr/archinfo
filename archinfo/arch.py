@@ -319,6 +319,7 @@ class Arch:
     memory_endness = Endness.LE
     register_endness = Endness.LE
     stack_change = None
+    word_instructions = False
 
     branch_delay_slot = False
 
