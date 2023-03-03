@@ -1,11 +1,13 @@
 # pylint: disable=wrong-import-position
 """
 archinfo is a collection of classes that contain architecture-specific information.
-It is useful for cross-architecture tools (such as pyvex).
+at is useful for cross-architecture tools (such as pyvex).
 """
 
 __version__ = "9.2.41.dev0"
 
+
+from typing import Optional, Type
 
 from .types import RegisterOffset, TmpVar, RegisterName
 from .arch import (
@@ -32,7 +34,19 @@ from .arch_mips64 import ArchMIPS64
 from .arch_soot import ArchSoot
 from .archerror import ArchError
 from .arch_s390x import ArchS390X
-from .arch_pcode import ArchPcode
+from .plugin import ArchPlugin
+
+ArchPcode: Optional[Type[Arch]]
+PyvexPlugin: Optional[Type[ArchPlugin]]
+CapstonePlugin: Optional[Type[ArchPlugin]]
+KeystonePlugin: Optional[Type[ArchPlugin]]
+UnicornPlugin: Optional[Type[ArchPlugin]]
+PyvexUnicornPlugin: Optional[Type[ArchPlugin]]
+
+try:
+    from .arch_pcode import ArchPcode
+except ModuleNotFoundError:
+    ArchPcode = None
 
 try:
     from .plugin_pyvex import PyvexPlugin
@@ -93,5 +107,6 @@ __all__ = [
     "CapstonePlugin",
     "KeystonePlugin",
     "UnicornPlugin",
-    "PyvexUnicornPlugin",
+    "PyvexUnicornPlugi",
+    "ArchPlugin",
 ]
