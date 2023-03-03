@@ -95,22 +95,6 @@ class ArchARM(Arch):
                 rb"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"  # pop {xxx}; bx lr
             }
 
-    # ArchARM will match with any ARM, but ArchARMEL/ArchARMHF is a mismatch
-    def __eq__(self, other):
-        # pylint: disable=unidiomatic-typecheck
-        if not isinstance(other, ArchARM):
-            return False
-        if self.memory_endness != other.memory_endness or self.bits != other.bits:
-            return False
-        if type(self) is type(other):
-            return True
-        if type(self) is ArchARM or type(other) is ArchARM:
-            return True
-        return False
-
-    def __hash__(self):
-        return super().__hash__()
-
     def __getstate__(self):
         self._cs = None
         self._cs_thumb = None
