@@ -6,3 +6,5 @@ MANIFEST
 Pipfile
 Pipfile.lock
 build
+
+docs/_build
