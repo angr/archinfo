@@ -1,9 +1,10 @@
 import logging
-from typing import Union, Dict, Tuple
+from typing import Union, Dict, Tuple, Optional
 
 import pypcode
 
 from .arch import Arch, Endness, Register
+from .register import RegisterFile
 from .types import RegisterOffset, RegisterName
 from .tls import TLSArchInfo
 from .archerror import ArchError
@@ -25,7 +26,7 @@ def get_register_dict(arch) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
     return res
 
 
-class ArchPcode(Arch):
+class ArchPcode(Arch[int, int]):
     """
     archinfo interface to pypcode architectures. Provides minimal mapping for
     architectural info like register file map, endianness, bit width, etc.
@@ -37,6 +38,7 @@ class ArchPcode(Arch):
 
         if isinstance(language, str):
             language = self._get_language_by_id(language)
+        assert language.pspec is not None
 
         self.name = language.id
         self.pcode_arch = language.id
@@ -110,13 +112,6 @@ class ArchPcode(Arch):
 
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
 
-        name_case_map = {rname.lower(): rname for rname in ctx.registers}
-        for reg in self.register_list:
-            reg.vex_offset = ctx.registers[name_case_map[reg.name]].offset
-        self.register_names = {r.vex_offset: r.name for r in self.register_list}
-        self.registers = get_register_dict(self)
-        self.argument_registers = {r.vex_offset for r in self.register_list if r.argument}
-        self.concretize_unique_registers = {r.vex_offset for r in self.register_list if r.concretize_unique}
 
     @staticmethod
     def _get_language_by_id(lang_id) -> "pypcode.ArchLanguage":
@@ -125,3 +120,15 @@ class ArchPcode(Arch):
                 if lang.id == lang_id:
                     return lang
         raise ArchError("Language not found")
+
+class PcodeRegisterFile(RegisterFile, name="pcode"):
+    def __init__(self, arch, ctx: Optional[pypcode.Context]=None):
+        if not isinstance(arch, ArchPcode):
+            raise NotImplementedError
+        if ctx is None:
+            raise TypeError("PcodeRegisterFile may not be manually instanciated")
+        self._mapping = {rname.lower(): reg.offset for (rname, reg) in ctx.registers.items()}
+        super().__init__(arch)
+
+    def _extract_offset(self, reg):
+        return self._mapping.get(reg.name, None)

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, TYPE_CHECKING, Type, Tuple
 import logging
 
 from .arch import Arch, REGISTERED_ARCH_PLUGINS, REGISTERED_REGISTER_PLUGINS
@@ -27,6 +27,8 @@ class ArchPlugin:
             else:
                 raise TypeError(f"Conflict between plugin and patchee ({k})")
 
+    _dependencies: Tuple[Type["ArchPlugin"], ...] = ()
+
     @classmethod
     def _init_1(cls, arch: Arch):
         # DO NOT EVER CALL SUPER
@@ -45,6 +47,10 @@ class ArchPlugin:
     @classmethod
     def _prep_copy(cls, arch: Arch):
         pass
+
+    if TYPE_CHECKING:
+        def __getattr__(self, k):
+            raise AttributeError(k)
 
 
 class RegisterPlugin:

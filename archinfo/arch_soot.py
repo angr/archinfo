@@ -323,7 +323,7 @@ class SootArgument:
         return f"{self.value} ({self.type})"
 
 
-class ArchSoot(Arch):
+class ArchSoot(Arch[SootAddressDescriptor, SootMethodDescriptor]):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
 

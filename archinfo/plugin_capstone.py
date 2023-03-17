@@ -1,5 +1,5 @@
+from typing import Optional
 import logging
-import capstone
 
 from .archerror import ArchError
 from .plugin import ArchPlugin
@@ -13,15 +13,21 @@ from .arch_mips64 import ArchMIPS64
 from .arch_ppc32 import ArchPPC32
 from .arch_ppc64 import ArchPPC64
 from .arch_s390x import ArchS390X
+from .archerror import ArchPluginUnavailable
+
+try:
+    import capstone
+except ModuleNotFoundError as e:
+    raise ArchPluginUnavailable("capstone") from e
 
 log = logging.getLogger(__name__)
 
 
 class CapstonePlugin(ArchPlugin, patches=Arch):
-    cs_arch = None
-    cs_mode = None
-    _cs = None
-    _cs_thumb = None
+    cs_arch: Optional[int] = None
+    cs_mode: Optional[int] = None
+    _cs: Optional[capstone.Cs] = None
+    _cs_thumb: Optional[capstone.Cs] = None
 
     @classmethod
     def _init_1(cls, arch):
@@ -42,7 +48,11 @@ class CapstonePlugin(ArchPlugin, patches=Arch):
         arch._cs_thumb = None
 
     @property
-    def capstone(self: Arch):
+    def capstone_thumb(self) -> capstone.Cs:
+        raise ArchError("Arch %s does not support thumb mode" % self.name)
+
+    @property
+    def capstone(self) -> capstone.Cs:
         """
         A Capstone instance for this arch
         """
@@ -55,24 +65,19 @@ class CapstonePlugin(ArchPlugin, patches=Arch):
         return self._cs
 
     @property
-    def capstone_support(self):
+    def capstone_support(self) -> bool:
         """
         Whether the architecture is supported by the Capstone engine or not.
 
         :return: True if this Arch is supported by the Capstone engine, False otherwise.
-        :rtype:  bool
         """
 
         return self.cs_arch is not None
 
-    @property
-    def capstone_thumb(self: Arch):
-        raise ArchError("Arch %s does not support thumb mode" % self.name)
-
-    def _configure_capstone(self):
+    def _configure_capstone(self) -> None:
         pass
 
-    def disasm(self, bytestring, addr=0, thumb=False):
+    def disasm(self, bytestring: bytes, addr: int=0, thumb: bool=False) -> str:
         if thumb and not hasattr(self, "capstone_thumb"):
             log.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
@@ -83,14 +88,14 @@ class CapstonePlugin(ArchPlugin, patches=Arch):
 class CapstoneAMD64(CapstonePlugin, patches=ArchAMD64):
     cs_arch = capstone.CS_ARCH_X86
     cs_mode = capstone.CS_MODE_64 + capstone.CS_MODE_LITTLE_ENDIAN
-    _cs_x86_syntax = None
+    _cs_x86_syntax: Optional[str] = None
 
     @classmethod
     def _init_1(cls, arch):
         arch._cs_x86_syntax = None
 
     @property
-    def capstone_x86_syntax(self):
+    def capstone_x86_syntax(self) -> Optional[str]:
         """
         The current syntax Capstone uses for x64. It can be 'intel' or 'at&t'
         """

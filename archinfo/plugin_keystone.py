@@ -1,5 +1,4 @@
 import logging
-import keystone
 
 from .plugin import ArchPlugin
 from .arch import Arch, Endness
@@ -13,6 +12,12 @@ from .arch_ppc32 import ArchPPC32
 from .arch_ppc64 import ArchPPC64
 from .arch_s390x import ArchS390X
 from .arch_x86 import ArchX86
+from .archerror import ArchPluginUnavailable
+
+try:
+    import keystone
+except ModuleNotFoundError as e:
+    raise ArchPluginUnavailable("keystone") from e
 
 log = logging.getLogger(__name__)
 

@@ -1,10 +1,9 @@
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, List, Set
 import copy
-import pyvex
 
 from .plugin import ArchPlugin, RegisterPlugin
 from .arch import Register, Endness, Arch
-from .register import RegisterOffset, RegisterName
+from .register import RegisterOffset, RegisterName, RegisterFile
 from .arch_amd64 import ArchAMD64
 from .arch_x86 import ArchX86
 from .arch_arm import ArchARM, ArchARMHF
@@ -14,29 +13,42 @@ from .arch_mips64 import ArchMIPS64
 from .arch_ppc32 import ArchPPC32
 from .arch_ppc64 import ArchPPC64
 from .arch_s390x import ArchS390X
+from .archerror import ArchPluginUnavailable
+
+try:
+    import pyvex
+except ModuleNotFoundError as e:
+    raise ArchPluginUnavailable("pyvex") from e
 
 
 class PyvexRegisterPlugin(RegisterPlugin):
-    def __init__(
-        self,
-        name,
-        vex_offset=None,
-        vex_name=None,
-    ):
+    def __init__(self, name, vex_name=None):
         super().__init__(name)
-        self.vex_offset = vex_offset
         self.vex_name = vex_name
+
+class LibvexRegisterFile(RegisterFile, name='libvex'):
+    def __init__(self, arch):
+        self.vex_arch = arch.vex_arch
+        super().__init__(arch)
+
+    def _extract_offset(self, reg):
+        for name in (reg.vex_name, reg.name) + reg.alias_names:
+            try:
+                return pyvex.vex_ffi.guest_offsets[(self.vex_arch, name)]
+            except KeyError:
+                pass
+        return None
 
 
 class PyvexPlugin(ArchPlugin, patches=Arch):
-    vex_arch = None
-    vex_archinfo = None
+    vex_arch: Optional[str] = None
+    vex_archinfo: Optional[dict] = None
 
     # whether VEX has ccall handlers for conditionals for this arch
-    vex_conditional_helpers = False
+    vex_conditional_helpers: bool = False
 
     # is it safe to cache IRSBs?
-    cache_irsb = True
+    cache_irsb: bool = True
 
     # vex-specific registers
     __patched_registers = [
@@ -53,83 +65,23 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
     sp_offset: Optional[RegisterOffset] = None
     bp_offset: Optional[RegisterOffset] = None
     lr_offset: Optional[RegisterOffset] = None
-    artificial_register_offsets = []
-    registers = {}
-    register_names = {}
-    register_size_names = {}
-    subregister_map = {}
-    vex_cc_regs = []
-    argument_registers = set()
-    argument_register_positions = {}
+    artificial_registers_offsets: List[RegisterOffset] = []
+    registers: Dict[RegisterName, Tuple[RegisterOffset, int]] = {}
+    register_names: Dict[RegisterOffset, RegisterName] = {}
+    register_size_names: Dict[Tuple[RegisterOffset, int], RegisterName] = {}
+    subregister_map: Dict[Tuple[RegisterOffset, int], Tuple[RegisterOffset, int]] = {}
+    vex_cc_regs: List[Register] = []
+    argument_registers: Set[RegisterOffset] = set()
+    argument_register_positions: Dict[RegisterOffset, int] = {}
+    # this is a list of registers that should be concretized, if unique, at the end of each block
+    concretize_unique_registers: Set[RegisterOffset] = set()
 
     @classmethod
-    def _init_1(cls, arch):
+    def _init_1(cls, arch: Arch):
         if arch.vex_support:
             arch.vex_archinfo = pyvex.enums.default_vex_archinfo()
             if arch.instruction_endness == Endness.BE:
                 arch.vex_archinfo["endness"] = pyvex.enums.vex_endness_from_string("VexEndnessBE")
-
-        if arch.register_list:
-            (_, _), max_offset = max(pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
-            max_offset += arch.bits
-            # Register collections
-            if isinstance(arch.vex_arch, str) or getattr(arch, "_please_allocate_registers", False):
-                va = arch.vex_arch[7:].lower() if isinstance(arch.vex_arch, str) else None
-                for r in arch.register_list:
-                    if r.vex_offset is None:
-                        for name in (r.vex_name, r.name) + r.alias_names:
-                            try:
-                                r.vex_offset = pyvex.vex_ffi.guest_offsets[(va, name)]
-                            except KeyError:
-                                r.vex_offset = max_offset
-                                max_offset += r.size
-                            else:
-                                break
-
-            arch.register_names = {r.vex_offset: r.name for r in arch.register_list}
-            arch.registers = get_register_dict(arch)
-            arch.argument_registers = {r.vex_offset for r in arch.register_list if r.argument}
-            arch.concretize_unique_registers = {r.vex_offset for r in arch.register_list if r.concretize_unique}
-
-            # Artificial registers offsets
-            arch.artificial_registers_offsets = []
-            for reg_name in arch.artificial_registers:
-                reg = arch.get_register_by_name(reg_name)
-                arch.artificial_registers_offsets.extend(range(reg.vex_offset, reg.vex_offset + reg.size))
-
-            # Register offsets
-            arch.ip_offset = arch.registers.get("ip", (None, None))[0]
-            arch.sp_offset = arch.registers.get("sp", (None, None))[0]
-            arch.bp_offset = arch.registers.get("bp", (None, None))[0]
-            arch.lr_offset = arch.registers.get("lr", (None, None))[0]
-
-        # generate register mapping (offset, size): name
-        arch.register_size_names = {}
-        for reg in arch.register_list:
-            if reg.vex_offset is None:
-                continue
-            arch.register_size_names[(reg.vex_offset, reg.size)] = reg.name
-            for name, off, sz in reg.subregisters:
-                # special hacks for X86 and AMD64 - don't translate register names to bp, sp, etc.
-                if arch.name in {"X86", "AMD64"} and name in {"bp", "sp", "ip"}:
-                    continue
-                arch.register_size_names[(reg.vex_offset + off, sz)] = name
-
-        # allow mapping a sub-register to its base register
-        arch.subregister_map = {}
-        for reg in arch.register_list:
-            if reg.vex_offset is None:
-                continue
-            base_reg = reg.vex_offset, reg.size
-            arch.subregister_map[(reg.vex_offset, reg.size)] = base_reg
-            arch.subregister_map[reg.vex_offset] = base_reg
-            for name, off, sz in reg.subregisters:
-                if arch.name in {"X86", "AMD64"} and name in {"bp", "sp", "ip"}:
-                    continue
-                subreg_offset = reg.vex_offset + off
-                arch.subregister_map[(subreg_offset, sz)] = base_reg
-                if subreg_offset not in arch.subregister_map:
-                    arch.subregister_map[subreg_offset] = base_reg
 
         # VEX registers used in lieu of flags register
         arch.vex_cc_regs = []
@@ -177,13 +129,13 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
 
         return self.subregister_map.get(key, None)
 
-    def get_register_offset(self, name):
+    def get_register_offset(self, name) -> RegisterOffset:
         try:
             return self.registers[name][0]
         except KeyError as e:
             raise ValueError("Register %s does not exist!" % name) from e
 
-    def is_artificial_register(self, offset, size):
+    def is_artificial_register(self, offset: RegisterOffset, size: int) -> bool:
         r = self.get_base_register(offset, size)
         if r is None:
             return False
@@ -197,7 +149,7 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
         return r_name in self.artificial_registers
 
     @property
-    def vex_support(self):
+    def vex_support(self) -> bool:
         """
         Whether the architecture is supported by VEX or not.
 
@@ -205,6 +157,7 @@ class PyvexPlugin(ArchPlugin, patches=Arch):
         :rtype:  bool
         """
 
+        print(self.artificial_registers)
         return self.vex_arch is not None
 
 
@@ -224,8 +177,8 @@ def get_register_dict(arch) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
 class PyvexAMD64(PyvexPlugin, patches=ArchAMD64):
     vex_arch = "VexArchAMD64"
     vex_conditional_helpers = True
-    syscall_num_offset = 16
-    ret_offset = 16
+    syscall_num_offset = RegisterOffset(16)
+    ret_offset = RegisterOffset(16)
 
     __patched_registers = [
         PyvexRegisterPlugin("fs", vex_name="fs_const"),
@@ -272,8 +225,8 @@ class PyvexAMD64(PyvexPlugin, patches=ArchAMD64):
 class PyvexX86(PyvexPlugin, patches=ArchX86):
     vex_arch = "VexArchX86"
     vex_conditional_helpers = True
-    syscall_num_offset = 8
-    ret_offset = 8
+    syscall_num_offset = RegisterOffset(8)
+    ret_offset = RegisterOffset(8)
 
     __new_registers = [
         Register(name="cc_op", size=4, default_value=(0, False, None), concrete=False, artificial=True),
@@ -292,9 +245,9 @@ class PyvexX86(PyvexPlugin, patches=ArchX86):
 class PyvexARM(PyvexPlugin, patches=ArchARM):
     vex_arch = "VexArchARM"
     vex_conditional_helpers = True
-    ret_offset = 8
-    fp_ret_offset = 8
-    syscall_num_offset = 36
+    ret_offset = RegisterOffset(8)
+    fp_ret_offset = RegisterOffset(8)
+    syscall_num_offset = RegisterOffset(36)
 
     __patched_registers = [
         PyvexRegisterPlugin(name="r15", vex_name="r15t"),
@@ -319,7 +272,7 @@ class PyvexARM(PyvexPlugin, patches=ArchARM):
 
 
 class PyvexARMHF(PyvexPlugin, patches=ArchARMHF):
-    fp_ret_offset = 128  # s0
+    fp_ret_offset = RegisterOffset(128)  # s0
 
 
 # ?????
@@ -332,8 +285,8 @@ class PyvexARMHF(PyvexPlugin, patches=ArchARMHF):
 class PyvexAArch64(PyvexPlugin, patches=ArchAArch64):
     vex_arch = "VexArchARM64"
     vex_conditional_helpers = True
-    ret_offset = 16
-    syscall_num_offset = 80
+    ret_offset = RegisterOffset(16)
+    syscall_num_offset = RegisterOffset(80)
 
     __new_registers = [
         Register(name="cc_op", size=8, artificial=True),
@@ -347,8 +300,8 @@ class PyvexAArch64(PyvexPlugin, patches=ArchAArch64):
 
 class PyvexMIPS32(PyvexPlugin, patches=ArchMIPS32):
     vex_arch = "VexArchMIPS32"
-    ret_offset = 16
-    syscall_num_offset = 16
+    ret_offset = RegisterOffset(16)
+    syscall_num_offset = RegisterOffset(16)
 
     __new_registers = [
         Register(name="emnote", size=4, artificial=True),
@@ -358,8 +311,8 @@ class PyvexMIPS32(PyvexPlugin, patches=ArchMIPS32):
 
 class PyvexMIPS64(PyvexPlugin, patches=ArchMIPS64):
     vex_arch = "VexArchMIPS64"
-    ret_offset = 32
-    syscall_register_offset = 16
+    ret_offset = RegisterOffset(32)
+    syscall_register_offset = RegisterOffset(16)
 
     __new_registers = [
         Register(name="emnote", size=4, artificial=True),
@@ -369,8 +322,8 @@ class PyvexMIPS64(PyvexPlugin, patches=ArchMIPS64):
 
 class PyvexPPC32(PyvexPlugin, patches=ArchPPC32):
     vex_arch = "VexArchPPC32"
-    ret_offset = 28
-    syscall_num_offset = 16
+    ret_offset = RegisterOffset(28)
+    syscall_num_offset = RegisterOffset(16)
 
     __new_registers = [
         Register(name="emnote", size=4, artificial=True),
@@ -393,8 +346,8 @@ class PyvexPPC32(PyvexPlugin, patches=ArchPPC32):
 
 class PyvexPPC64(PyvexPlugin, patches=ArchPPC64):
     vex_arch = "VexArchPPC64"
-    ret_offset = 40
-    syscall_num_offset = 16
+    ret_offset = RegisterOffset(40)
+    syscall_num_offset = RegisterOffset(16)
 
     __new_registers = [
         Register(name="emnote", size=4, artificial=True),
@@ -444,8 +397,8 @@ class PyvexPPC64(PyvexPlugin, patches=ArchPPC64):
 
 class PyvexS390X(PyvexPlugin, patches=ArchS390X):
     vex_arch = "VexArchS390X"  # enum VexArch
-    ret_offset = 584  # offsetof(VexGuestS390XState, guest_r2)
-    syscall_num_offset = 576  # offsetof(VexGuestS390XState, guest_r1)
+    ret_offset = RegisterOffset(584)  # offsetof(VexGuestS390XState, guest_r2)
+    syscall_num_offset = RegisterOffset(576)  # offsetof(VexGuestS390XState, guest_r1)
 
     __new_registers = [
         Register(name="ip_at_syscall", size=8, artificial=True),

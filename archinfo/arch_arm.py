@@ -27,7 +27,7 @@ def get_real_address_if_arm(arch, addr):
     return ((addr >> 1) << 1) if is_arm_arch(arch) else addr
 
 
-class ArchARM(Arch):
+class ArchARM(Arch[int, int]):
     """
     ARM architecture specific subclass
     """
@@ -317,7 +317,7 @@ class ArchARMCortexM(ArchARMEL):
 
     # These are the standard THUMB prologs.  We leave these off for other ARMs due to their length
     # For CM, we assume the FPs are OK, as they are almost guaranteed to appear all over the place
-    function_prologs = {}
+    function_prologs = set()
 
     thumb_prologs = {rb"[\x00-\xff]\xb5", rb"\x2d\xe9[\x00-\xff][\x00-\xff]"}  # push {xxx,lr}  # push.w {xxx, lr}
     function_epilogs = {

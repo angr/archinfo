@@ -12,7 +12,7 @@ _prefixed = [(_endbr64 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
 _FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
 
 
-class ArchAMD64(Arch):
+class ArchAMD64(Arch[int, int]):
     def __init__(self, endness=Endness.LE):
         if endness != Endness.LE:
             raise ArchError("Arch AMD64 must be little endian")
@@ -34,7 +34,7 @@ class ArchAMD64(Arch):
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    function_prologs = _FUNCTION_PROLOGS
+    function_prologs = set(_FUNCTION_PROLOGS)
     function_epilogs = {
         rb"\xc9\xc3",  # leaveq; retq
         rb"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3",  # pop <reg>; retq

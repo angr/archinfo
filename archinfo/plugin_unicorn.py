@@ -1,4 +1,5 @@
-import unicorn
+from typing import Optional
+from types import ModuleType
 
 from .plugin import ArchPlugin, Arch
 from .archerror import ArchError
@@ -9,13 +10,19 @@ from .arch_arm import ArchARM, ArchARMCortexM
 from .arch_mips32 import ArchMIPS32
 from .arch_mips64 import ArchMIPS64
 from .arch_x86 import ArchX86
+from .archerror import ArchPluginUnavailable
+
+try:
+    import unicorn
+except ModuleNotFoundError as e:
+    raise ArchPluginUnavailable("unicorn") from e
 
 
 class UnicornPlugin(ArchPlugin, patches=Arch):
-    uc_arch = None
-    uc_mode = None
-    uc_const = None
-    uc_prefix = None
+    uc_arch: Optional[int] = None
+    uc_mode: Optional[int] = None
+    uc_const: Optional[ModuleType] = None
+    uc_prefix: Optional[str] = None
     uc_regs = None
 
     @classmethod

@@ -5,7 +5,7 @@ from .tls import TLSArchInfo
 # TODO: Only persist t9 in PIC programs
 
 
-class ArchMIPS32(Arch):
+class ArchMIPS32(Arch[int, int]):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:

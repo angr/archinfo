@@ -5,7 +5,7 @@ from .tls import TLSArchInfo
 # Normally r1 is used as stack pointer
 
 
-class ArchPPC64(Arch):
+class ArchPPC64(Arch[int, int]):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
         if endness == Endness.BE:

@@ -21,7 +21,7 @@ _prefixed = [(_endbr32 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
 _FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
 
 
-class ArchX86(Arch):
+class ArchX86(Arch[int, int]):
     def __init__(self, endness=Endness.LE):
         if endness != Endness.LE:
             raise ArchError("Arch i386 must be little endian")
@@ -40,7 +40,7 @@ class ArchX86(Arch):
     memory_endness = Endness.LE
     register_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 32, "long long": 64}
-    function_prologs = _FUNCTION_PROLOGS
+    function_prologs = set(_FUNCTION_PROLOGS)
     function_epilogs = {
         rb"\xc9\xc3",  # leave; ret
         rb"([^\x41][\x50-\x5f]{1}|\x41[\x50-\x5f])\xc3",  # pop <reg>; ret

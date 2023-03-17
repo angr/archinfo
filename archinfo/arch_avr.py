@@ -3,7 +3,7 @@ from .archerror import ArchError
 from .tls import TLSArchInfo
 
 
-class ArchAVR8(Arch):
+class ArchAVR8(Arch[int, int]):
     bits = 32
     vex_arch = None
     name = "AVR8"

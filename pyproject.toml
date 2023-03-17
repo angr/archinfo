@@ -10,4 +10,4 @@ target-version = ['py38']
 line-length = 120
 
 [tool.mypy]
-plugins = "archinfo.mypy"
+plugins = "archinfo.static_mypy"

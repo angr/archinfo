@@ -37,41 +37,11 @@ from .arch_s390x import ArchS390X
 from .plugin import ArchPlugin
 
 ArchPcode: Optional[Type[Arch]]
-PyvexPlugin: Optional[Type[ArchPlugin]]
-CapstonePlugin: Optional[Type[ArchPlugin]]
-KeystonePlugin: Optional[Type[ArchPlugin]]
-UnicornPlugin: Optional[Type[ArchPlugin]]
-PyvexUnicornPlugin: Optional[Type[ArchPlugin]]
 
 try:
     from .arch_pcode import ArchPcode
 except ModuleNotFoundError:
     ArchPcode = None
-
-try:
-    from .plugin_pyvex import PyvexPlugin
-except ModuleNotFoundError:
-    PyvexPlugin = None
-
-try:
-    from .plugin_capstone import CapstonePlugin
-except ModuleNotFoundError:
-    CapstonePlugin = None
-
-try:
-    from .plugin_keystone import KeystonePlugin
-except ModuleNotFoundError:
-    KeystonePlugin = None
-
-try:
-    from .plugin_unicorn import UnicornPlugin
-except ModuleNotFoundError:
-    UnicornPlugin = None
-
-try:
-    from .plugin_pyvex_unicorn import PyvexUnicornPlugin
-except ModuleNotFoundError:
-    PyvexUnicornPlugin = None
 
 __all__ = [
     "RegisterOffset",
@@ -103,10 +73,5 @@ __all__ = [
     "ArchError",
     "ArchS390X",
     "ArchPcode",
-    "PyvexPlugin",
-    "CapstonePlugin",
-    "KeystonePlugin",
-    "UnicornPlugin",
-    "PyvexUnicornPlugi",
     "ArchPlugin",
 ]

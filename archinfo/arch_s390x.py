@@ -3,7 +3,7 @@ from .archerror import ArchError
 from .tls import TLSArchInfo
 
 
-class ArchS390X(Arch):
+class ArchS390X(Arch[int, int]):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness != Endness.BE:

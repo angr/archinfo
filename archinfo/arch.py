@@ -1,30 +1,54 @@
+from typing import List, Optional, Type, Dict, Set, Union, Generic, TypeVar, Tuple
 import logging
 from functools import cached_property
 from collections import defaultdict
-from typing import List
 import struct as _struct
 import platform as _platform
 import re
 from functools import partial
 import copy
 
-from .archerror import ArchError
+from .archerror import ArchError, ArchPluginUnavailable
 from .tls import TLSArchInfo
-from .register import Register, Endness
+from .register import Register, Endness, RegisterFileLookup
+from .types import RegisterName
+
+import sys
+if sys.version_info < (3, 10):
+    from importlib_metadata import entry_points
+else:
+    from importlib.metadata import entry_points
 
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
 
-REGISTERED_ARCH_PLUGINS = defaultdict(list)
-REGISTERED_REGISTER_PLUGINS = []
+REGISTERED_ARCH_PLUGINS: defaultdict[Type, List] = defaultdict(list)
+REGISTERED_REGISTER_PLUGINS: List[Type] = []
+
+AddrT = TypeVar("AddrT")
+FuncT = TypeVar("FuncT")
 
 
 def _get_plugins(arch: "Arch"):
     for cls in type(arch).mro():
         yield from REGISTERED_ARCH_PLUGINS[cls]
 
+LOADED_PLUGINS = False
+def _load_plugins():
+    global LOADED_PLUGINS
+    if LOADED_PLUGINS:
+        return
+    for entry_point in entry_points(group="archinfo.plugins"):
+        try:
+            entry_point.load()
+        except ArchPluginUnavailable as e:
+            log.debug(f"Install {e.args[0]} to use {entry_point.name} plugin")
+        except Exception:
+            log.exception(f"Failed loading registered archinfo plugin {entry_point.name}: {entry_point.module}")
+    LOADED_PLUGINS = True
 
-class Arch:
+
+class Arch(Generic[AddrT, FuncT]):
     """
     A collection of information about a given architecture. This class should be subclassed for each different
     architecture, and then that subclass should be registered with the ``register_arch`` method.
@@ -70,6 +94,7 @@ class Arch:
 
         self.bytes = self.bits // self.byte_width
         self.register_list = [copy.copy(reg) for reg in self.register_list]
+        self.register_files = RegisterFileLookup(self)
 
         self.instruction_endness = instruction_endness or endness
         if endness == Endness.BE:
@@ -78,6 +103,7 @@ class Arch:
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
+        _load_plugins()
         register_plugins = defaultdict(dict)
         plugins = list(_get_plugins(self))
         for plugin in plugins:
@@ -120,7 +146,7 @@ class Arch:
         return [r.name for r in self.register_list if r.persistent]
 
     @cached_property
-    def artificial_registers(self):
+    def artificial_registers(self) -> Set[RegisterName]:
         return {r.name for r in self.register_list if r.artificial}
 
     def copy(self):
@@ -154,7 +180,7 @@ class Arch:
     def __setstate__(self, data):
         self.__dict__.update(data)
 
-    def get_register_by_name(self, reg_name):
+    def get_register_by_name(self, reg_name) -> Optional[Register]:
         """
         Return the Register object associated with the given name.
         This includes subregisters.
@@ -222,7 +248,7 @@ class Arch:
         return fmt_end + fmt_size
 
     # e.g. sizeof['int'] = 32
-    sizeof = {}
+    sizeof: Dict[str, int] = {}
 
     def translate_dynamic_tag(self, tag):
         try:
@@ -232,7 +258,7 @@ class Arch:
                 log.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
             return tag
 
-    def translate_symbol_type(self, tag):
+    def translate_symbol_type(self, tag) -> Union[str, int]:
         try:
             return self.symbol_type_translation[tag]
         except KeyError:
@@ -296,67 +322,57 @@ class Arch:
         """
         return False
 
-    address_types = (int,)
-    function_address_types = (int,)
+    address_types: Tuple[type, ...] = (int,)
+    function_address_types: Tuple[type, ...] = (int,)
 
     # various names
     name: str
-    qemu_name = None
-    ida_processor = None
-    linux_name = None
-    triplet = None
+    qemu_name: Optional[str] = None
+    ida_processor: Optional[str] = None
+    linux_name: Optional[str] = None
+    triplet: Optional[str] = None
 
     # instruction stuff
-    instruction_endness = "Iend_LE"
-    max_inst_bytes = None
-    ret_instruction = b""
-    nop_instruction = b""
-    instruction_alignment = None
+    instruction_endness: str = Endness.LE
+    max_inst_bytes: Optional[int] = None
+    ret_instruction: bytes = b""
+    nop_instruction: bytes = b""
+    instruction_alignment: Optional[int] = None
 
     # memory stuff
-    byte_width = 8
-    bits = None
-    memory_endness = Endness.LE
-    register_endness = Endness.LE
-    stack_change = None
-    word_instructions = False
+    byte_width: int = 8
+    bits: int
+    memory_endness: str = Endness.LE
+    register_endness: str = Endness.LE
+    stack_change: Optional[int] = None
+    word_instructions: bool = False
 
-    branch_delay_slot = False
+    branch_delay_slot: bool = False
 
-    function_prologs = set()
-    function_epilogs = set()
+    function_prologs: Set[bytes] = set()
+    function_epilogs: Set[bytes] = set()
 
-    call_pushes_ret = False
-    initial_sp = 0x7FFF0000
+    call_pushes_ret: bool = False
+    initial_sp: int = 0x7FFF0000
 
     # Difference of the stack pointer after a call instruction (or its equivalent) is executed
-    call_sp_fix = 0
+    call_sp_fix: int = 0
 
-    stack_size = 0x8000000
+    stack_size: int = 0x8000000
 
     # Register information
     register_list: List[Register] = []
-    concretize_unique_registers = (
-        set()
-    )  # this is a list of registers that should be concretized, if unique, at the end of each block
 
-    lib_paths = []
-    reloc_s_a = []
-    reloc_b_a = []
-    reloc_s = []
-    reloc_copy = []
-    reloc_tls_mod_id = []
-    reloc_tls_doffset = []
-    reloc_tls_offset = []
-    dynamic_tag_translation = {}
-    symbol_type_translation = {}
-    got_section_name = ""
-    elf_tls: TLSArchInfo = None
+    lib_paths: List[str] = []
+    dynamic_tag_translation: Dict[Union[str, int], str] = {}
+    symbol_type_translation: Dict[Union[str, int], str] = {}
+    got_section_name: str = ""
+    elf_tls: Optional[TLSArchInfo] = None
 
 
 arch_id_map = []
 
-_all_arches = []
+_all_arches: List[Type[Arch]] = []
 
 
 def all_arches():

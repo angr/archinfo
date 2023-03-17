@@ -2,7 +2,7 @@ from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
 
-class ArchMIPS64(Arch):
+class ArchMIPS64(Arch[int, int]):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
