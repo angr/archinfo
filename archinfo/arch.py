@@ -175,11 +175,14 @@ class Arch:
     :ivar str ld_linux_name: The name of the linux dynamic loader program
     :cvar int byte_width: the number of bits in a byte.
     :ivar TLSArchInfo elf_tls: A description of how thread-local storage works
+    :cvar List[str] dwarf_registers: A list of register names in the order specified in the DWARF specification of the
+                                     corresponding arcitecture.
     """
 
     byte_width = 8
     instruction_endness = "Iend_BE"
     elf_tls: TLSArchInfo = None
+    dwarf_registers: List[str] = [ ]
 
     def __init__(self, endness, instruction_endness=None):
         self.bytes = self.bits // self.byte_width
