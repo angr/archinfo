@@ -514,6 +514,25 @@ class ArchARMCortexM(ArchARMEL):
     uc_mode = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_mode_thumb = _unicorn.UC_MODE_THUMB + _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
 
+    dwarf_registers = [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11",
+        "r12",
+        "sp",
+        "lr",
+        "pc",
+    ]
+
     @property
     def capstone_thumb(self):
         return self.capstone
