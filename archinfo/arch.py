@@ -182,7 +182,7 @@ class Arch:
     byte_width = 8
     instruction_endness = "Iend_BE"
     elf_tls: TLSArchInfo = None
-    dwarf_registers: List[str] = [ ]
+    dwarf_registers: List[str] = []
 
     def __init__(self, endness, instruction_endness=None):
         self.bytes = self.bits // self.byte_width
