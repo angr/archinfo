@@ -58,14 +58,22 @@ class ArchRISCV64(Arch):
     instruction_alignment = 4
     register_list = [
         Register(name="x0", size=8, alias_names=("zero",)),
-        Register(name="x1", size=8, alias_names=("ra","lr",), general_purpose=True),
+        Register(
+            name="x1",
+            size=8,
+            alias_names=(
+                "ra",
+                "lr",
+            ),
+            general_purpose=True,
+        ),
         Register(name="x2", size=8, alias_names=("sp",), general_purpose=True),
         Register(name="x3", size=8, alias_names=("gp",), general_purpose=True),
         Register(name="x4", size=8, alias_names=("tp",), general_purpose=True),
         Register(name="x5", size=8, alias_names=("t0",), general_purpose=True),
         Register(name="x6", size=8, alias_names=("t1",), general_purpose=True),
         Register(name="x7", size=8, alias_names=("t2",), general_purpose=True),
-        Register(name="x8", size=8, alias_names=("s0","fp","bp"), general_purpose=True),
+        Register(name="x8", size=8, alias_names=("s0", "fp", "bp"), general_purpose=True),
         Register(name="x9", size=8, alias_names=("s1",), general_purpose=True),
         Register(name="x10", size=8, alias_names=("a0",), general_purpose=True, argument=True),
         Register(name="x11", size=8, alias_names=("a1",), general_purpose=True, argument=True),
@@ -90,7 +98,12 @@ class ArchRISCV64(Arch):
         Register(name="x30", size=8, alias_names=("t5",), general_purpose=True),
         Register(name="x31", size=8, alias_names=("t6",), general_purpose=True),
         Register(name="pc", size=8, alias_names=("ip",)),
-        Register(name="f0", size=8, alias_names=("ft0",), floating_point=True,),
+        Register(
+            name="f0",
+            size=8,
+            alias_names=("ft0",),
+            floating_point=True,
+        ),
         Register(name="f1", size=8, alias_names=("ft1",), floating_point=True),
         Register(name="f2", size=8, alias_names=("ft2",), floating_point=True),
         Register(name="f3", size=8, alias_names=("ft3",), floating_point=True),
