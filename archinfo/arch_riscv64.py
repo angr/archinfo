@@ -40,7 +40,7 @@ class ArchRISCV64(Arch):
     register_endness = Endness.LE
     instruction_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
-    if _capstone:
+    if _capstone and hasattr(_capstone, "CS_ARCH_RISCV"):
         cs_arch = _capstone.CS_ARCH_RISCV
         cs_mode = _capstone.CS_MODE_RISCV64
     # if _keystone:
