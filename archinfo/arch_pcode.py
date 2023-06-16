@@ -58,8 +58,8 @@ class ArchPcode(Arch):
             log.warning("Unknown program counter register offset?")
             pc_offset = 0x80000000
 
-        # Get stack pointer register
         sp_offset = None
+        ret_offset = None
         if len(language.cspecs):
 
             def find_matching_cid(language, desired):
@@ -72,6 +72,8 @@ class ArchPcode(Arch):
                 find_matching_cid(language, "default") or find_matching_cid(language, "gcc") or list(language.cspecs)[0]
             )
             cspec = language.cspecs[cspec_id]
+
+            # Get stack pointer register
             sp_tag = cspec.find("stackpointer")
             if sp_tag is not None:
                 sp_reg = sp_tag.attrib.get("register", None)
@@ -84,6 +86,18 @@ class ArchPcode(Arch):
                             del archinfo_regs["sp"]
                         archinfo_regs[sp_reg.lower()].alias_names += ("sp",)
 
+            # Get return offset
+            proto_tags = cspec.find("default_proto")
+            if proto_tags is not None and len(proto_tags) >= 1:
+                proto_tag = proto_tags[0]
+                output_tags = proto_tag.find("output")
+                if output_tags is not None and len(output_tags) >= 1:
+                    output_tag = output_tags[0]
+                    output_register_tag = output_tag.find("register")
+                    if output_register_tag is not None:
+                        output_reg = output_register_tag.attrib["name"]
+                        ret_offset = ctx.registers[output_reg].offset
+
         if sp_offset is None:
             log.warning("Unknown stack pointer register offset?")
             sp_offset = 0x80000008
@@ -92,6 +106,7 @@ class ArchPcode(Arch):
         self.ip_offset = pc_offset
         self.sp_offset = sp_offset
         self.bp_offset = sp_offset
+        self.ret_offset = ret_offset
         self.register_list = list(archinfo_regs.values())
         self.initial_sp = (0x8000 << (self.bits - 16)) - 1
         self.linux_name = ""  # FIXME
