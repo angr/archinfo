@@ -363,7 +363,11 @@ class Arch:
         on an ARM platform.
         """
         for r in self.register_list:
-            if reg_name == r.name or reg_name in r.alias_names:
+            if (
+                reg_name == r.name
+                or reg_name in r.alias_names
+                or reg_name in [sub_reg[0] for sub_reg in r.subregisters]
+            ):
                 return r
         return None
 
