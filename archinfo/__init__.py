@@ -4,7 +4,7 @@ archinfo is a collection of classes that contain architecture-specific informati
 It is useful for cross-architecture tools (such as pyvex).
 """
 
-__version__ = "9.2.58.dev0"
+__version__ = "9.2.59.dev0"
 
 
 from .types import RegisterOffset, TmpVar, RegisterName
