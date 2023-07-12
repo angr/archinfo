@@ -112,6 +112,14 @@ class ArchPcode(Arch):
         self.linux_name = ""  # FIXME
         self.triplet = ""  # FIXME
 
+        # TODO: Replace the following hardcoded function prologues by data sourced from patterns.xml
+        if "PowerPC:BE" in self.name:
+            self.function_prologs = [
+                # stwu  r1, xx(r1); mfspr rx, lr
+                b"\x94\x21[\xc0-\xff][\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xa0\xb0\xc0\xd0\xe0\xf0]"
+                b"[\x7c-\x7f][\x08\x28\x48\x68\x88\xa8\xc8\xe8]\x02\xa6",
+            ]
+
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
 
     @staticmethod
