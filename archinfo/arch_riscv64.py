@@ -18,6 +18,10 @@ except ImportError:
     _unicorn = None
 
 
+def is_riscv_arch(a):
+    return a.name.startswith("RISCV")
+
+
 class ArchRISCV64(Arch):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
