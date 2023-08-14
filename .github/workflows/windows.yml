@@ -21,7 +21,7 @@ jobs:
         shell: bash
       - run: |
           call %USERPROFILE%\venv\Scripts\activate
-          pip install --no-build-isolation .[testing]
+          pip install .[testing]
         name: Install
         shell: cmd
       - run: |
