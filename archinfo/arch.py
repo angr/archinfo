@@ -214,7 +214,7 @@ class Arch:
             (_, _), max_offset = max(_pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
             max_offset += self.bits
             # Register collections
-            if type(self.vex_arch) is str:
+            if isinstance(self.vex_arch, str):
                 va = self.vex_arch[7:].lower()  # pylint: disable=unsubscriptable-object
                 for r in self.register_list:
                     if r.vex_offset is None:
