@@ -746,7 +746,7 @@ class Arch:
     artificial_registers_offsets = None
     artificial_registers: Set[RegisterName]
     cpu_flag_register_offsets_and_bitmasks_map: Dict
-    reg_blacklist: List[str]
+    reg_blacklist: List[str] = []
     reg_blacklist_offsets: List[RegisterOffset]
     vex_to_unicorn_map = None
     vex_cc_regs = None
