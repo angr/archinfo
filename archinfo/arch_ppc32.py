@@ -1,3 +1,4 @@
+from archinfo.types import RegisterOffset
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
@@ -59,7 +60,7 @@ class ArchPPC32(Arch):
     max_inst_bytes = 4
     # https://www.ibm.com/developerworks/community/forums/html/topic?id=77777777-0000-0000-0000-000013836863
     # claims that r15 is the base pointer but that is NOT what I see in practice
-    ret_offset = 28
+    ret_offset = RegisterOffset(28)
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
@@ -318,5 +319,5 @@ class ArchPPC32(Arch):
     ]
 
 
-register_arch([r".*p\w*pc.*be"], 32, "Iend_BE", ArchPPC32)
-register_arch([r".*p\w*pc.*"], 32, "any", ArchPPC32)
+register_arch([r".*p\w*pc.*be"], 32, Endness.BE, ArchPPC32)
+register_arch([r".*p\w*pc.*"], 32, Endness.ANY, ArchPPC32)

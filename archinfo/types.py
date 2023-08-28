@@ -1,6 +1,13 @@
 from typing import NewType
 
-RegisterOffset = NewType("RegisterOffset", int)
+
+class RegisterOffset(int):
+    def __add__(self, other):
+        if isinstance(other, int):
+            return RegisterOffset(self + other)
+        return NotImplemented
+
+
 TmpVar = NewType("TmpVar", int)
 
 # This causes too much issues as a NewType, sot is a simple alias instead

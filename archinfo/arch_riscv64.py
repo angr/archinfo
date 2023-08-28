@@ -1,3 +1,4 @@
+from archinfo.types import RegisterOffset
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
@@ -36,7 +37,7 @@ class ArchRISCV64(Arch):
     linux_name = "riscv64"
     triplet = "riscv64-linux-gnu"
     max_inst_bytes = 4
-    ret_offset = 4
+    ret_offset = RegisterOffset(4)
     vex_conditional_helpers = True
     syscall_num_offset = 132
     call_pushes_ret = False
@@ -147,4 +148,4 @@ class ArchRISCV64(Arch):
     elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
 
 
-register_arch([r".*riscv.*"], 64, "any", ArchRISCV64)
+register_arch([r".*riscv.*"], 64, Endness.ANY, ArchRISCV64)

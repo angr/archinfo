@@ -1,3 +1,4 @@
+from archinfo.types import RegisterOffset
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 from .archerror import ArchError
@@ -23,14 +24,14 @@ except ImportError:
     _pyvex = None
 
 
-_NATIVE_FUNCTION_PROLOGS = [
+_NATIVE_FUNCTION_PROLOGS = {
     rb"\x55\x48\x89\xe5",  # push rbp; mov rbp, rsp
     rb"\x48[\x83,\x81]\xec[\x00-\xff]",  # sub rsp, xxx
-]
+}
 # every function prolog can potentially be prefixed with endbr64
 _endbr64 = b"\xf3\x0f\x1e\xfa"
-_prefixed = [(_endbr64 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
-_FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
+_prefixed = {(_endbr64 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS}
+_FUNCTION_PROLOGS = _prefixed | _NATIVE_FUNCTION_PROLOGS
 
 
 class ArchAMD64(Arch):
@@ -148,7 +149,7 @@ class ArchAMD64(Arch):
     linux_name = "x86_64"
     triplet = "x86_64-linux-gnu"
     max_inst_bytes = 15
-    ret_offset = 16
+    ret_offset = RegisterOffset(16)
     vex_conditional_helpers = True
     syscall_num_offset = 16
     call_pushes_ret = True

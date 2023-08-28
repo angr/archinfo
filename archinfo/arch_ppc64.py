@@ -1,3 +1,4 @@
+from archinfo.types import RegisterOffset
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
@@ -83,7 +84,7 @@ class ArchPPC64(Arch):
     triplet = "powerpc64le-linux-gnu"
     linux_name = "ppc750"
     max_inst_bytes = 4
-    ret_offset = 40
+    ret_offset = RegisterOffset(40)
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -8
@@ -394,5 +395,5 @@ class ArchPPC64(Arch):
     ]
 
 
-register_arch([r".*p\w*pc.*be"], 64, "Iend_BE", ArchPPC64)
-register_arch([r".*p\w*pc.*"], 64, "any", ArchPPC64)
+register_arch([r".*p\w*pc.*be"], 64, Endness.BE, ArchPPC64)
+register_arch([r".*p\w*pc.*"], 64, Endness.ANY, ArchPPC64)

@@ -332,8 +332,8 @@ class ArchSoot(Arch):
     vex_arch = None  # No VEX support
     qemu_name = None  # No Qemu/Unicorn-engine support
     bits = 64
-    address_types = (SootAddressDescriptor,)
-    function_address_types = (SootMethodDescriptor,)
+    address_types = [SootAddressDescriptor]
+    function_address_types = [SootMethodDescriptor]
 
     # Size of native counterparts of primitive Java types
     sizeof = {"boolean": 8, "byte": 8, "char": 16, "short": 16, "int": 32, "long": 64, "float": 32, "double": 64}

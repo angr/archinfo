@@ -1,3 +1,4 @@
+from archinfo.types import RegisterOffset
 from .arch import Arch, register_arch, Endness, Register
 from .tls import TLSArchInfo
 
@@ -43,7 +44,7 @@ class ArchMIPS32(Arch):
     linux_name = "mipsel"  # ???
     triplet = "mipsel-linux-gnu"
     max_inst_bytes = 4
-    ret_offset = 16
+    ret_offset = RegisterOffset(16)
     syscall_num_offset = 16
     call_pushes_ret = False
     stack_change = -4
@@ -280,4 +281,4 @@ class ArchMIPS32(Arch):
 
 
 register_arch([r"mipsel|mipsle"], 32, Endness.LE, ArchMIPS32)
-register_arch([r".*mips.*"], 32, "any", ArchMIPS32)
+register_arch([r".*mips.*"], 32, Endness.ANY, ArchMIPS32)
