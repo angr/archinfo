@@ -747,7 +747,7 @@ class Arch:
     artificial_registers: Set[RegisterName]
     cpu_flag_register_offsets_and_bitmasks_map: Dict
     reg_blacklist: List[str] = []
-    reg_blacklist_offsets: List[RegisterOffset]
+    reg_blacklist_offsets: List[RegisterOffset] = []
     vex_to_unicorn_map = None
     vex_cc_regs = None
 
@@ -833,11 +833,10 @@ def register_arch(regexes: List[str], bits: int, endness: Endness, my_arch: Type
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if endness is not None:
-        if endness not in (Endness.BE, Endness.LE, Endness.ME, "any"):
-            print(endness)
+        if endness not in (Endness.BE, Endness.LE, Endness.ME, Endness.ANY):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
-    if endness == "any":
+    if endness == Endness.ANY:
         _append_arch_unique(my_arch(Endness.BE))
         _append_arch_unique(my_arch(Endness.LE))
     else:
