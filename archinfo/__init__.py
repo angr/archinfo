@@ -7,9 +7,8 @@ It is useful for cross-architecture tools (such as pyvex).
 __version__ = "9.2.72.dev0"
 
 
-from .types import RegisterOffset, TmpVar, RegisterName
+from .types import RegisterOffset, TmpVar, RegisterName, Endness
 from .arch import (
-    Endness,
     Register,
     Arch,
     register_arch,
