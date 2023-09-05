@@ -21,6 +21,7 @@ TmpVar = NewType("TmpVar", int)
 # The downside is that PyCharm will show the type as `str` when displaying the signature
 RegisterName = str
 
+
 class Endness(StrEnum):
     """Endness specifies the byte order for integer values
 

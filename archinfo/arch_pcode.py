@@ -8,6 +8,7 @@ from .types import RegisterOffset
 
 try:
     import pypcode
+
     _has_pypcode = True
 except ImportError:
     _has_pypcode = False
