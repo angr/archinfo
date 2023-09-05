@@ -3,11 +3,11 @@ from typing import Dict, List, Tuple, Optional, Type, Any, Set, Union
 import struct as _struct
 import platform as _platform
 import re
-from enum import Enum
 
 from archinfo.types import RegisterOffset, RegisterName
 from .archerror import ArchError
 from .tls import TLSArchInfo
+from .types import Endness
 
 import copy
 
@@ -33,21 +33,6 @@ try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
-
-
-class Endness(Enum):
-    """Endness specifies the byte order for integer values
-
-    :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address
-    :cvar ME:      Middle-endian. Yep.
-    """
-
-    LE = "Iend_LE"
-    BE = "Iend_BE"
-    ME = "Iend_ME"
-    ANY = "any"
-    UNSURE = "unsure"
 
 
 class Register:
@@ -685,8 +670,8 @@ class Arch:
 
         return self.ks_arch is not None
 
-    address_types: List[type] = [int]
-    function_address_types: List[type] = [int]
+    address_types: Tuple[type, ...] = (int,)
+    function_address_types: Tuple[type, ...] = (int,)
 
     # various names
     name: str
@@ -894,7 +879,7 @@ def arch_from_id(ident: str, endness=Endness.ANY, bits="") -> Arch:
             continue
         if bits and bits != abits:
             continue
-        if aendness in (Endness.ANY, Endness.UNSURE, endness):
+        if aendness == Endness.ANY or endness == aendness or endness == Endness.UNSURE:
             cls = acls
             break
     if not cls:
