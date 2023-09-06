@@ -685,7 +685,7 @@ class Arch:
     max_inst_bytes: int
     ret_instruction = b""
     nop_instruction = b""
-    instruction_alignment: int
+    instruction_alignment: Optional[int] = None
 
     # register offsets
     ip_offset: Optional[RegisterOffset] = None
