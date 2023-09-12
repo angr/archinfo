@@ -31,6 +31,7 @@ class ArchMIPS64(Arch):
     bits = 64
     vex_arch = "VexArchMIPS64"
     name = "MIPS64"
+    default_endness = Endness.BE
     qemu_name = "mips64el"
     ida_processor = "mips64"
     linux_name = "mips64el"  # ???

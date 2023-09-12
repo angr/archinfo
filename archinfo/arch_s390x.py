@@ -44,6 +44,7 @@ class ArchS390X(Arch):
     bits = 64
     vex_arch = "VexArchS390X"  # enum VexArch
     name = "S390X"
+    default_endness = Endness.BE
     qemu_name = "s390x"  # target/s390x
     triplet = "s390x-linux-gnu"
     linux_name = "s390"  # arch/s390

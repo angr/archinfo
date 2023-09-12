@@ -701,6 +701,7 @@ class Arch:
     # memory stuff
     bits: int
     memory_endness = Endness.LE
+    default_endness = Endness.LE
     register_endness = Endness.LE
     stack_change: int
 
@@ -889,7 +890,7 @@ def arch_from_id(ident: str, endness=Endness.ANY, bits="") -> Arch:
     if endness == Endness.UNSURE:
         if aendness == Endness.ANY:
             # We really don't care, use default
-            return cls(cls.memory_endness)
+            return cls(cls.default_endness)
         else:
             # We're expecting the ident to pick the endness.
             # ex. 'armeb' means obviously this is Iend_BE
