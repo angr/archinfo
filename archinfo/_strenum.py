@@ -4,7 +4,7 @@ It is licensed under the Python Software Foundation License Version 2.
 
 This file should be replaced with backports.strenum once its packaging issues
 are resolved. See here: https://github.com/clbarnes/backports.strenum/issues/9
-Alternatively, if archifo is sooner updated to Python 3.11, this file can be
+Alternatively, if archinfo is sooner updated to Python 3.11, this file can be
 removed and replaced with the standard library version.
 """
 import sys
