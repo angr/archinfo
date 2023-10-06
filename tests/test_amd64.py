@@ -1,7 +1,7 @@
 import unittest
 
-from archinfo.arch import Endness
 from archinfo import ArchAMD64, ArchError
+from archinfo.arch import Endness
 
 
 class TestAmd64(unittest.TestCase):

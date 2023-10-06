@@ -1,15 +1,15 @@
+import copy
 import logging
-from typing import Dict, List, Tuple, Optional, Type, Any, Set, Union
-import struct as _struct
 import platform as _platform
 import re
+import struct as _struct
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
-from archinfo.types import RegisterOffset, RegisterName
+from archinfo.types import RegisterName, RegisterOffset
+
 from .archerror import ArchError
 from .tls import TLSArchInfo
 from .types import Endness
-
-import copy
 
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())

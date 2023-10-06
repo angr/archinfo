@@ -1,4 +1,4 @@
-from .arch import Arch, register_arch, Endness, Register
+from .arch import Arch, Endness, Register, register_arch
 from .tls import TLSArchInfo
 
 try:

@@ -8,6 +8,10 @@ else:
 
 
 class RegisterOffset(int):
+    """A register offset is an integer that represents the offset of a register
+    in VEX's register memory space.
+    """
+
     def __add__(self, other):
         if isinstance(other, int):
             return RegisterOffset(int(self) + other)

@@ -1,7 +1,8 @@
 from archinfo.types import RegisterOffset
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
+
+from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
+from .tls import TLSArchInfo
 
 try:
     import capstone as _capstone

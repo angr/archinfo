@@ -1,14 +1,14 @@
 # pylint:disable=missing-class-docstring,no-self-use
-import unittest
 import pickle
+import unittest
 
 try:
     import pypcode
 except ImportError:
     pypcode = None
 
+from archinfo import ArchError, ArchPcode
 from archinfo.arch import Endness
-from archinfo import ArchPcode, ArchError
 
 
 @unittest.skipUnless(pypcode is not None, "pypcode not installed")

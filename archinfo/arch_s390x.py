@@ -14,7 +14,8 @@ except ImportError:
     _pyvex = None
 
 from archinfo.types import RegisterOffset
-from .arch import Arch, register_arch, Endness, Register
+
+from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
 from .tls import TLSArchInfo
 
