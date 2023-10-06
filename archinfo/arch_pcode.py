@@ -1,17 +1,20 @@
 import logging
 from typing import Union
 
+from .arch import Arch, Endness, Register
+from .archerror import ArchError
+from .tls import TLSArchInfo
+from .types import RegisterOffset
+
 try:
     import pypcode
+
+    _has_pypcode = True
 except ImportError:
-    pypcode = None
-
-from .arch import Arch, Endness, Register
-from .tls import TLSArchInfo
-from .archerror import ArchError
+    _has_pypcode = False
 
 
-log = logging.getLogger("__name__")
+log = logging.getLogger(__name__)
 
 
 class ArchPcode(Arch):
@@ -21,11 +24,13 @@ class ArchPcode(Arch):
     """
 
     def __init__(self, language: Union["pypcode.ArchLanguage", str]):
-        if pypcode is None:
+        if not _has_pypcode:
             raise ArchError("pypcode not installed")
 
         if isinstance(language, str):
             language = self._get_language_by_id(language)
+
+        assert isinstance(language, pypcode.ArchLanguage)
 
         self.name = language.id
         self.pcode_arch = language.id
@@ -42,7 +47,7 @@ class ArchPcode(Arch):
 
         # Get program counter register
         pc_offset = None
-        pc_tag = language.pspec.find("programcounter")
+        pc_tag = language.pspec.find("programcounter") if language.pspec is not None else None
         if pc_tag is not None:
             pc_reg = pc_tag.attrib.get("register", None)
             if pc_reg is not None:
@@ -59,7 +64,7 @@ class ArchPcode(Arch):
             pc_offset = 0x80000000
 
         sp_offset = None
-        ret_offset = None
+        ret_offset = RegisterOffset(0)
         if len(language.cspecs):
 
             def find_matching_cid(language, desired):
@@ -96,17 +101,17 @@ class ArchPcode(Arch):
                     output_register_tag = output_tag.find("register")
                     if output_register_tag is not None:
                         output_reg = output_register_tag.attrib["name"]
-                        ret_offset = ctx.registers[output_reg].offset
+                        ret_offset = RegisterOffset(ctx.registers[output_reg].offset)
 
         if sp_offset is None:
             log.warning("Unknown stack pointer register offset?")
             sp_offset = 0x80000008
 
         self.instruction_alignment = 1
-        self.ip_offset = pc_offset
-        self.sp_offset = sp_offset
-        self.bp_offset = sp_offset
-        self.ret_offset = ret_offset
+        self.ip_offset = RegisterOffset(pc_offset)
+        self.sp_offset = RegisterOffset(sp_offset)
+        self.bp_offset = RegisterOffset(sp_offset)
+        self.ret_offset = RegisterOffset(ret_offset)
         self.register_list = list(archinfo_regs.values())
         self.initial_sp = (0x8000 << (self.bits - 16)) - 1
         self.linux_name = ""  # FIXME
@@ -114,16 +119,18 @@ class ArchPcode(Arch):
 
         # TODO: Replace the following hardcoded function prologues by data sourced from patterns.xml
         if "PowerPC:BE" in self.name:
-            self.function_prologs = [
+            self.function_prologs = {
                 # stwu  r1, xx(r1); mfspr rx, lr
                 b"\x94\x21[\xc0-\xff][\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xa0\xb0\xc0\xd0\xe0\xf0]"
                 b"[\x7c-\x7f][\x08\x28\x48\x68\x88\xa8\xc8\xe8]\x02\xa6",
-            ]
+            }
 
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
 
     @staticmethod
     def _get_language_by_id(lang_id) -> "pypcode.ArchLanguage":
+        if not _has_pypcode:
+            raise ArchError("pypcode not installed")
         for arch in pypcode.Arch.enumerate():
             for lang in arch.languages:
                 if lang.id == lang_id:

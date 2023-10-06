@@ -13,7 +13,9 @@ try:
 except ImportError:
     _pyvex = None
 
-from .arch import Arch, register_arch, Endness, Register
+from archinfo.types import RegisterOffset
+
+from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
 from .tls import TLSArchInfo
 
@@ -43,11 +45,12 @@ class ArchS390X(Arch):
     bits = 64
     vex_arch = "VexArchS390X"  # enum VexArch
     name = "S390X"
+    default_endness = Endness.BE
     qemu_name = "s390x"  # target/s390x
     triplet = "s390x-linux-gnu"
     linux_name = "s390"  # arch/s390
     max_inst_bytes = 6
-    ret_offset = 584  # offsetof(VexGuestS390XState, guest_r2)
+    ret_offset = RegisterOffset(584)  # offsetof(VexGuestS390XState, guest_r2)
     syscall_num_offset = 576  # offsetof(VexGuestS390XState, guest_r1)
     call_pushes_ret = False
     stack_change = -8

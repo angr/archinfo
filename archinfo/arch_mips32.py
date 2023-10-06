@@ -1,4 +1,4 @@
-from .arch import Arch, register_arch, Endness, Register
+from .arch import Arch, Endness, Register, register_arch
 from .tls import TLSArchInfo
 
 try:
@@ -38,6 +38,7 @@ class ArchMIPS32(Arch):
     bits = 32
     vex_arch = "VexArchMIPS32"
     name = "MIPS32"
+    default_endness = Endness.BE
     ida_processor = "mipsb"
     qemu_name = "mipsel"
     linux_name = "mipsel"  # ???

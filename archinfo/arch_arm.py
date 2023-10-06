@@ -1,6 +1,8 @@
 import logging
 
-from .arch import Arch, register_arch, Endness, Register
+from archinfo.types import RegisterOffset
+
+from .arch import Arch, Endness, Register, register_arch
 from .tls import TLSArchInfo
 
 log = logging.getLogger("archinfo.arch_arm")
@@ -178,8 +180,8 @@ class ArchARM(Arch):
     linux_name = "arm"
     triplet = "arm-linux-gnueabihf"
     max_inst_bytes = 4
-    ret_offset = 8
-    fp_ret_offset = 8
+    ret_offset = RegisterOffset(8)
+    fp_ret_offset = RegisterOffset(8)
     vex_conditional_helpers = True
     syscall_num_offset = 36
     call_pushes_ret = False
@@ -341,7 +343,7 @@ class ArchARMHF(ArchARM):
     name = "ARMHF"
     triplet = "arm-linux-gnueabihf"
     ld_linux_name = "ld-linux-armhf.so.3"
-    fp_ret_offset = 128  # s0
+    fp_ret_offset = RegisterOffset(128)  # s0
 
 
 class ArchARMEL(ArchARM):
@@ -388,7 +390,7 @@ class ArchARMCortexM(ArchARMEL):
 
     # These are the standard THUMB prologs.  We leave these off for other ARMs due to their length
     # For CM, we assume the FPs are OK, as they are almost guaranteed to appear all over the place
-    function_prologs = {}
+    function_prologs = set()
 
     thumb_prologs = {rb"[\x00-\xff]\xb5", rb"\x2d\xe9[\x00-\xff][\x00-\xff]"}  # push {xxx,lr}  # push.w {xxx, lr}
     function_epilogs = {
@@ -549,8 +551,8 @@ class ArchARMCortexM(ArchARMEL):
     # TODO: Add.... the NVIC? to SimOS
 
 
-register_arch([r".*cortexm|.*cortex\-m.*|.*v7\-m.*"], 32, "any", ArchARMCortexM)
-register_arch([r".*armhf.*"], 32, "any", ArchARMHF)
+register_arch([r".*cortexm|.*cortex\-m.*|.*v7\-m.*"], 32, Endness.ANY, ArchARMCortexM)
+register_arch([r".*armhf.*"], 32, Endness.ANY, ArchARMHF)
 register_arch([r".*armeb|.*armbe"], 32, Endness.BE, ArchARM)
 register_arch([r".*armel|arm.*"], 32, Endness.LE, ArchARMEL)
-register_arch([r".*arm.*|.*thumb.*"], 32, "any", ArchARM)
+register_arch([r".*arm.*|.*thumb.*"], 32, Endness.ANY, ArchARM)

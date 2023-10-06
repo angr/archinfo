@@ -1,4 +1,6 @@
-from .arch import Arch, register_arch, Endness, Register
+from archinfo.types import RegisterOffset
+
+from .arch import Arch, Endness, Register, register_arch
 from .tls import TLSArchInfo
 
 try:
@@ -33,7 +35,7 @@ class ArchAArch64(Arch):
     linux_name = "aarch64"
     triplet = "aarch64-linux-gnueabihf"
     max_inst_bytes = 4
-    ret_offset = 16
+    ret_offset = RegisterOffset(16)
     vex_conditional_helpers = True
     syscall_num_offset = 80
     call_pushes_ret = False
@@ -56,8 +58,6 @@ class ArchAArch64(Arch):
 
     ret_instruction = b"\xC0\x03\x5F\xD6"  # ret
     nop_instruction = b"\x1F\x20\x03\xD5"  # nop
-    function_prologs = set()
-    function_epilogs = set()
     instruction_alignment = 4
     register_list = [
         Register(
@@ -527,4 +527,4 @@ class ArchAArch64(Arch):
     ]
 
 
-register_arch([r".*arm64.*|.*aarch64*"], 64, "any", ArchAArch64)
+register_arch([r".*arm64.*|.*aarch64*"], 64, Endness.ANY, ArchAArch64)

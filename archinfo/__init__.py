@@ -7,64 +7,62 @@ It is useful for cross-architecture tools (such as pyvex).
 __version__ = "9.2.72.dev0"
 
 
-from .types import RegisterOffset, TmpVar, RegisterName
 from .arch import (
-    Endness,
-    Register,
     Arch,
-    register_arch,
     ArchNotFound,
-    arch_from_id,
-    reverse_ends,
-    get_host_arch,
+    Register,
     all_arches,
+    arch_from_id,
+    get_host_arch,
+    register_arch,
+    reverse_ends,
 )
-from .defines import defines
-from .arch_amd64 import ArchAMD64
-from .arch_x86 import ArchX86
-from .arch_arm import ArchARM, ArchARMEL, ArchARMHF, ArchARMCortexM
 from .arch_aarch64 import ArchAArch64
+from .arch_amd64 import ArchAMD64
+from .arch_arm import ArchARM, ArchARMCortexM, ArchARMEL, ArchARMHF
 from .arch_avr import ArchAVR8
-from .arch_ppc32 import ArchPPC32
-from .arch_ppc64 import ArchPPC64
 from .arch_mips32 import ArchMIPS32
 from .arch_mips64 import ArchMIPS64
-from .arch_soot import ArchSoot
-from .archerror import ArchError
-from .arch_s390x import ArchS390X
 from .arch_pcode import ArchPcode
+from .arch_ppc32 import ArchPPC32
+from .arch_ppc64 import ArchPPC64
 from .arch_riscv64 import ArchRISCV64
-
+from .arch_s390x import ArchS390X
+from .arch_soot import ArchSoot
+from .arch_x86 import ArchX86
+from .archerror import ArchError
+from .defines import defines
+from .types import Endness, RegisterName, RegisterOffset, TmpVar
 
 __all__ = [
-    "RegisterOffset",
-    "TmpVar",
-    "RegisterName",
-    "Endness",
-    "Register",
     "Arch",
-    "register_arch",
-    "ArchNotFound",
-    "arch_from_id",
-    "reverse_ends",
-    "get_host_arch",
-    "all_arches",
-    "defines",
+    "ArchAArch64",
     "ArchAMD64",
-    "ArchX86",
     "ArchARM",
+    "ArchARMCortexM",
     "ArchARMEL",
     "ArchARMHF",
-    "ArchARMCortexM",
-    "ArchAArch64",
     "ArchAVR8",
-    "ArchPPC32",
-    "ArchPPC64",
+    "ArchError",
     "ArchMIPS32",
     "ArchMIPS64",
-    "ArchSoot",
-    "ArchError",
-    "ArchS390X",
+    "ArchNotFound",
+    "ArchPPC32",
+    "ArchPPC64",
     "ArchPcode",
     "ArchRISCV64",
+    "ArchS390X",
+    "ArchSoot",
+    "ArchX86",
+    "Endness",
+    "Register",
+    "RegisterName",
+    "RegisterOffset",
+    "TmpVar",
+    "all_arches",
+    "arch_from_id",
+    "defines",
+    "get_host_arch",
+    "register_arch",
+    "reverse_ends",
 ]

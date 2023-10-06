@@ -1,6 +1,8 @@
-from .arch import Arch, register_arch, Endness, Register
-from .tls import TLSArchInfo
+from archinfo.types import RegisterOffset
+
+from .arch import Arch, Endness, Register, register_arch
 from .archerror import ArchError
+from .tls import TLSArchInfo
 
 try:
     import capstone as _capstone
@@ -23,7 +25,7 @@ except ImportError:
     _pyvex = None
 
 
-_NATIVE_FUNCTION_PROLOGS = [
+_NATIVE_FUNCTION_PROLOGS = {
     rb"\x8b\xff\x55\x8b\xec",  # mov edi, edi; push ebp; mov ebp, esp
     rb"\x55\x8b\xec",  # push ebp; mov ebp, esp
     rb"\x55\x89\xe5",  # push ebp; mov ebp, esp
@@ -35,11 +37,11 @@ _NATIVE_FUNCTION_PROLOGS = [
     # (push ebp; push eax; push edi; push ebx; push esi; push edx; push ecx) mov xxx, xxx
     rb"[\x50\x51\x52\x53\x55\x56\x57]{1,7}\x8b[\x00-\xff]{2}",
     rb"(\x81|\x83)\xec",  # sub xxx %esp
-]
+}
 # every function prolog can potentially be prefixed with endbr32
 _endbr32 = b"\xf3\x0f\x1e\xfb"
-_prefixed = [(_endbr32 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS]
-_FUNCTION_PROLOGS = _prefixed + _NATIVE_FUNCTION_PROLOGS
+_prefixed = {(_endbr32 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS}
+_FUNCTION_PROLOGS = _prefixed | _NATIVE_FUNCTION_PROLOGS
 
 
 class ArchX86(Arch):
@@ -152,7 +154,7 @@ class ArchX86(Arch):
     triplet = "i386-linux-gnu"
     max_inst_bytes = 15
     call_sp_fix = -4
-    ret_offset = 8
+    ret_offset = RegisterOffset(8)
     vex_conditional_helpers = True
     syscall_num_offset = 8
     call_pushes_ret = True

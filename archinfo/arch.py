@@ -1,14 +1,15 @@
+import copy
 import logging
-from typing import Dict, List, Tuple, Optional
-import struct as _struct
 import platform as _platform
 import re
+import struct as _struct
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
-from archinfo.types import RegisterOffset, RegisterName
+from archinfo.types import RegisterName, RegisterOffset
+
 from .archerror import ArchError
 from .tls import TLSArchInfo
-
-import copy
+from .types import Endness
 
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
@@ -32,19 +33,6 @@ try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
-
-
-class Endness:  # pylint: disable=no-init
-    """Endness specifies the byte order for integer values
-
-    :cvar LE:      little endian, least significant byte is stored at lowest address
-    :cvar BE:      big endian, most significant byte is stored at lowest address
-    :cvar ME:      Middle-endian. Yep.
-    """
-
-    LE = "Iend_LE"
-    BE = "Iend_BE"
-    ME = "Iend_ME"
 
 
 class Register:
@@ -180,8 +168,8 @@ class Arch:
     """
 
     byte_width = 8
-    instruction_endness = "Iend_BE"
-    elf_tls: TLSArchInfo = None
+    instruction_endness = Endness.BE
+    elf_tls: Optional[TLSArchInfo] = None
     dwarf_registers: List[str] = []
 
     def __init__(self, endness, instruction_endness=None):
@@ -425,18 +413,18 @@ class Arch:
 
     def _get_register_dict(self) -> Dict[RegisterName, Tuple[RegisterOffset, int]]:
         res = {}
-        for r in self.register_list:
-            if r.vex_offset is None:
+        for register in self.register_list:
+            if register.vex_offset is None:
                 continue
-            res[r.name] = (r.vex_offset, r.size)
-            for i in r.alias_names:
-                res[i] = (r.vex_offset, r.size)
-            for reg, offset, size in r.subregisters:
-                res[reg] = (r.vex_offset + offset, size)
+            res[register.name] = (register.vex_offset, register.size)
+            for i in register.alias_names:
+                res[i] = (register.vex_offset, register.size)
+            for reg, offset, size in register.subregisters:
+                res[reg] = (register.vex_offset + offset, size)
         return res
 
     # e.g. sizeof['int'] = 32
-    sizeof = {}
+    sizeof: Dict[str, int] = {}
 
     @property
     def capstone(self):
@@ -527,7 +515,7 @@ class Arch:
                 log.error("Please look up and add dynamic tag type %#x for %s", tag, self.name)
             return tag
 
-    def translate_symbol_type(self, tag):
+    def translate_symbol_type(self, tag: Union[str, int]):
         try:
             return self.symbol_type_translation[tag]
         except KeyError:
@@ -682,22 +670,22 @@ class Arch:
 
         return self.ks_arch is not None
 
-    address_types = (int,)
-    function_address_types = (int,)
+    address_types: Tuple[type, ...] = (int,)
+    function_address_types: Tuple[type, ...] = (int,)
 
     # various names
     name: str
-    vex_arch = None
-    qemu_name = None
-    ida_processor = None
-    linux_name = None
-    triplet = None
+    vex_arch: Optional[str] = None
+    qemu_name: Optional[str] = None
+    ida_processor: Optional[str] = None
+    linux_name: Optional[str] = None
+    triplet: Optional[str] = None
 
     # instruction stuff
-    max_inst_bytes = None
+    max_inst_bytes: int
     ret_instruction = b""
     nop_instruction = b""
-    instruction_alignment = None
+    instruction_alignment: Optional[int] = None
 
     # register offsets
     ip_offset: Optional[RegisterOffset] = None
@@ -711,18 +699,19 @@ class Arch:
     vex_conditional_helpers = False
 
     # memory stuff
-    bits = None
+    bits: int
     memory_endness = Endness.LE
+    default_endness = Endness.LE
     register_endness = Endness.LE
-    stack_change = None
+    stack_change: int
 
     # is it safe to cache IRSBs?
     cache_irsb = True
 
     branch_delay_slot = False
 
-    function_prologs = set()
-    function_epilogs = set()
+    function_prologs: Set[bytes] = set()
+    function_epilogs: Set[bytes] = set()
 
     # Capstone stuff
     cs_arch = None
@@ -738,13 +727,13 @@ class Arch:
     uc_arch = None
     uc_mode = None
     uc_const = None
-    uc_prefix = None
+    uc_prefix: Optional[str] = None
     uc_regs = None
     artificial_registers_offsets = None
-    artificial_registers = None
-    cpu_flag_register_offsets_and_bitmasks_map = None
-    reg_blacklist = None
-    reg_blacklist_offsets = None
+    artificial_registers: Set[RegisterName]
+    cpu_flag_register_offsets_and_bitmasks_map: Dict
+    reg_blacklist: List[str] = []
+    reg_blacklist_offsets: List[RegisterOffset] = []
     vex_to_unicorn_map = None
     vex_cc_regs = None
 
@@ -758,28 +747,28 @@ class Arch:
 
     # Register information
     register_list: List[Register] = []
-    default_register_values = []
-    entry_register_values = {}
-    default_symbolic_registers = []
+    default_register_values: List = []
+    entry_register_values: Dict[str, Any] = {}  # I don't know the value type
+    default_symbolic_registers: List[RegisterName] = []
     registers: Dict[RegisterName, Tuple[RegisterOffset, int]] = {}
     register_names: Dict[RegisterOffset, RegisterName] = {}
-    argument_registers = set()
-    argument_register_positions = {}
-    persistent_regs = []
-    concretize_unique_registers = (
-        set()
-    )  # this is a list of registers that should be concretized, if unique, at the end of each block
+    argument_registers: Set[RegisterOffset] = set()
+    argument_register_positions: Dict[RegisterName, int] = {}
+    persistent_regs: List[RegisterName] = []
+    # this is a set of registers that should be concretized, if unique, at the end of each block
+    concretize_unique_registers: Set[RegisterOffset] = set()
 
-    lib_paths = []
-    reloc_s_a = []
-    reloc_b_a = []
-    reloc_s = []
-    reloc_copy = []
-    reloc_tls_mod_id = []
-    reloc_tls_doffset = []
-    reloc_tls_offset = []
-    dynamic_tag_translation = {}
-    symbol_type_translation = {}
+    lib_paths: List[str] = []
+    # TODO: reloc_* are just guesses, couldn't find docs or usage
+    reloc_s_a: List[Any] = []
+    reloc_b_a: List[Any] = []
+    reloc_s: List[Any] = []
+    reloc_copy: List[Any] = []
+    reloc_tls_mod_id: List[Any] = []
+    reloc_tls_doffset: List[Any] = []
+    reloc_tls_offset: List[Any] = []
+    dynamic_tag_translation: Dict[int, str] = {}
+    symbol_type_translation: Dict[Union[int, str], str] = {}
     got_section_name = ""
 
     vex_archinfo = None
@@ -799,7 +788,7 @@ def _append_arch_unique(my_arch: Arch) -> bool:
     return True
 
 
-def register_arch(regexes, bits, endness, my_arch):
+def register_arch(regexes: List[str], bits: int, endness: Endness, my_arch: Type[Arch]):
     """
     Register a new architecture.
     Architectures are loaded by their string name using ``arch_from_id()``, and
@@ -825,15 +814,15 @@ def register_arch(regexes, bits, endness, my_arch):
             re.compile(rx)
         except re.error as e:
             raise ValueError("Invalid Regular Expression %s" % rx) from e
-    # if not isinstance(my_arch,Arch):
-    #    raise TypeError("Arch must be a subclass of archinfo.Arch")
+    if not issubclass(my_arch, Arch):
+        raise TypeError("Arch must be a subclass of archinfo.Arch")
     if not isinstance(bits, int):
         raise TypeError("Bits must be an int")
     if endness is not None:
-        if endness not in (Endness.BE, Endness.LE, Endness.ME, "any"):
+        if endness not in (Endness.BE, Endness.LE, Endness.ME, Endness.ANY):
             raise TypeError("Endness must be Endness.BE, Endness.LE, or 'any'")
     arch_id_map.append((regexes, bits, endness, my_arch))
-    if endness == "any":
+    if endness == Endness.ANY:
         _append_arch_unique(my_arch(Endness.BE))
         _append_arch_unique(my_arch(Endness.LE))
     else:
@@ -844,7 +833,7 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident, endness="any", bits="") -> Arch:
+def arch_from_id(ident: str, endness=Endness.ANY, bits="") -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 
@@ -873,14 +862,14 @@ def arch_from_id(ident, endness="any", bits="") -> Arch:
     elif "be" in endness:
         endness = Endness.BE
     elif "l" in endness:
-        endness = "unsure"
+        endness = Endness.UNSURE
     elif "b" in endness:
-        endness = "unsure"
+        endness = Endness.UNSURE
     else:
-        endness = "unsure"
+        endness = Endness.UNSURE
     ident = ident.lower()
     cls = None
-    aendness = ""
+    aendness = None
     for arxs, abits, aendness, acls in arch_id_map:
         found_it = False
         for rx in arxs:
@@ -891,17 +880,17 @@ def arch_from_id(ident, endness="any", bits="") -> Arch:
             continue
         if bits and bits != abits:
             continue
-        if aendness == "any" or endness == aendness or endness == "unsure":
+        if aendness == Endness.ANY or endness == aendness or endness == Endness.UNSURE:
             cls = acls
             break
     if not cls:
         raise ArchNotFound(
             f"Can't find architecture info for architecture {ident} with {repr(bits)} bits and {endness} endness"
         )
-    if endness == "unsure":
-        if aendness == "any":
+    if endness == Endness.UNSURE:
+        if aendness == Endness.ANY:
             # We really don't care, use default
-            return cls()
+            return cls(cls.default_endness)
         else:
             # We're expecting the ident to pick the endness.
             # ex. 'armeb' means obviously this is Iend_BE
