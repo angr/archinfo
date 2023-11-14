@@ -125,6 +125,9 @@ class ArchPcode(Arch):
                 b"[\x7c-\x7f][\x08\x28\x48\x68\x88\xa8\xc8\xe8]\x02\xa6",
             }
 
+        if "sparc:" in self.name.lower() and self.bits == 32:
+            self.branch_delay_slot = True
+
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
 
     @staticmethod
