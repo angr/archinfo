@@ -82,7 +82,7 @@ jobs:
       - run: pip install ./ailment
       # angr
       - run: git clone https://github.com/angr/angr.git
-      - run: pip install ./angr
+      - run: pip install --no-build-isolation ./angr # TODO: reeanble build isolation
       # angr management
       - run: git clone https://github.com/angr/angr-management.git
       - run: pip install ./angr-management
