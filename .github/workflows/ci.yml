@@ -119,6 +119,9 @@ jobs:
       # rex
       - run: git clone https://github.com/angr/rex.git
       - run: pip install ./rex
+      # colorguard, test dep of rex
+      - run: git clone https://github.com/mechaphish/colorguard.git
+      - run: pip install ./colorguard
       # driller
       - run: git clone https://github.com/shellphish/driller.git
       - run: pip install ./driller
