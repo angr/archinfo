@@ -112,7 +112,7 @@ jobs:
       - run: pip install ./compilerex
       # povsim, dep of rex
       - run: git clone https://github.com/mechaphish/povsim.git
-      - run: pip install ./angr
+      - run: pip install ./povsim
       # rex
       - run: git clone https://github.com/angr/rex.git
       - run: pip install ./rex
