@@ -83,7 +83,7 @@ jobs:
       # angr
       - run: git clone https://github.com/angr/angr.git
       - run: sed -i 's/pyvex[^"]*/pyvex/g' angr/pyproject.toml  # FIXME: temporary workaround for == versions
-      - run: pip install --no-build-isolation ./angr
+      - run: pip install ./angr
       # angr management
       - run: git clone https://github.com/angr/angr-management.git
       - run: pip install ./angr-management
