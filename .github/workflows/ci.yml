@@ -110,9 +110,6 @@ jobs:
       # compilerex, patcherex
       - run: git clone https://github.com/mechaphish/compilerex.git
       - run: pip install ./compilerex
-      # colorguard, dep of rex
-      - run: git clone https://github.com/mechaphish/colorguard.git
-      - run: pip install ./colorguard
       # povsim, dep of rex
       - run: git clone https://github.com/mechaphish/povsim.git
       - run: pip install ./angr
