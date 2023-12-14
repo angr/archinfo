@@ -29,62 +29,62 @@ jobs:
       # Checkout and install all the ecosystem packages
       # Core packages
       # pyvex
-      - run: gh repo clone angr/pyvex
+      - run: git clone https://github.com/angr/pyvex.git
       - run: pip install ./pyvex
       # cle
-      - run: gh repo clone angr/cle
+      - run: git clone https://github.com/angr/cle.git
       - run: pip install ./cle
       # TODO: remove this once angr installs claripy directly
-      - run: gh repo clone angr/claripy
+      - run: git clone https://github.com/angr/claripy.git
       - run: pip install ./claripy
       # TODO: remove this once angr installs ailment directly
-      - run: gh repo clone angr/ailment
+      - run: git clone https://github.com/angr/ailment.git
       - run: pip install ./ailment
       # angr
-      - run: gh repo clone angr/angr
+      - run: git clone https://github.com/angr/angr.git
       - run: pip install ./angr
       # angr management
-      - run: gh repo clone angr/angr-management
+      - run: git clone https://github.com/angr/angr-management.git
       - run: pip install ./angr-management
       # binaries
-      - run: gh repo clone angr/binaries
+      - run: git clone https://github.com/angr/binaries.git
 
       # Extended packages
       # angr-platforms
-      - run: gh repo clone angr/angr-platforms
+      - run: git clone https://github.com/angr/angr-platforms.git
       - run: pip install ./angr-platforms
       # pysoot
-      - run: gh repo clone angr/pysoot
+      - run: git clone https://github.com/angr/pysoot.git
       - run: pip install ./pysoot
       # archr, dep of rex
-      - run: gh repo clone angr/archr
+      - run: git clone https://github.com/angr/archr.git
       - run: pip install ./archr
       # angrop
-      - run: gh repo clone angr/angrop
+      - run: git clone https://github.com/angr/angrop.git
       - run: pip install ./angrop
       # tracer, dep of rex
-      - run: gh repo clone angr/tracer
+      - run: git clone https://github.com/angr/tracer.git
       - run: pip install ./tracer
       # compilerex, patcherex
-      - run: gh repo clone mechaphish/compilerex
+      - run: git clone https://github.com/mechaphish/compilerex.git
       - run: pip install ./compilerex
       # colorguard, dep of rex
-      - run: gh repo clone mechaphish/colorguard
+      - run: git clone https://github.com/mechaphish/colorguard.git
       - run: pip install ./colorguard
       # povsim, dep of rex
-      - run: gh repo clone mechaphish/povsim
+      - run: git clone https://github.com/mechaphish/povsim.git
       - run: pip install ./angr
       # rex
-      - run: gh repo clone angr/rex
+      - run: git clone https://github.com/angr/rex.git
       - run: pip install ./rex
       # driller
-      - run: gh repo clone shellphish/driller
+      - run: git clone https://github.com/shellphish/driller.git
       - run: pip install ./driller
       # heaphopper
-      - run: gh repo clone angr/heaphopper
+      - run: git clone https://github.com/angr/heaphopper.git
       - run: pip install ./heaphopper
       # patcherex
-      - run: gh repo clone angr/patcherex
+      - run: git clone https://github.com/angr/patcherex.git
       - run: pip install ./patcherex
 
       # Reinstall archinfo in case it was overwritten by one of the ecosystem packages

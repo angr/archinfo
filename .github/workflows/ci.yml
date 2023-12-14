@@ -19,16 +19,9 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - run: python -m venv $HOME/venv
-        name: Create venv
-        shell: bash
-      - run: |
-          source $HOME/venv/bin/activate
-          pip install .[testing]
+      - run: pip install .[testing]
         name: Install
-      - run: |
-          source $HOME/venv/bin/activate
-          pytest -n auto
+      - run: pytest
         name: Run pytest
   docs:
     runs-on: ubuntu-22.04
