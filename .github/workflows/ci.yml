@@ -127,7 +127,7 @@ jobs:
       - run: pip install ./patcherex
 
       # Reinstall archinfo in case it was overwritten by one of the ecosystem packages
-      - run: git -C archinfo checkout ${{ github.ref }}
+      - run: git -C archinfo fetch ${{ github.ref }} && git -C archinfo checkout ${{ github.ref }}
       - run: pip install ./archinfo[testing]
 
       - name: Run pytest
