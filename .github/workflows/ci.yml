@@ -100,7 +100,7 @@ jobs:
       - run: pip install ./angr-platforms
       # pysoot
       - run: git clone https://github.com/angr/pysoot.git
-      - run: pip install ./pysoot
+      - run: pip install -e ./pysoot # Regular install doesn't work... see angr/pysoot#12
       # archr, dep of rex
       - run: git clone https://github.com/angr/archr.git
       - run: pip install ./archr
