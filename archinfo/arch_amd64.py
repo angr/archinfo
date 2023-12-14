@@ -443,7 +443,7 @@ class ArchAMD64(Arch):
         Register(name="ds_seg", size=2, vex_name="ds"),
         Register(name="es_seg", size=2, vex_name="es"),
         Register(name="fs_seg", size=2, vex_name="fs"),
-        Register(name="fs_seg", size=2, vex_name="gs"),
+        Register(name="gs_seg", size=2, vex_name="gs"),
         Register(name="ss_seg", size=2, vex_name="ss"),
     ]
 
