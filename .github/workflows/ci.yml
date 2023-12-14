@@ -89,6 +89,8 @@ jobs:
       # binaries
       - run: git clone https://github.com/angr/binaries.git
 
+      - run: pip install --upgrade setuptools
+
       # Extended packages
       # angr-platforms
       - run: git clone https://github.com/angr/angr-platforms.git
