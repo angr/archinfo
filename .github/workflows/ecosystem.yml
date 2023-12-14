@@ -1,0 +1,109 @@
+name: Ecosystem CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-ecosystem:
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5]
+    name: Test Ecosystem
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - uses: actions/checkout@v3
+        with:
+          path: archinfo
+      - run: pip install ./archinfo
+
+      # Checkout and install all the ecosystem packages
+      # Core packages
+      # pyvex
+      - run: gh repo clone angr/pyvex
+      - run: pip install ./pyvex
+      # cle
+      - run: gh repo clone angr/cle
+      - run: pip install ./cle
+      # TODO: remove this once angr installs claripy directly
+      - run: gh repo clone angr/claripy
+      - run: pip install ./claripy
+      # TODO: remove this once angr installs ailment directly
+      - run: gh repo clone angr/ailment
+      - run: pip install ./ailment
+      # angr
+      - run: gh repo clone angr/angr
+      - run: pip install ./angr
+      # angr management
+      - run: gh repo clone angr/angr-management
+      - run: pip install ./angr-management
+      # binaries
+      - run: gh repo clone angr/binaries
+
+      # Extended packages
+      # angr-platforms
+      - run: gh repo clone angr/angr-platforms
+      - run: pip install ./angr-platforms
+      # pysoot
+      - run: gh repo clone angr/pysoot
+      - run: pip install ./pysoot
+      # archr, dep of rex
+      - run: gh repo clone angr/archr
+      - run: pip install ./archr
+      # angrop
+      - run: gh repo clone angr/angrop
+      - run: pip install ./angrop
+      # tracer, dep of rex
+      - run: gh repo clone angr/tracer
+      - run: pip install ./tracer
+      # compilerex, patcherex
+      - run: gh repo clone mechaphish/compilerex
+      - run: pip install ./compilerex
+      # colorguard, dep of rex
+      - run: gh repo clone mechaphish/colorguard
+      - run: pip install ./colorguard
+      # povsim, dep of rex
+      - run: gh repo clone mechaphish/povsim
+      - run: pip install ./angr
+      # rex
+      - run: gh repo clone angr/rex
+      - run: pip install ./rex
+      # driller
+      - run: gh repo clone shellphish/driller
+      - run: pip install ./driller
+      # heaphopper
+      - run: gh repo clone angr/heaphopper
+      - run: pip install ./heaphopper
+      # patcherex
+      - run: gh repo clone angr/patcherex
+      - run: pip install ./patcherex
+
+      # Reinstall archinfo in case it was overwritten by one of the ecosystem packages
+      - run: pip install ./archinfo[testing]
+
+      - name: Run pytest
+        run: |
+            pytest -rs -n auto --splits 5 --group ${{matrix.group}} \
+                pyvex \
+                cle \
+                angr \
+                angr-management \
+                angr-examples \
+                angr-platforms \
+                pysoot \
+                angrop \
+                rex \
+                driller \
+                heaphopper \
+                patcherex
+        env:
+          SKIP_SLOW_TESTS: 1

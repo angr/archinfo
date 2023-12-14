@@ -8,12 +8,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
-    uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
-  windows:
-    uses: ./.github/workflows/windows.yml
-  macos:
-    uses: ./.github/workflows/macos.yml
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-12, windows-2022]
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+      - run: python -m venv $HOME/venv
+        name: Create venv
+        shell: bash
+      - run: |
+          source $HOME/venv/bin/activate
+          pip install .[testing]
+        name: Install
+      - run: |
+          source $HOME/venv/bin/activate
+          pytest -n auto
+        name: Run pytest
   docs:
     runs-on: ubuntu-22.04
     steps:
