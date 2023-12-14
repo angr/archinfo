@@ -55,6 +55,8 @@ jobs:
     name: Test Ecosystem
     runs-on: ubuntu-22.04
     steps:
+      - run: sudo apt update; sudo apt install -y libegl1
+
       - name: Setup python
         uses: actions/setup-python@v4
         with:
