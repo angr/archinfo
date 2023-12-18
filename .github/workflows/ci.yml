@@ -11,7 +11,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-12, windows-2022]
+        os: [ubuntu-22.04, macos-12, windows-2022]
     name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -139,6 +139,6 @@ jobs:
       - run: ls
       - name: Run pytest
         run: |
-            pytest -rfEs -n auto --durations 10 --splits 5 --group ${{matrix.group}} --log-level=DEBUG cle angr angr-platforms pysoot angrop rex driller heaphopper patcherex
+            pytest -rfEs -n auto --durations 10 --splits 5 --group ${{matrix.group}} cle angr angr-platforms pysoot angrop rex driller heaphopper patcherex
         env:
           SKIP_SLOW_TESTS: 1
