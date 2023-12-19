@@ -96,7 +96,7 @@ jobs:
 
       # Extended packages
       # angr-platforms
-      - run: git clone https://github.com/angr/angr-platforms.git -b riscv/disable-prologs
+      - run: git clone https://github.com/angr/angr-platforms.git
       - run: pip install ./angr-platforms
       # pysoot
       - run: git clone https://github.com/angr/pysoot.git
