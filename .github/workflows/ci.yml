@@ -99,7 +99,7 @@ jobs:
       - run: git clone https://github.com/angr/angr-platforms.git
       - run: pip install ./angr-platforms
       # pysoot
-      - run: git clone https://github.com/angr/pysoot.git
+      - run: git clone https://github.com/angr/pysoot.git -b set-heap-from-env
       - run: pip install -e ./pysoot # Regular install doesn't work... see angr/pysoot#12
       # archr, dep of rex
       - run: git clone https://github.com/angr/archr.git
@@ -145,3 +145,4 @@ jobs:
             echo "Return code: $?"
         env:
           SKIP_SLOW_TESTS: 1
+          PYSOOT_HEAP_SIZE: 2G
