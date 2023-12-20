@@ -53,7 +53,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     name: Test Ecosystem
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - run: sudo apt update; sudo apt install -y libegl1
 
