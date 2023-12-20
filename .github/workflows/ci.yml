@@ -84,7 +84,7 @@ jobs:
       - run: git clone https://github.com/angr/ailment.git
       - run: pip install ./ailment
       # angr
-      - run: git clone https://github.com/angr/angr.git
+      - run: git clone https://github.com/angr/angr.git -b fix/cfgfast-make-return-edges-not-assume-integer
       - run: sed -i 's/pyvex[^"]*/pyvex/g' angr/pyproject.toml  # FIXME: temporary workaround for == versions
       - run: pip install ./angr
       # angr management
