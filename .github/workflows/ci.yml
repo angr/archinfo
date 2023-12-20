@@ -84,7 +84,7 @@ jobs:
       - run: git clone https://github.com/angr/ailment.git
       - run: pip install ./ailment
       # angr
-      - run: git clone https://github.com/angr/angr.git -b fix/cfgfast-make-return-edges-not-assume-integer
+      - run: git clone https://github.com/angr/angr.git
       - run: sed -i 's/pyvex[^"]*/pyvex/g' angr/pyproject.toml  # FIXME: temporary workaround for == versions
       - run: pip install ./angr
       # angr management
@@ -136,8 +136,7 @@ jobs:
       - run: git -C archinfo checkout -
       - run: pip install ./archinfo[testing]
 
-      - run: pytest angr/tests/engines/test_unicorn.py::TestUnicorn::test_fauxware_aggressive
-        continue-on-error: true
+      - run: pip install "git+https://github.com/unicorn-engine/unicorn#subdirectory=bindings/python"
       - name: Run pytest
         run: |
             ulimit -v 6291456
