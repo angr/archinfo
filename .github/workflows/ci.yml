@@ -136,7 +136,7 @@ jobs:
       - run: git -C archinfo checkout -
       - run: pip install ./archinfo[testing]
 
-      - run: pip install "git+https://github.com/unicorn-engine/unicorn#subdirectory=bindings/python"
+      - run: pip install "git+https://github.com/unicorn-engine/unicorn@dev#subdirectory=bindings/python"
       - name: Run pytest
         run: |
             ulimit -v 6291456
