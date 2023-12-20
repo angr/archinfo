@@ -145,4 +145,4 @@ jobs:
             echo "Return code: $?"
         env:
           SKIP_SLOW_TESTS: 1
-          PYSOOT_HEAP_SIZE: 2G
+          PYSOOT_HEAP_SIZE: 2147483648 # 2GB
