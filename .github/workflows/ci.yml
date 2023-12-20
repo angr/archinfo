@@ -136,7 +136,8 @@ jobs:
       - run: git -C archinfo checkout -
       - run: pip install ./archinfo[testing]
 
-      - run: ls
+      - run: pytest angr/tests/engines/test_unicorn.py::TestUnicorn::test_fauxware_aggressive
+        continue-on-error: true
       - name: Run pytest
         run: |
             ulimit -v 6291456
