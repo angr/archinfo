@@ -136,11 +136,10 @@ jobs:
       - run: git -C archinfo checkout -
       - run: pip install ./archinfo[testing]
 
-      - run: pip install "git+https://github.com/unicorn-engine/unicorn@dev#subdirectory=bindings/python"
       - name: Run pytest
         run: |
             ulimit -v 6291456
-            pytest -rfEs -n auto --durations 10 --splits 5 --group ${{matrix.group}} cle angr
+            pytest -rfEs --durations 10 --splits 5 --group ${{matrix.group}} cle angr
             # angr-platforms pysoot angrop rex driller heaphopper patcherex
             echo "Return code: $?"
         env:
