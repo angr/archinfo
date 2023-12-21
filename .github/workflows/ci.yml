@@ -139,7 +139,7 @@ jobs:
       - name: Run pytest
         run: |
             ulimit -v 6291456
-            pytest -rfEs --durations 10 --splits 10 --group ${{matrix.group}} cle angr
+            pytest -rfEs -n 1 --durations 10 --splits 10 --group ${{matrix.group}} cle angr
             # angr-platforms pysoot angrop rex driller heaphopper patcherex
             echo "Return code: $?"
         env:
