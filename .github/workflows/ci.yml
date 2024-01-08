@@ -62,6 +62,12 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
