@@ -105,8 +105,8 @@ jobs:
       - run: git clone https://github.com/angr/angr-platforms.git
       - run: pip install ./angr-platforms
       # pysoot
-      - run: git clone https://github.com/angr/pysoot.git -b set-heap-from-env
-      - run: pip install -e ./pysoot # Regular install doesn't work... see angr/pysoot#12
+      - run: git clone https://github.com/angr/pysoot.git -b refactor/jpype
+      - run: pip install ./pysoot
       # archr, dep of rex
       - run: git clone https://github.com/angr/archr.git
       - run: pip install ./archr
