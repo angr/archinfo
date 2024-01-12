@@ -78,64 +78,64 @@ jobs:
       # Checkout and install all the ecosystem packages
       # Core packages
       # pyvex
-      - run: git clone --recursive https://github.com/angr/pyvex.git
+      - run: git clone --depth 1 --recursive https://github.com/angr/pyvex.git
       - run: pip install ./pyvex
       # cle
-      - run: git clone https://github.com/angr/cle.git
+      - run: git clone --depth 1 https://github.com/angr/cle.git
       - run: pip install ./cle
       # TODO: remove this once angr installs claripy directly
-      - run: git clone https://github.com/angr/claripy.git
+      - run: git clone --depth 1 https://github.com/angr/claripy.git
       - run: pip install ./claripy
       # TODO: remove this once angr installs ailment directly
-      - run: git clone https://github.com/angr/ailment.git
+      - run: git clone --depth 1 https://github.com/angr/ailment.git
       - run: pip install ./ailment
       # angr
-      - run: git clone https://github.com/angr/angr.git
+      - run: git clone --depth 1 https://github.com/angr/angr.git
       - run: sed -i 's/pyvex[^"]*/pyvex/g' angr/pyproject.toml  # FIXME: temporary workaround for == versions
       - run: pip install ./angr
       # angr management
-      - run: git clone https://github.com/angr/angr-management.git
+      - run: git clone --depth 1 https://github.com/angr/angr-management.git
       - run: pip install ./angr-management
       # binaries
-      - run: git clone https://github.com/angr/binaries.git
+      - run: git clone --depth 1 https://github.com/angr/binaries.git
 
 
       # Extended packages
       # angr-platforms
-      - run: git clone https://github.com/angr/angr-platforms.git
+      - run: git clone --depth 1 https://github.com/angr/angr-platforms.git
       - run: pip install ./angr-platforms
       # pysoot
-      - run: git clone https://github.com/angr/pysoot.git -b refactor/jpype
+      - run: git clone --depth 1 https://github.com/angr/pysoot.git -b refactor/jpype
       - run: pip install ./pysoot
       # archr, dep of rex
-      - run: git clone https://github.com/angr/archr.git
+      - run: git clone --depth 1 https://github.com/angr/archr.git
       - run: pip install ./archr
       # angrop
-      - run: git clone https://github.com/angr/angrop.git
+      - run: git clone --depth 1 https://github.com/angr/angrop.git
       - run: pip install ./angrop
       # tracer, dep of rex
-      - run: git clone https://github.com/angr/tracer.git
+      - run: git clone --depth 1 https://github.com/angr/tracer.git
       - run: pip install ./tracer
       # compilerex, patcherex
-      - run: git clone https://github.com/mechaphish/compilerex.git
+      - run: git clone --depth 1 https://github.com/mechaphish/compilerex.git
       - run: pip install ./compilerex
       # povsim, dep of rex
-      - run: git clone https://github.com/mechaphish/povsim.git
+      - run: git clone --depth 1 https://github.com/mechaphish/povsim.git
       - run: pip install ./povsim
       # rex
-      - run: git clone https://github.com/angr/rex.git
+      - run: git clone --depth 1 https://github.com/angr/rex.git
       - run: pip install ./rex
       # colorguard, test dep of rex
-      - run: git clone https://github.com/mechaphish/colorguard.git
+      - run: git clone --depth 1 https://github.com/mechaphish/colorguard.git
       - run: pip install ./colorguard
       # driller
-      - run: git clone https://github.com/shellphish/driller.git
+      - run: git clone --depth 1 https://github.com/shellphish/driller.git
       - run: pip install ./driller
       # heaphopper
-      - run: git clone https://github.com/angr/heaphopper.git
+      - run: git clone --depth 1 https://github.com/angr/heaphopper.git
       - run: pip install ./heaphopper
       # patcherex
-      - run: git clone https://github.com/angr/patcherex.git
+      - run: git clone --depth 1 https://github.com/angr/patcherex.git
       - run: pip install ./patcherex
 
       # Reinstall archinfo in case it was overwritten by one of the ecosystem packages
