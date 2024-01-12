@@ -142,8 +142,16 @@ jobs:
       - run: git -C archinfo checkout -
       - run: pip install ./archinfo[testing]
 
+      - name: Set cores to get stored in /cores
+        run: |
+          sudo mkdir /cores
+          sudo chmod 777 /cores
+          # Core filenames will be of the form executable.pid.timestamp:
+          sudo bash -c 'echo "/cores/%e.%p.%t" > /proc/sys/kernel/core_pattern'
+
       - name: Run pytest
         run: |
+            ulimit -c unlimited
             ulimit -v 6291456
             pytest -rfEs -n 1 --durations 10 --splits 10 --group ${{matrix.group}} cle angr
             # angr-platforms pysoot angrop rex driller heaphopper patcherex
@@ -151,3 +159,9 @@ jobs:
         env:
           SKIP_SLOW_TESTS: 1
           PYSOOT_HEAP_SIZE: 2147483648 # 2GB
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}  # Run only if something went wrong
+        with:
+          name: cores
+          path: /cores
