@@ -153,7 +153,7 @@ jobs:
         run: |
             ulimit -c unlimited
             ulimit -v 6291456
-            pytest -rfEs --durations 10 --splits 10 --group ${{matrix.group}} cle angr
+            pytest -rfEs --capture=no --log-cli-level=INFO --durations 10 --splits 10 --group ${{matrix.group}} cle angr
             # angr-platforms pysoot angrop rex driller heaphopper patcherex
             echo "Return code: $?"
         env:
