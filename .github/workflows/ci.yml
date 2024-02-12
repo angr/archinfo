@@ -9,7 +9,7 @@ on:
 
 jobs:
   ci:
-    uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
+    uses: angr/ci-settings/.github/workflows/angr-ci.yml@disable-compression
   windows:
     uses: ./.github/workflows/windows.yml
   macos:
