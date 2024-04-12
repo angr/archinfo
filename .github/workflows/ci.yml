@@ -10,6 +10,8 @@ on:
 jobs:
   ci:
     uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
+    with:
+      container_image: angr/ci:jammy
   windows:
     uses: ./.github/workflows/windows.yml
   macos:
