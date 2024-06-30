@@ -447,6 +447,13 @@ class ArchAMD64(Arch):
         Register(name="ss_seg", size=2, vex_name="ss"),
     ]
 
+    # https://gitlab.com/x86-psABIs/x86-64-ABI
+    dynamic_tag_translation = {
+        0x70000000: "DT_X86_64_PLT",
+        0x70000001: "DT_X86_64_PLTSZ",
+        0x70000003: "DT_X86_64_PLTENT",
+    }
+
     symbol_type_translation = {10: "STT_GNU_IFUNC", "STT_LOOS": "STT_GNU_IFUNC"}
     got_section_name = ".got.plt"
     ld_linux_name = "ld-linux-x86-64.so.2"
