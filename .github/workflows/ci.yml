@@ -8,10 +8,160 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
-    uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
-  windows:
-    uses: ./.github/workflows/windows.yml
-  macos:
-    uses: ./.github/workflows/macos.yml
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-12, windows-2022]
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - run: pip install .[testing]
+        name: Install
+      - run: pytest --durations 10
+        name: Run pytest
 
+  docs:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install
+        run: pip install .[docs]
+      - name: Build docs
+        run: cd docs && make html
+      - name: Build coverage
+        run: cd docs && make coverage
+      - name: Test coverage
+        run: |
+          if [ -s docs/_build/coverage/python.txt ]; then
+            echo "Doc coverage is missing for the for:"
+            cat docs/_build/coverage/python.txt
+            exit 1
+          fi
+
+  test-ecosystem:
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    name: Test Ecosystem
+    runs-on: ubuntu-20.04
+    steps:
+      - run: sudo apt update; sudo apt install -y libegl1
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: archinfo
+      - run: git -C archinfo checkout master # FIXME: temporary workaround for == versions
+      - run: pip install ./archinfo
+
+      # Checkout and install all the ecosystem packages
+      # Core packages
+      # pyvex
+      - run: git clone --depth 1 --recursive https://github.com/angr/pyvex.git
+      - run: pip install ./pyvex
+      # cle
+      - run: git clone --depth 1 https://github.com/angr/cle.git
+      - run: pip install ./cle
+      # TODO: remove this once angr installs claripy directly
+      - run: git clone --depth 1 https://github.com/angr/claripy.git
+      - run: pip install ./claripy
+      # TODO: remove this once angr installs ailment directly
+      - run: git clone --depth 1 https://github.com/angr/ailment.git
+      - run: pip install ./ailment
+      # angr
+      - run: git clone --depth 1 https://github.com/angr/angr.git
+      - run: sed -i 's/pyvex[^"]*/pyvex/g' angr/pyproject.toml  # FIXME: temporary workaround for == versions
+      - run: pip install ./angr
+      # angr management
+      - run: git clone --depth 1 https://github.com/angr/angr-management.git
+      - run: pip install ./angr-management
+      # binaries
+      - run: git clone --depth 1 https://github.com/angr/binaries.git
+
+
+      # Extended packages
+      # angr-platforms
+      - run: git clone --depth 1 https://github.com/angr/angr-platforms.git
+      - run: pip install ./angr-platforms
+      # pysoot
+      - run: git clone --depth 1 https://github.com/angr/pysoot.git -b refactor/jpype
+      - run: pip install ./pysoot
+      # archr, dep of rex
+      - run: git clone --depth 1 https://github.com/angr/archr.git
+      - run: pip install ./archr
+      # angrop
+      - run: git clone --depth 1 https://github.com/angr/angrop.git
+      - run: pip install ./angrop
+      # tracer, dep of rex
+      - run: git clone --depth 1 https://github.com/angr/tracer.git
+      - run: pip install ./tracer
+      # compilerex, patcherex
+      - run: git clone --depth 1 https://github.com/mechaphish/compilerex.git
+      - run: pip install ./compilerex
+      # povsim, dep of rex
+      - run: git clone --depth 1 https://github.com/mechaphish/povsim.git
+      - run: pip install ./povsim
+      # rex
+      - run: git clone --depth 1 https://github.com/angr/rex.git
+      - run: pip install ./rex
+      # colorguard, test dep of rex
+      - run: git clone --depth 1 https://github.com/mechaphish/colorguard.git
+      - run: pip install ./colorguard
+      # driller
+      - run: git clone --depth 1 https://github.com/shellphish/driller.git
+      - run: pip install ./driller
+      # heaphopper
+      - run: git clone --depth 1 https://github.com/angr/heaphopper.git
+      - run: pip install ./heaphopper
+      # patcherex
+      - run: git clone --depth 1 https://github.com/angr/patcherex.git
+      - run: pip install ./patcherex
+
+      # Reinstall archinfo in case it was overwritten by one of the ecosystem packages
+      - run: git -C archinfo checkout -
+      - run: pip install ./archinfo[testing]
+
+      - name: Set cores to get stored in /cores
+        run: |
+          sudo mkdir /cores
+          sudo chmod 777 /cores
+          # Core filenames will be of the form executable.pid.timestamp:
+          sudo bash -c 'echo "/cores/%e.%p.%t" > /proc/sys/kernel/core_pattern'
+
+      - name: Run pytest
+        run: |
+            ulimit -c unlimited
+            ulimit -v 6291456
+            pytest -rfEs --capture=no --log-cli-level=INFO --durations 10 --splits 10 --group ${{matrix.group}} cle angr
+            # angr-platforms pysoot angrop rex driller heaphopper patcherex
+            echo "Return code: $?"
+        env:
+          SKIP_SLOW_TESTS: 1
+          PYSOOT_HEAP_SIZE: 2147483648 # 2GB
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}  # Run only if something went wrong
+        with:
+          name: cores
+          path: /cores

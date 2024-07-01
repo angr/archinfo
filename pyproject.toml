@@ -2,6 +2,44 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "archinfo"
+description = "Classes with architecture-specific information useful to other projects."
+license = {text = "BSD-2-Clause"}
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+urls = {Homepage = "https://github.com/angr/archinfo"}
+requires-python = ">=3.10"
+dependencies = ["backports.strenum>=1.2.8;python_version<'3.11'"]
+dynamic = ["version"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.optional-dependencies]
+docs = [
+    "furo",
+    "myst-parser",
+    "sphinx",
+    "sphinx-autodoc-typehints",
+]
+pcode = ["pypcode>=1.1"]
+testing = ["pytest", "pytest-xdist", "pytest-split"]
+
+[tool.setuptools]
+license-files = ["LICENSE"]
+package-data = { archinfo = ["py.typed"] }
+
+[tool.setuptools.dynamic]
+version = {attr = "archinfo.__version__"}
+
 [tool.black]
 line-length = 120
 target-version = ['py310']
