@@ -30,6 +30,7 @@ from .arch_riscv64 import ArchRISCV64
 from .arch_s390x import ArchS390X
 from .arch_soot import ArchSoot
 from .arch_x86 import ArchX86
+from .arch_tilegx import ArchTILEGX
 from .archerror import ArchError
 from .defines import defines
 from .types import Endness, RegisterName, RegisterOffset, TmpVar
@@ -54,6 +55,7 @@ __all__ = [
     "ArchS390X",
     "ArchSoot",
     "ArchX86",
+    "ArchTILEGX",
     "Endness",
     "Register",
     "RegisterName",
