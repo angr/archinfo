@@ -25,7 +25,6 @@ Utilities
 
 .. automodule:: archinfo.types
 .. automodule:: archinfo.tls
-.. automodule:: archinfo.defines
 
 Errors
 ------
