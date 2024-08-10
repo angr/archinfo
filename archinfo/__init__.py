@@ -60,7 +60,6 @@ __all__ = [
     "TmpVar",
     "all_arches",
     "arch_from_id",
-    "defines",
     "get_host_arch",
     "register_arch",
     "reverse_ends",
