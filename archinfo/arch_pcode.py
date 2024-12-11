@@ -143,3 +143,9 @@ class ArchPcode(Arch):
                 if lang.id == lang_id:
                     return lang
         raise ArchError("Language not found")
+
+    def disasm(self, bytestring, addr=0, thumb=False):
+        ctx = pypcode.Context(self.name)
+        ctx.setVariableDefault("TMode", 1 if thumb else 0)
+        instructions = ctx.disassemble(bytestring, addr, 0, len(bytestring), 0).instructions
+        return "\n".join(f"{insn.addr.offset:#x}:\t{insn.mnem} {insn.body}" for insn in instructions)
