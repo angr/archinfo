@@ -535,6 +535,8 @@ class ArchARMCortexM(ArchARMEL):
         "pc",
     ]
 
+    fp_ret_offset = RegisterOffset(128)  # s0
+
     @property
     def capstone_thumb(self):
         return self.capstone
