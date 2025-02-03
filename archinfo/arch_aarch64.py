@@ -56,8 +56,8 @@ class ArchAArch64(Arch):
     uc_prefix = "UC_ARM64_" if _unicorn else None
     initial_sp = 0x7FFFFFFFFFF0000
 
-    ret_instruction = b"\xC0\x03\x5F\xD6"  # ret
-    nop_instruction = b"\x1F\x20\x03\xD5"  # nop
+    ret_instruction = b"\xc0\x03\x5f\xd6"  # ret
+    nop_instruction = b"\x1f\x20\x03\xd5"  # nop
     instruction_alignment = 4
     register_list = [
         Register(

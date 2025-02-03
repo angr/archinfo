@@ -66,7 +66,7 @@ class ArchMIPS32(Arch):
     }
     function_epilogs = {rb"[\x00-\xff]{2}\xbf\x8f([\x00-\xff]{4}){0,4}\x08\x00\xe0\x03"}  # lw ra, off(sp); ... ; jr ra
 
-    ret_instruction = b"\x08\x00\xE0\x03" + b"\x25\x08\x20\x00"
+    ret_instruction = b"\x08\x00\xe0\x03" + b"\x25\x08\x20\x00"
     nop_instruction = b"\x00\x00\x00\x00"
     instruction_alignment = 4
     register_list = [
