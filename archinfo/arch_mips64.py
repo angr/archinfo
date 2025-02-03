@@ -57,7 +57,7 @@ class ArchMIPS64(Arch):
     function_prologs = set()
     function_epilogs = set()
 
-    ret_instruction = b"\x08\x00\xE0\x03" + b"\x25\x08\x20\x00"
+    ret_instruction = b"\x08\x00\xe0\x03" + b"\x25\x08\x20\x00"
     nop_instruction = b"\x00\x00\x00\x00"
     instruction_alignment = 4
     register_list = [

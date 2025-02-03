@@ -203,7 +203,7 @@ class ArchARM(Arch):
     uc_const = _unicorn.arm_const if _unicorn else None
     uc_prefix = "UC_ARM_" if _unicorn else None
     # self.ret_instruction = b"\x0E\xF0\xA0\xE1" # this is mov pc, lr
-    ret_instruction = b"\x1E\xFF\x2F\xE1"  # this is bx lr
+    ret_instruction = b"\x1e\xff\x2f\xe1"  # this is bx lr
     nop_instruction = b"\x00\x00\x00\x00"
     function_prologs = {
         # br"[\x00-\xff][\x40-\x7f\xc0-\xff]\x2d\xe9",       # stmfd sp!, {xxxxx,lr}
