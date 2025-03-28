@@ -275,6 +275,14 @@ class Arch:
                 if subreg_offset not in self.subregister_map:
                     self.subregister_map[subreg_offset] = base_reg
 
+        # VEX registers used in lieu of flags register
+        self.vex_cc_regs = []
+        vex_cc_register_names = ["cc_op", "cc_dep1", "cc_dep2", "cc_ndep"]
+        for reg_name in vex_cc_register_names:
+            vex_flag_reg = self.get_register_by_name(reg_name)
+            if vex_flag_reg is not None:
+                self.vex_cc_regs.append(vex_flag_reg)
+
         # Unicorn specific stuff
         if self.uc_mode is not None:
             if endness == Endness.BE:
@@ -296,14 +304,6 @@ class Arch:
 
                 vex_reg = self.get_register_by_name(reg_name)
                 self.vex_to_unicorn_map[vex_reg.vex_offset] = (unicorn_reg_id, vex_reg.size)
-
-            # VEX registers used in lieu of flags register
-            self.vex_cc_regs = []
-            vex_cc_register_names = ["cc_op", "cc_dep1", "cc_dep2", "cc_ndep"]
-            for reg_name in vex_cc_register_names:
-                vex_flag_reg = self.get_register_by_name(reg_name)
-                if vex_flag_reg is not None:
-                    self.vex_cc_regs.append(vex_flag_reg)
 
     def copy(self):
         """
