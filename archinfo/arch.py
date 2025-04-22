@@ -331,11 +331,11 @@ class Arch:
 
     def __getstate__(self):
         result = dict(self.__dict__)
-        result['_cs'] = None
-        result['_ks'] = None
-        if result['vex_archinfo'] is not None:
+        result["_cs"] = None
+        result["_ks"] = None
+        if result["vex_archinfo"] is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
-            result['vex_archinfo']["hwcache_info"]["caches"] = None
+            result["vex_archinfo"]["hwcache_info"]["caches"] = None
         return result
 
     def __setstate__(self, data):
