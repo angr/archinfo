@@ -333,7 +333,7 @@ class Arch:
         result = dict(self.__dict__)
         result["_cs"] = None
         result["_ks"] = None
-        if result["vex_archinfo"] is not None:
+        if "vex_archinfo" in result and result["vex_archinfo"] is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
             result["vex_archinfo"]["hwcache_info"]["caches"] = None
         return result
