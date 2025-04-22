@@ -330,12 +330,13 @@ class Arch:
         return not self == other
 
     def __getstate__(self):
-        self._cs = None
-        self._ks = None
-        if self.vex_archinfo is not None:
+        result = dict(self.__dict__)
+        result['_cs'] = None
+        result['_ks'] = None
+        if result['vex_archinfo'] is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
-            self.vex_archinfo["hwcache_info"]["caches"] = None
-        return self.__dict__
+            result['vex_archinfo']["hwcache_info"]["caches"] = None
+        return result
 
     def __setstate__(self, data):
         self.__dict__.update(data)
