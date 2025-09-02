@@ -128,6 +128,11 @@ class ArchPcode(Arch):
                 b"\x94\x21[\xc0-\xff][\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xa0\xb0\xc0\xd0\xe0\xf0]"
                 b"[\x7c-\x7f][\x08\x28\x48\x68\x88\xa8\xc8\xe8]\x02\xa6",
             }
+        if self.name.startswith("Xtensa:LE"):
+            self.function_prologs = {
+                # entry  a1, N
+                b"\x36[\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1]\x00",
+            }
 
         if "sparc:" in self.name.lower() and self.bits == 32:
             self.branch_delay_slot = True
