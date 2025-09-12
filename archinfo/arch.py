@@ -4,6 +4,7 @@ import platform as _platform
 import re
 import struct as _struct
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+import warnings
 
 from archinfo.types import RegisterName, RegisterOffset
 
@@ -14,13 +15,22 @@ from .types import Endness
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
 
+def warningless_import_unicorn():
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        warnings.warn("deprecated", DeprecationWarning)
+        import unicorn as _unicorn
+    return _unicorn
+
+
 try:
     import pyvex as _pyvex
 except ImportError:
     _pyvex = None
 
 try:
-    import unicorn as _unicorn
+    _unicorn = warningless_import_unicorn()
+    from unicorn import riscv_const
 except ImportError:
     _unicorn = None
 

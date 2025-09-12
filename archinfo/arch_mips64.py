@@ -1,6 +1,6 @@
 from archinfo.types import RegisterOffset
 
-from .arch import Arch, Endness, Register, register_arch
+from .arch import Arch, Endness, Register, register_arch, warningless_import_unicorn
 from .tls import TLSArchInfo
 
 try:
@@ -14,7 +14,7 @@ except ImportError:
     _keystone = None
 
 try:
-    import unicorn as _unicorn
+    _unicorn = warningless_import_unicorn()
 except ImportError:
     _unicorn = None
 

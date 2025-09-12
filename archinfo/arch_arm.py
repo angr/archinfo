@@ -2,7 +2,7 @@ import logging
 
 from archinfo.types import RegisterOffset
 
-from .arch import Arch, Endness, Register, register_arch
+from .arch import Arch, Endness, Register, register_arch, warningless_import_unicorn
 from .tls import TLSArchInfo
 
 log = logging.getLogger("archinfo.arch_arm")
@@ -18,7 +18,7 @@ except ImportError:
     _keystone = None
 
 try:
-    import unicorn as _unicorn
+    _unicorn = warningless_import_unicorn()
 except ImportError:
     _unicorn = None
 
