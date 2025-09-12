@@ -20,6 +20,7 @@ def warningless_import_unicorn():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         warnings.warn("deprecated", DeprecationWarning)
+        # pylint: disable=import-outside-toplevel
         import unicorn as _unicorn
     return _unicorn
 
