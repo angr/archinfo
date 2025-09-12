@@ -3,8 +3,8 @@ import logging
 import platform as _platform
 import re
 import struct as _struct
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 import warnings
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
 from archinfo.types import RegisterName, RegisterOffset
 
@@ -14,6 +14,7 @@ from .types import Endness
 
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
+
 
 def warningless_import_unicorn():
     with warnings.catch_warnings():

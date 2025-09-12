@@ -1,5 +1,3 @@
-import warnings
-
 from archinfo.types import RegisterOffset
 
 from .arch import Arch, Endness, Register, register_arch, warningless_import_unicorn
