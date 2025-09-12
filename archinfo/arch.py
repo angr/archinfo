@@ -31,7 +31,6 @@ except ImportError:
 
 try:
     _unicorn = warningless_import_unicorn()
-    from unicorn import riscv_const
 except ImportError:
     _unicorn = None
 
