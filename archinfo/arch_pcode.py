@@ -100,12 +100,16 @@ class ArchPcode(Arch):
             if proto_tags is not None and len(proto_tags) >= 1:
                 proto_tag = proto_tags[0]
                 output_tags = proto_tag.find("output")
-                if output_tags is not None and len(output_tags) >= 1:
-                    output_tag = output_tags[0]
-                    output_register_tag = output_tag.find("register")
+                output_pentries_tag = output_tags.findall("pentry")
+                for pentry_tag in output_pentries_tag:
+                    if "metatype" in pentry_tag.attrib:
+                        continue
+
+                    output_register_tag = pentry_tag.find("register")
                     if output_register_tag is not None:
                         output_reg = output_register_tag.attrib["name"]
                         ret_offset = RegisterOffset(ctx.registers[output_reg].offset)
+                        break
 
         if sp_offset is None:
             log.warning("Unknown stack pointer register offset?")
