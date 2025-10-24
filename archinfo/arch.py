@@ -335,7 +335,12 @@ class Arch:
         result["_ks"] = None
         if "vex_archinfo" in result and result["vex_archinfo"] is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
-            result["vex_archinfo"]["hwcache_info"]["caches"] = None
+            # more copies to avert the reference being mutated in other threads
+            # deepcopy cannot work because this might contain cffi objects...
+            result["vex_archinfo"] = dict(result["vex_archinfo"])
+            if "hwcache_info" in result["vex_archinfo"] and result["vex_archinfo"]["hwcache_info"] is not None:
+                result["vex_archinfo"]["hwcache_info"] = dict(result["vex_archinfo"]["hwcache_info"])
+                result["vex_archinfo"]["hwcache_info"]["caches"] = None
         return result
 
     def __setstate__(self, data):
