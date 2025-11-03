@@ -5,7 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "archinfo"
 description = "Classes with architecture-specific information useful to other projects."
-license = { text = "BSD-2-Clause" }
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -45,7 +46,6 @@ testing = [
 
 [tool.setuptools]
 include-package-data = true
-license-files = ["LICENSE"]
 
 [tool.setuptools.dynamic]
 version = { attr = "archinfo.__version__" }
