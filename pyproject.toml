@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "archinfo"
 description = "Classes with architecture-specific information useful to other projects."
-license = { text = "BSD-2-Clause" }
+license = "BSD-2-Clause"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
