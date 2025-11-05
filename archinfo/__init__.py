@@ -20,7 +20,6 @@ from .arch import (
 from .arch_aarch64 import ArchAArch64
 from .arch_amd64 import ArchAMD64
 from .arch_arm import ArchARM, ArchARMCortexM, ArchARMEL, ArchARMHF
-from .arch_avr import ArchAVR8
 from .arch_mips32 import ArchMIPS32
 from .arch_mips64 import ArchMIPS64
 from .arch_pcode import ArchPcode
@@ -41,7 +40,6 @@ __all__ = [
     "ArchARMCortexM",
     "ArchARMEL",
     "ArchARMHF",
-    "ArchAVR8",
     "ArchError",
     "ArchMIPS32",
     "ArchMIPS64",
