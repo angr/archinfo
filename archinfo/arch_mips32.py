@@ -24,6 +24,7 @@ class ArchMIPS32(Arch):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.pcode_id = "MIPS:BE:32:default"
             self.function_prologs = {
                 rb"\x27\xbd\xff[\x00-\xff]"  # addiu $sp, xxx
                 rb"\x3c\x1c[\x00-\xff][\x00-\xff]\x9c\x27[\x00-\xff][\x00-\xff]"  # lui $gp, xxx; addiu $gp, $gp, xxxx
@@ -34,6 +35,8 @@ class ArchMIPS32(Arch):
             self.qemu_name = "mips"
             self.triplet = "mips-linux-gnu"
             self.linux_name = "mips"
+        else:
+            self.pcode_id = "MIPS:LE:32:default"
 
     bits = 32
     vex_arch = "VexArchMIPS32"

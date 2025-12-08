@@ -148,6 +148,7 @@ class ArchX86(Arch):
     bits = 32
     vex_arch = "VexArchX86"
     name = "X86"
+    pcode_id = "x86:LE:32:default"
     qemu_name = "i386"
     ida_processor = "metapc"
     linux_name = "i386"
