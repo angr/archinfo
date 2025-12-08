@@ -8,11 +8,6 @@ try:
 except ImportError:
     _keystone = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 from archinfo.types import RegisterOffset
 
 from .arch import Arch, Endness, Register, register_arch
@@ -25,22 +20,18 @@ class ArchS390X(Arch):
         super().__init__(endness)
         if endness != Endness.BE:
             raise ArchError("Arch s390x must be big endian")
-        self.argument_register_positions = (
-            {
-                self.registers["r2"][0]: 0,
-                self.registers["r3"][0]: 1,
-                self.registers["r4"][0]: 2,
-                self.registers["r5"][0]: 3,
-                self.registers["r6"][0]: 4,
-                # fp registers
-                self.registers["f0"][0]: 0,
-                self.registers["f2"][0]: 1,
-                self.registers["f4"][0]: 2,
-                self.registers["f6"][0]: 3,
-            }
-            if _pyvex is not None
-            else None
-        )
+        self.argument_register_positions = {
+            self.registers["r2"][0]: 0,
+            self.registers["r3"][0]: 1,
+            self.registers["r4"][0]: 2,
+            self.registers["r5"][0]: 3,
+            self.registers["r6"][0]: 4,
+            # fp registers
+            self.registers["f0"][0]: 0,
+            self.registers["f2"][0]: 1,
+            self.registers["f4"][0]: 2,
+            self.registers["f6"][0]: 3,
+        }
 
     bits = 64
     vex_arch = "VexArchS390X"  # enum VexArch

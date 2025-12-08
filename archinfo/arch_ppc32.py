@@ -13,11 +13,6 @@ try:
 except ImportError:
     _keystone = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # PowerPC doesn't have stack base pointer, so bp_offset is set to -1 below
 # Normally r1 is used as stack pointer
@@ -36,20 +31,16 @@ class ArchPPC32(Arch):
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"
             }
 
-        self.argument_register_positions = (
-            {
-                self.registers["r3"][0]: 0,
-                self.registers["r4"][0]: 1,
-                self.registers["r5"][0]: 2,
-                self.registers["r6"][0]: 3,
-                self.registers["r7"][0]: 4,
-                self.registers["r8"][0]: 5,
-                self.registers["r9"][0]: 6,
-                self.registers["r10"][0]: 7,
-            }
-            if _pyvex is not None
-            else None
-        )
+        self.argument_register_positions = {
+            self.registers["r3"][0]: 0,
+            self.registers["r4"][0]: 1,
+            self.registers["r5"][0]: 2,
+            self.registers["r6"][0]: 3,
+            self.registers["r7"][0]: 4,
+            self.registers["r8"][0]: 5,
+            self.registers["r9"][0]: 6,
+            self.registers["r10"][0]: 7,
+        }
 
     bits = 32
     vex_arch = "VexArchPPC32"

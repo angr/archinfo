@@ -13,11 +13,6 @@ try:
 except ImportError:
     _keystone = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 # Note: PowerPC doesn't have pc, so guest_CIA is commented as IP (no arch visible register)
 # Normally r1 is used as stack pointer
 
@@ -35,47 +30,43 @@ class ArchPPC64(Arch):
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"  # mtlr reg; ... ; blr
             }
             self.triplet = "powerpc-linux-gnu"
-        self.argument_register_positions = (
-            {
-                self.registers["r3"][0]: 0,
-                self.registers["r4"][0]: 1,
-                self.registers["r5"][0]: 2,
-                self.registers["r6"][0]: 3,
-                self.registers["r7"][0]: 4,
-                self.registers["r8"][0]: 5,
-                self.registers["r9"][0]: 6,
-                self.registers["r10"][0]: 7,
-                # fp registers
-                self.registers["vsr1"][0]: 0,
-                self.registers["vsr2"][0]: 1,
-                self.registers["vsr3"][0]: 2,
-                self.registers["vsr4"][0]: 3,
-                self.registers["vsr5"][0]: 4,
-                self.registers["vsr6"][0]: 5,
-                self.registers["vsr7"][0]: 6,
-                self.registers["vsr8"][0]: 7,
-                self.registers["vsr9"][0]: 8,
-                self.registers["vsr10"][0]: 9,
-                self.registers["vsr11"][0]: 10,
-                self.registers["vsr12"][0]: 11,
-                self.registers["vsr13"][0]: 12,
-                # vector registers
-                self.registers["vsr2"][0]: 0,
-                self.registers["vsr3"][0]: 1,
-                self.registers["vsr4"][0]: 2,
-                self.registers["vsr5"][0]: 3,
-                self.registers["vsr6"][0]: 4,
-                self.registers["vsr7"][0]: 5,
-                self.registers["vsr8"][0]: 6,
-                self.registers["vsr9"][0]: 7,
-                self.registers["vsr10"][0]: 8,
-                self.registers["vsr11"][0]: 9,
-                self.registers["vsr12"][0]: 10,
-                self.registers["vsr13"][0]: 11,
-            }
-            if _pyvex is not None
-            else None
-        )
+        self.argument_register_positions = {
+            self.registers["r3"][0]: 0,
+            self.registers["r4"][0]: 1,
+            self.registers["r5"][0]: 2,
+            self.registers["r6"][0]: 3,
+            self.registers["r7"][0]: 4,
+            self.registers["r8"][0]: 5,
+            self.registers["r9"][0]: 6,
+            self.registers["r10"][0]: 7,
+            # fp registers
+            self.registers["vsr1"][0]: 0,
+            self.registers["vsr2"][0]: 1,
+            self.registers["vsr3"][0]: 2,
+            self.registers["vsr4"][0]: 3,
+            self.registers["vsr5"][0]: 4,
+            self.registers["vsr6"][0]: 5,
+            self.registers["vsr7"][0]: 6,
+            self.registers["vsr8"][0]: 7,
+            self.registers["vsr9"][0]: 8,
+            self.registers["vsr10"][0]: 9,
+            self.registers["vsr11"][0]: 10,
+            self.registers["vsr12"][0]: 11,
+            self.registers["vsr13"][0]: 12,
+            # vector registers
+            self.registers["vsr2"][0]: 0,
+            self.registers["vsr3"][0]: 1,
+            self.registers["vsr4"][0]: 2,
+            self.registers["vsr5"][0]: 3,
+            self.registers["vsr6"][0]: 4,
+            self.registers["vsr7"][0]: 5,
+            self.registers["vsr8"][0]: 6,
+            self.registers["vsr9"][0]: 7,
+            self.registers["vsr10"][0]: 8,
+            self.registers["vsr11"][0]: 9,
+            self.registers["vsr12"][0]: 10,
+            self.registers["vsr13"][0]: 11,
+        }
 
     bits = 64
     vex_arch = "VexArchPPC64"

@@ -19,11 +19,6 @@ try:
 except ImportError:
     _unicorn = None
 
-try:
-    import pyvex as _pyvex
-except ImportError:
-    _pyvex = None
-
 
 _NATIVE_FUNCTION_PROLOGS = {
     rb"\x8b\xff\x55\x8b\xec",  # mov edi, edi; push ebp; mov ebp, esp
@@ -60,7 +55,7 @@ class ArchX86(Arch):
                     self.reg_blacklist.append(register.name)
                     self.reg_blacklist_offsets.append(register.vex_offset)
 
-        if _unicorn and _pyvex:
+        if _unicorn:
             # CPU flag registers
             uc_flags_reg = _unicorn.x86_const.UC_X86_REG_EFLAGS
             cpu_flag_registers = {"d": 1 << 10, "ac": 1 << 18, "id": 1 << 21}
