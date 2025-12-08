@@ -54,6 +54,9 @@ class ArchARM(Arch):
         instruction_endness = None
         if endness == Endness.LE:
             instruction_endness = Endness.LE
+            self.pcode_id = "ARM:LE:32:v7"
+        else:
+            self.pcode_id = "ARM:BE:32:v7"
 
         super().__init__(endness, instruction_endness=instruction_endness)
         if endness == Endness.BE:
@@ -341,6 +344,7 @@ class ArchARMHF(ArchARM):
     """
 
     name = "ARMHF"
+    pcode_id = "ARM:LE:32:v7"
     triplet = "arm-linux-gnueabihf"
     ld_linux_name = "ld-linux-armhf.so.3"
     fp_ret_offset = RegisterOffset(128)  # s0
@@ -353,6 +357,7 @@ class ArchARMEL(ArchARM):
     """
 
     name = "ARMEL"
+    pcode_id = "ARM:LE:32:v7"
     triplet = "arm-linux-gnueabi"
     ld_linux_name = "ld-linux.so.3"
     elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
@@ -386,6 +391,7 @@ class ArchARMCortexM(ArchARMEL):
     """
 
     name = "ARMCortexM"
+    pcode_id = "ARM:LE:32:Cortex"
     triplet = "arm-none-eabi"  # ARM's own CM compilers use this triplet
 
     # These are the standard THUMB prologs.  We leave these off for other ARMs due to their length

@@ -33,7 +33,7 @@ class ArchPcode(Arch):
         assert isinstance(language, pypcode.ArchLanguage)
 
         self.name = language.id
-        self.pcode_arch = language.id
+        self.pcode_id = language.id
         self.description = language.description
         self.bits = int(language.size)
         self.endness = {"little": Endness.LE, "big": Endness.BE}[language.endian]
@@ -138,6 +138,15 @@ class ArchPcode(Arch):
             self.branch_delay_slot = True
 
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
+
+    def pcode_arch(self) -> "ArchPcode":
+        """
+        Return the ArchPcode instance for this architecture.
+        For ArchPcode, this returns itself.
+
+        :return: This ArchPcode instance
+        """
+        return self
 
     @staticmethod
     def _get_language_by_id(lang_id) -> "pypcode.ArchLanguage":

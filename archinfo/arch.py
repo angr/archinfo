@@ -3,7 +3,10 @@ import logging
 import platform as _platform
 import re
 import struct as _struct
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Type, Union
+
+if TYPE_CHECKING:
+    from .arch_pcode import ArchPcode
 
 from archinfo.types import RegisterName, RegisterOffset
 
@@ -477,6 +480,22 @@ class Arch:
         # always create a new Unicorn instance
         return _unicorn.Uc(self.uc_arch, self.uc_mode)
 
+    def pcode_arch(self) -> "ArchPcode":
+        """
+        Get an ArchPcode instance for this architecture.
+
+        :return: An ArchPcode instance corresponding to this architecture
+        :raises ArchError: If pypcode is not installed or pcode_arch is None
+        """
+        if self.pcode_id is None:
+            raise ArchError(f"Arch {self.name} does not have a pcode_arch defined")
+
+        # Import ArchPcode here to avoid circular dependency
+        from .arch_pcode import ArchPcode
+
+        # Return an ArchPcode instance for this architecture
+        return ArchPcode(self.pcode_id)
+
     def asm(self, string, addr=0, as_bytes=True, thumb=False):
         """
         Compile the assembly instruction represented by string using Keystone
@@ -778,6 +797,8 @@ class Arch:
     got_section_name = ""
 
     vex_archinfo = None
+
+    pcode_id: str | None = None
 
 
 arch_id_map = []
