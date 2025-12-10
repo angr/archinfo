@@ -27,6 +27,7 @@ class ArchPPC32(Arch):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.pcode_id = "PowerPC:BE:32:default"
             self.function_prologs = {
                 # stwu r1, -off(r1); mflr r0
                 rb"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6"
@@ -35,6 +36,8 @@ class ArchPPC32(Arch):
                 # mtlr reg; ... ; blr
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"
             }
+        else:
+            self.pcode_id = "PowerPC:LE:32:default"
 
         self.argument_register_positions = (
             {

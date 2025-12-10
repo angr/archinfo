@@ -34,6 +34,7 @@ class ArchRISCV64(Arch):
     bits = 64
     vex_arch = "VexArchRISCV64"
     name = "RISCV64"
+    pcode_id = "RISCV:LE:64:default"
     qemu_name = "riscv64"
     linux_name = "riscv64"
     triplet = "riscv64-linux-gnu"

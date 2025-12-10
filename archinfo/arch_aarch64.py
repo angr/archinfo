@@ -23,9 +23,12 @@ class ArchAArch64(Arch):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.pcode_id = "AARCH64:BE:64:v8A"
             self.ida_processor = "armb"
             self.function_prologs = set()
             self.function_epilogs = set()
+        else:
+            self.pcode_id = "AARCH64:LE:64:v8A"
 
     bits = 64
     vex_arch = "VexArchARM64"
