@@ -66,7 +66,15 @@ class ArchRISCV64(Arch):
     instruction_alignment = 2
     register_list = [
         Register(name="zero", size=8, alias_names=("x0",)),
-        Register(name="ra", size=8, alias_names=("x1", "lr",), general_purpose=True),
+        Register(
+            name="ra",
+            size=8,
+            alias_names=(
+                "x1",
+                "lr",
+            ),
+            general_purpose=True,
+        ),
         Register(name="sp", size=8, alias_names=("x2",), general_purpose=True),
         Register(name="gp", size=8, alias_names=("x3",), general_purpose=True),
         Register(name="tp", size=8, alias_names=("x4",), general_purpose=True),
@@ -98,7 +106,6 @@ class ArchRISCV64(Arch):
         Register(name="t5", size=8, alias_names=("x30",), general_purpose=True),
         Register(name="t6", size=8, alias_names=("x31",), general_purpose=True),
         Register(name="pc", size=8, alias_names=("ip",)),
-
         Register(name="ft0", size=8, alias_names=("f0",), floating_point=True),
         Register(name="ft1", size=8, alias_names=("f1",), floating_point=True),
         Register(name="ft2", size=8, alias_names=("f2",), floating_point=True),
