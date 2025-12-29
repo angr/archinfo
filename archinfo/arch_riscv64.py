@@ -18,6 +18,7 @@ try:
     from unicorn import riscv_const
 except ImportError:
     _unicorn = None
+    riscv_const = None
 
 
 def is_riscv_arch(a):
