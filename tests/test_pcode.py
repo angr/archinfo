@@ -7,8 +7,7 @@ try:
 except ImportError:
     pypcode = None
 
-from archinfo import ArchError, ArchPcode, arch_from_id
-from archinfo.arch import Endness
+from archinfo import ArchError, ArchPcode, Endness, arch_from_id
 
 
 @unittest.skipUnless(pypcode is not None, "pypcode not installed")
@@ -43,56 +42,56 @@ class TestArchPcode(unittest.TestCase):
         assert pcode_arch.bits == 32
 
         # Test ARM LE
-        arm_le = arch_from_id("arm", "le")
+        arm_le = arch_from_id("arm", Endness.LE)
         pcode_arch = arm_le.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "ARM:LE:32:v7"
         assert pcode_arch.bits == 32
 
         # Test ARM BE
-        arm_be = arch_from_id("arm", "be")
+        arm_be = arch_from_id("arm", Endness.BE)
         pcode_arch = arm_be.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "ARM:BE:32:v7"
         assert pcode_arch.bits == 32
 
         # Test MIPS32 LE
-        mips_le = arch_from_id("mips32", "le")
+        mips_le = arch_from_id("mips32", Endness.LE)
         pcode_arch = mips_le.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "MIPS:LE:32:default"
         assert pcode_arch.bits == 32
 
         # Test MIPS32 BE
-        mips_be = arch_from_id("mips32", "be")
+        mips_be = arch_from_id("mips32", Endness.BE)
         pcode_arch = mips_be.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "MIPS:BE:32:default"
         assert pcode_arch.bits == 32
 
         # Test AARCH64 LE
-        aarch64_le = arch_from_id("aarch64", "le")
+        aarch64_le = arch_from_id("aarch64", Endness.LE)
         pcode_arch = aarch64_le.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "AARCH64:LE:64:v8A"
         assert pcode_arch.bits == 64
 
         # Test AARCH64 BE
-        aarch64_be = arch_from_id("aarch64", "be")
+        aarch64_be = arch_from_id("aarch64", Endness.BE)
         pcode_arch = aarch64_be.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "AARCH64:BE:64:v8A"
         assert pcode_arch.bits == 64
 
         # Test PPC64 LE
-        ppc64_le = arch_from_id("ppc64", "le")
+        ppc64_le = arch_from_id("ppc64", Endness.LE)
         pcode_arch = ppc64_le.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "PowerPC:LE:64:default"
         assert pcode_arch.bits == 64
 
         # Test PPC64 BE
-        ppc64_be = arch_from_id("ppc64", "be")
+        ppc64_be = arch_from_id("ppc64", Endness.BE)
         pcode_arch = ppc64_be.pcode_arch()
         assert isinstance(pcode_arch, ArchPcode)
         assert pcode_arch.pcode_id == "PowerPC:BE:64:default"
