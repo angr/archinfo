@@ -2,12 +2,12 @@
 import pickle
 import unittest
 
+from archinfo import ArchError, ArchPcode, ArchS390X, Endness, arch_from_id
+
 try:
     import pypcode
 except ImportError:
     pypcode = None
-
-from archinfo import ArchError, ArchPcode, Endness, arch_from_id
 
 
 @unittest.skipUnless(pypcode is not None, "pypcode not installed")
@@ -113,8 +113,6 @@ class TestArchPcode(unittest.TestCase):
 
     def test_pcode_method_arch_without_pcode(self):
         """Test that architectures without pcode support raise ArchError"""
-        from archinfo.arch_s390x import ArchS390X
-
         s390x = ArchS390X()
         assert s390x.pcode_id is None
         with self.assertRaises(ArchError) as cm:
