@@ -7,14 +7,15 @@ import re
 import struct as _struct
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Type, Union
 
-if TYPE_CHECKING:
-    from .arch_pcode import ArchPcode
-
 from archinfo.types import RegisterName, RegisterOffset
 
 from .archerror import ArchError
 from .tls import TLSArchInfo
 from .types import Endness
+
+if TYPE_CHECKING:
+    from .arch_pcode import ArchPcode
+
 
 log = logging.getLogger("archinfo.arch")
 log.addHandler(logging.NullHandler())
