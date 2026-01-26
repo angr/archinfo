@@ -492,7 +492,7 @@ class Arch:
             raise ArchError(f"Arch {self.name} does not have a pcode_arch defined")
 
         # Delayed import to avoid circular dependency
-        from .arch_pcode import ArchPcode
+        from .arch_pcode import ArchPcode  # pylint: disable=import-outside-toplevel
 
         return ArchPcode(self.pcode_id)
 
