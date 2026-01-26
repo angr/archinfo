@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import copy
 import logging
 import platform as _platform
@@ -483,7 +481,7 @@ class Arch:
         # always create a new Unicorn instance
         return _unicorn.Uc(self.uc_arch, self.uc_mode)
 
-    def pcode_arch(self) -> ArchPcode:
+    def pcode_arch(self) -> "ArchPcode":
         """
         Get an ArchPcode instance for this architecture.
 
