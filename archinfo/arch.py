@@ -480,7 +480,7 @@ class Arch:
         # always create a new Unicorn instance
         return _unicorn.Uc(self.uc_arch, self.uc_mode)
 
-    def pcode_arch(self) -> "ArchPcode":
+    def pcode_arch(self) -> ArchPcode:
         """
         Get an ArchPcode instance for this architecture.
 
@@ -490,10 +490,9 @@ class Arch:
         if self.pcode_id is None:
             raise ArchError(f"Arch {self.name} does not have a pcode_arch defined")
 
-        # Import ArchPcode here to avoid circular dependency
+        # Delayed import to avoid circular dependency
         from .arch_pcode import ArchPcode
 
-        # Return an ArchPcode instance for this architecture
         return ArchPcode(self.pcode_id)
 
     def asm(self, string, addr=0, as_bytes=True, thumb=False):
