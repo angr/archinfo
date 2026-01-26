@@ -145,6 +145,7 @@ class ArchAMD64(Arch):
     vex_arch = "VexArchAMD64"
     vex_endness = "VexEndnessLE"
     name = "AMD64"
+    pcode_id = "x86:LE:64:default"
     qemu_name = "x86_64"
     ida_processor = "metapc"
     linux_name = "x86_64"
