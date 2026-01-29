@@ -156,7 +156,7 @@ class ArchAMD64(Arch):
     syscall_num_offset = 16
     call_pushes_ret = True
     stack_change = -8
-    initial_sp = 0x7FFFFFFFFFF0000
+    initial_sp = 0x7FFFFFFF0000
     call_sp_fix = -8
     memory_endness = Endness.LE
     register_endness = Endness.LE
