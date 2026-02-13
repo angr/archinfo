@@ -1,5 +1,6 @@
 import logging
 from typing import Union
+from xml.etree.ElementTree import Element
 
 from .arch import Arch, Endness, Register
 from .archerror import ArchError
@@ -96,16 +97,7 @@ class ArchPcode(Arch):
                         archinfo_regs[sp_reg.lower()].alias_names += ("sp",)
 
             # Get return offset
-            proto_tags = cspec.find("default_proto")
-            if proto_tags is not None and len(proto_tags) >= 1:
-                proto_tag = proto_tags[0]
-                output_tags = proto_tag.find("output")
-                if output_tags is not None and len(output_tags) >= 1:
-                    output_tag = output_tags[0]
-                    output_register_tag = output_tag.find("register")
-                    if output_register_tag is not None:
-                        output_reg = output_register_tag.attrib["name"]
-                        ret_offset = RegisterOffset(ctx.registers[output_reg].offset)
+            ret_offset = self.__get_ret_offset(cspec, ctx)
 
         if sp_offset is None:
             log.warning("Unknown stack pointer register offset?")
@@ -163,3 +155,28 @@ class ArchPcode(Arch):
         ctx.setVariableDefault("TMode", 1 if thumb else 0)
         instructions = ctx.disassemble(bytestring, addr, 0, len(bytestring), 0).instructions
         return "\n".join(f"{insn.addr.offset:#x}:\t{insn.mnem} {insn.body}" for insn in instructions)
+
+    @staticmethod
+    def __get_ret_offset(cspec: Element, ctx: pypcode.Context):
+        proto_tags = cspec.find("default_proto")
+        if proto_tags is None or len(proto_tags) == 0:
+            return RegisterOffset(0)
+
+        proto_tag = proto_tags[0]
+        output_tags = proto_tag.find("output")
+        if output_tags is None:
+            return RegisterOffset(0)
+
+        output_pentries_tag = output_tags.findall("pentry")
+        for pentry_tag in output_pentries_tag:
+            if "metatype" in pentry_tag.attrib:
+                continue
+
+            output_register_tag = pentry_tag.find("register")
+            if output_register_tag is None:
+                continue
+
+            output_reg = output_register_tag.attrib["name"]
+            return RegisterOffset(ctx.registers[output_reg].offset)
+
+        return RegisterOffset(0)
