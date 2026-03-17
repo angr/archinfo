@@ -4,7 +4,7 @@ archinfo is a collection of classes that contain architecture-specific informati
 It is useful for cross-architecture tools (such as pyvex).
 """
 
-__version__ = "9.2.206.dev0"
+__version__ = "9.2.206"
 
 
 from .arch import (
