@@ -90,7 +90,7 @@ class ArchAArch64(Arch):
         Register(
             name="x6", size=8, subregisters=[("w6", 0, 4)], alias_names=("r6",), general_purpose=True, argument=True
         ),
-        Register(name="x7", size=8, subregisters=[("w7", 0, 4)], alias_names=("r7",), general_purpose=True),
+        Register(name="x7", size=8, subregisters=[("w7", 0, 4)], alias_names=("r7",), general_purpose=True, argument=True),
         Register(name="x8", size=8, subregisters=[("w8", 0, 4)], alias_names=("r8",), general_purpose=True),
         Register(name="x9", size=8, subregisters=[("w9", 0, 4)], alias_names=("r9",), general_purpose=True),
         Register(name="x10", size=8, subregisters=[("w10", 0, 4)], alias_names=("r10",), general_purpose=True),
