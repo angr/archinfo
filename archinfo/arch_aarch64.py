@@ -403,6 +403,15 @@ class ArchAArch64(Arch):
         0x70000001: "DT_AARCH64_BTI_PLT",
         0x70000003: "DT_AARCH64_PAC_PLT",
         0x70000005: "DT_AARCH64_VARIANT_PCS",
+
+        # https://github.com/ARM-software/abi-aa/blob/main/memtagabielf64/memtagabielf64.rst#dynamic-section
+        # These values are in the AArch64 Processor-specific range. The values are subject to change if 
+        # there is a clash with any section types added by AAELF64.
+        0x70000009: "DT_AARCH64_MEMTAG_MODE",
+        0x7000000B: "DT_AARCH64_MEMTAG_HEAP",
+        0x7000000C: "DT_AARCH64_MEMTAG_STACK",
+        0x7000000D: "DT_AARCH64_MEMTAG_GLOBALS",
+        0x7000000F: "DT_AARCH64_MEMTAG_GLOBALSSZ",
     }
 
     got_section_name = ".got"
