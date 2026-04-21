@@ -412,6 +412,13 @@ class ArchAArch64(Arch):
         0x7000000C: "DT_AARCH64_MEMTAG_STACK",
         0x7000000D: "DT_AARCH64_MEMTAG_GLOBALS",
         0x7000000F: "DT_AARCH64_MEMTAG_GLOBALSSZ",
+
+        # https://github.com/ARM-software/abi-aa/blob/main/pauthabielf64/pauthabielf64.rst#dynamic-section
+        # These values are in the AArch64 Processor-specific range. The values are subject to change if 
+        # there is a clash with any section types added by AAELF64.
+        0x70000011: "DT_AARCH64_AUTH_RELRSZ",
+        0x70000012: "DT_AARCH64_AUTH_RELR",
+        0x70000013: "DT_AARCH64_AUTH_RELRENT",
     }
 
     got_section_name = ".got"
