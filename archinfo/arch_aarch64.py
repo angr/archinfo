@@ -397,6 +397,14 @@ class ArchAArch64(Arch):
         Register(name="fpcr", size=4, floating_point=True, default_value=(initial_sp, True, "global")),
     ]
 
+    dynamic_tag_translation = {
+        # https://github.com/ARM-software/abi-aa/blob/main/sysvabi64/sysvabi64.rst#dynamic-section-tags
+        # https://github.com/ARM-software/abi-aa/blob/main/aaelf64/aaelf64.rst#st-other-values
+        0x70000001: "DT_AARCH64_BTI_PLT",
+        0x70000003: "DT_AARCH64_PAC_PLT",
+        0x70000005: "DT_AARCH64_VARIANT_PCS",
+    }
+
     got_section_name = ".got"
     ld_linux_name = "ld-linux-aarch64.so.1"
     elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
