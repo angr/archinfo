@@ -397,6 +397,28 @@ class ArchAArch64(Arch):
         Register(name="fpcr", size=4, floating_point=True, default_value=(initial_sp, True, "global")),
     ]
 
+    dynamic_tag_translation = {
+        # https://github.com/ARM-software/abi-aa/blob/main/sysvabi64/sysvabi64.rst#dynamic-section-tags
+        # https://github.com/ARM-software/abi-aa/blob/main/aaelf64/aaelf64.rst#st-other-values
+        0x70000001: "DT_AARCH64_BTI_PLT",
+        0x70000003: "DT_AARCH64_PAC_PLT",
+        0x70000005: "DT_AARCH64_VARIANT_PCS",
+        # https://github.com/ARM-software/abi-aa/blob/main/memtagabielf64/memtagabielf64.rst#dynamic-section
+        # These values are in the AArch64 Processor-specific range. The values are subject to change if
+        # there is a clash with any section types added by AAELF64.
+        0x70000009: "DT_AARCH64_MEMTAG_MODE",
+        0x7000000B: "DT_AARCH64_MEMTAG_HEAP",
+        0x7000000C: "DT_AARCH64_MEMTAG_STACK",
+        0x7000000D: "DT_AARCH64_MEMTAG_GLOBALS",
+        0x7000000F: "DT_AARCH64_MEMTAG_GLOBALSSZ",
+        # https://github.com/ARM-software/abi-aa/blob/main/pauthabielf64/pauthabielf64.rst#dynamic-section
+        # These values are in the AArch64 Processor-specific range. The values are subject to change if
+        # there is a clash with any section types added by AAELF64.
+        0x70000011: "DT_AARCH64_AUTH_RELRSZ",
+        0x70000012: "DT_AARCH64_AUTH_RELR",
+        0x70000013: "DT_AARCH64_AUTH_RELRENT",
+    }
+
     got_section_name = ".got"
     ld_linux_name = "ld-linux-aarch64.so.1"
     elf_tls = TLSArchInfo(1, 32, [], [0], [], 0, 0)
