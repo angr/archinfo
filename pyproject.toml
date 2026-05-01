@@ -30,12 +30,6 @@ Homepage = "https://api.angr.io/projects/archinfo/en/latest/"
 Repository = "https://github.com/angr/archinfo"
 
 [project.optional-dependencies]
-docs = [
-    "furo",
-    "myst-parser",
-    "sphinx",
-    "sphinx-autodoc-typehints",
-]
 pcode = [
     "pypcode>=1.1",
 ]
@@ -43,6 +37,12 @@ pcode = [
 [dependency-groups]
 dev = [
     "pytest",
+]
+docs = [
+    "furo",
+    "myst-parser",
+    "sphinx",
+    "sphinx-autodoc-typehints",
 ]
 
 [tool.setuptools]
