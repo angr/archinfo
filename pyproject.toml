@@ -15,9 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 requires-python = ">=3.12"
-dependencies = [
-    "backports-strenum>=1.2.8;python_version<'3.11'"
-]
+dependencies = []
 dynamic = ["version"]
 
 [project.readme]
