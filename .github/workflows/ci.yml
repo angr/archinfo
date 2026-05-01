@@ -10,8 +10,16 @@ on:
 jobs:
   ci:
     uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
-  windows:
-    uses: ./.github/workflows/windows.yml
-  macos:
-    uses: ./.github/workflows/macos.yml
 
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v6
+        with:
+            python-version: 3.12
+      - run: uv run pytest

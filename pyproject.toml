@@ -39,9 +39,10 @@ docs = [
 pcode = [
     "pypcode>=1.1",
 ]
-testing = [
+
+[dependency-groups]
+dev = [
     "pytest",
-    "pytest-xdist",
 ]
 
 [tool.setuptools]
