@@ -28,7 +28,7 @@ Repository = "https://github.com/angr/archinfo"
 
 [project.optional-dependencies]
 pcode = [
-    "pypcode>=1.1",
+    "pypcode~=4.0",
 ]
 
 [dependency-groups]
