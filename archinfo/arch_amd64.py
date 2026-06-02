@@ -152,6 +152,7 @@ class ArchAMD64(Arch):
     triplet = "x86_64-linux-gnu"
     max_inst_bytes = 15
     ret_offset = RegisterOffset(16)
+    fp_ret_offset = RegisterOffset(224)  # xmm0
     vex_conditional_helpers = True
     syscall_num_offset = 16
     call_pushes_ret = True
