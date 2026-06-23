@@ -57,10 +57,7 @@ class ArchS390X(Arch):
     initial_sp = 0x40000000000
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
     if _capstone:
-        try:
-            cs_arch = _capstone.CS_ARCH_SYSTEMZ
-        except AttributeError:
-            cs_arch = _capstone.CS_ARCH_SYSZ
+        cs_arch = getattr(_capstone, "CS_ARCH_SYSTEMZ", _capstone.CS_ARCH_SYSZ)
         cs_mode = _capstone.CS_MODE_BIG_ENDIAN
     if _keystone:
         ks_arch = _keystone.KS_ARCH_SYSTEMZ
