@@ -48,7 +48,10 @@ class ArchAArch64(Arch):
     instruction_endness = Endness.LE
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
     if _capstone:
-        cs_arch = getattr(_capstone, "CS_ARCH_AARCH64", _capstone.CS_ARCH_ARM64)
+        if hasattr(_capstone, "CS_ARCH_AARCH64"):
+            cs_arch = _capstone.CS_ARCH_AARCH64
+        else:
+            cs_arch = _capstone.CS_ARCH_ARM64
         cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
     if _keystone:
         ks_arch = _keystone.KS_ARCH_ARM64
