@@ -52,7 +52,7 @@ class ArchRISCV64(Arch):
     sizeof = {"short": 16, "int": 32, "long": 64, "long long": 64}
     if _capstone:
         cs_arch = _capstone.CS_ARCH_RISCV
-        cs_mode = _capstone.CS_MODE_RISCV64 | _capstone.CS_MODE_RISCVC
+        cs_mode = _capstone.CS_MODE_RISCV64 | getattr(_capstone, "CS_MODE_RISCVC", getattr(_capstone, "CS_MODE_RISCV_C", 0))
     # if _keystone:
     #     ks_arch = _keystone.KS_ARCH_RISCV
     #     ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
