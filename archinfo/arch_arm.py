@@ -446,7 +446,9 @@ class ArchARMCortexM(ArchARMEL):
         Register(name="msplim", size=4, general_purpose=True),
         Register(name="msplim_s", size=4, general_purpose=True),
         Register(name="msplim_ns", size=4, general_purpose=True),
-        Register(name="msplim_ns", size=4, general_purpose=True),
+        Register(name="psplim", size=4, general_purpose=True),
+        Register(name="psplim_s", size=4, general_purpose=True),
+        Register(name="psplim_ns", size=4, general_purpose=True),
         # additional stack pointers for secure/non_secure world
         Register(name="sp_process", size=4, general_purpose=True),
         Register(name="sp_process_s", size=4, general_purpose=True),
@@ -507,6 +509,7 @@ class ArchARMCortexM(ArchARMEL):
         # Bit 1: Whether we use MSP (0) or PSP (1)
         # Bit 0: Thread mode privilege level. 0 for privileged, 1 for unprivileged.
         Register(name="control", size=4, default_value=(0, False, None)),
+        Register(name="control_ns", size=4, default_value=(0, False, None)),
     ]
 
     # Special handling of CM mode in *stone
