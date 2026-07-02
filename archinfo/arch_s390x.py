@@ -3,10 +3,6 @@ try:
 except ImportError:
     _capstone = None
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
 
 try:
     import pyvex as _pyvex
@@ -62,9 +58,7 @@ class ArchS390X(Arch):
         else:
             cs_arch = _capstone.CS_ARCH_SYSZ
         cs_mode = _capstone.CS_MODE_BIG_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_SYSTEMZ
-        ks_mode = _keystone.KS_MODE_BIG_ENDIAN
+    nyxstone_triple = "s390x-linux-gnu"
     ret_instruction = b"\x07\xf4"  # br %r14
     nop_instruction = b"\x07\x07"  # nopr %r7
     instruction_alignment = 2

@@ -8,10 +8,6 @@ try:
 except ImportError:
     _capstone = None
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
 
 try:
     import pyvex as _pyvex
@@ -26,6 +22,7 @@ class ArchPPC64(Arch):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.nyxstone_triple = "powerpc64-linux-gnu"
             self.pcode_id = "PowerPC:BE:64:default"
             self.function_prologs = {
                 rb"\x94\x21[\x00-\xff]{2}\x7c\x08\x02\xa6",  # stwu r1, -off(r1); mflr r0
@@ -37,6 +34,7 @@ class ArchPPC64(Arch):
             }
             self.triplet = "powerpc-linux-gnu"
         else:
+            self.nyxstone_triple = "powerpc64le-linux-gnu"
             self.pcode_id = "PowerPC:LE:64:default"
         self.argument_register_positions = (
             {
@@ -97,9 +95,6 @@ class ArchPPC64(Arch):
     if _capstone:
         cs_arch = _capstone.CS_ARCH_PPC
         cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_PPC
-        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
     # Unicorn not supported
     # uc_arch = _unicorn.UC_ARCH_PPC if _unicorn else None
     # uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
