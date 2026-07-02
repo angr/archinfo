@@ -34,9 +34,9 @@ except ImportError:
     _capstone = None
 
 try:
-    import keystone as _keystone
+    from nyxstone import Nyxstone as _Nyxstone
 except ImportError:
-    _keystone = None
+    _Nyxstone = None
 
 
 class Register:
@@ -143,8 +143,7 @@ class Arch:
     :ivar dict sizeof: A mapping from C type to variable size in bits
     :ivar cs_arch: The Capstone arch value for this arch
     :ivar cs_mode: The Capstone mode value for this arch
-    :ivar ks_arch: The Keystone arch value for this arch
-    :ivar ks_mode: The Keystone mode value for this arch
+    :ivar nyxstone_triple: The LLVM target triple for assembly with Nyxstone
     :ivar uc_arch: The Unicorn engine arch value for this arch
     :ivar uc_mode: The Unicorn engine mode value for this arch
     :ivar uc_const: The Unicorn engine constants module for this arch
@@ -196,9 +195,6 @@ class Arch:
             if _capstone and self.cs_mode is not None:
                 self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
                 self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
-            if _keystone and self.ks_mode is not None:
-                self.ks_mode -= _keystone.KS_MODE_LITTLE_ENDIAN
-                self.ks_mode += _keystone.KS_MODE_BIG_ENDIAN
             self.ret_instruction = reverse_ends(self.ret_instruction)
             self.nop_instruction = reverse_ends(self.nop_instruction)
 
@@ -316,7 +312,8 @@ class Arch:
         res = copy.copy(self)
         res.vex_archinfo = copy.deepcopy(self.vex_archinfo)
         res._cs = None
-        res._ks = None
+        res._nx = None
+        res._nx_thumb = None
         return res
 
     def __repr__(self):
@@ -336,7 +333,8 @@ class Arch:
     def __getstate__(self):
         result = dict(self.__dict__)
         result["_cs"] = None
-        result["_ks"] = None
+        result["_nx"] = None
+        result["_nx_thumb"] = None
         if "vex_archinfo" in result and result["vex_archinfo"] is not None:
             # clear hwcacheinfo-caches because it may contain cffi.CData
             # more copies to avert the reference being mutated in other threads
@@ -452,23 +450,53 @@ class Arch:
         return self._cs
 
     @property
+    def nyxstone(self):
+        """
+        A Nyxstone instance for this arch
+        """
+        if self._nx is None:
+            if _Nyxstone is None:
+                raise ArchError("Nyxstone is not installed!")
+            if self.nyxstone_triple is None:
+                raise ArchError("Arch %s does not support assembly with Nyxstone" % self.name)
+            try:
+                self._nx = _Nyxstone(self.nyxstone_triple)
+            except ValueError as e:
+                raise ArchError(f"Failed to initialize Nyxstone for {self.nyxstone_triple}: {e}") from e
+        return self._nx
+
+    @property
+    def nyxstone_thumb(self):
+        """
+        A Nyxstone instance configured for ARM Thumb mode
+        """
+        if self._nx_thumb is None:
+            if _Nyxstone is None:
+                raise ArchError("Nyxstone is not installed!")
+            triple = self.nyxstone_thumb_triple
+            if triple is None:
+                raise ArchError("Arch %s does not support thumb assembly" % self.name)
+            try:
+                self._nx_thumb = _Nyxstone(triple)
+            except ValueError as e:
+                raise ArchError(f"Failed to initialize Nyxstone for {triple}: {e}") from e
+        return self._nx_thumb
+
+    @property
     def keystone(self):
         """
-        A Keystone instance for this arch
+        Deprecated: use .nyxstone instead. Returns the Nyxstone instance for backward compatibility.
         """
-        if self._ks is None:
-            if _keystone is None:
-                raise Exception("Keystone is not installed!")
-            if self.ks_arch is None:
-                raise ArchError("Arch %s does not support disassembly with Keystone" % self.name)
-            self._ks = _keystone.Ks(self.ks_arch, self.ks_mode)
-            self._configure_keystone()
-        return self._ks
+        import warnings
+
+        warnings.warn(
+            "arch.keystone is deprecated, use arch.nyxstone",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.nyxstone
 
     def _configure_capstone(self):
-        pass
-
-    def _configure_keystone(self):
         pass
 
     @property
@@ -498,31 +526,29 @@ class Arch:
 
     def asm(self, string, addr=0, as_bytes=True, thumb=False):
         """
-        Compile the assembly instruction represented by string using Keystone
+        Compile the assembly instruction represented by string using Nyxstone
 
         :param string:     The textual assembly instructions, separated by semicolons
         :param addr:       The address at which the text should be assembled, to deal with PC-relative access. Default 0
         :param as_bytes:   Set to False to return a list of integers instead of a python byte string
         :param thumb:      If working with an ARM processor, set to True to assemble in thumb mode.
         :return:           The assembled bytecode
+        :raises ArchError: If assembly fails or the assembler is not available
         """
-        if thumb and not hasattr(self, "keystone_thumb"):
+        if thumb and self.nyxstone_thumb_triple is None:
             log.warning("Specified thumb=True on non-ARM architecture")
             thumb = False
-        ks = self.keystone_thumb if thumb else self.keystone  # pylint: disable=no-member
+        nx = self.nyxstone_thumb if thumb else self.nyxstone
+
+        if isinstance(string, bytes):
+            string = string.decode()
 
         try:
-            encoding, _ = ks.asm(string, addr, as_bytes)  # pylint: disable=too-many-function-args
-        except TypeError:
-            bytelist, _ = ks.asm(string, addr)
-            if as_bytes:
-                if bytes is str:
-                    encoding = "".join(chr(c) for c in bytelist)
-                else:
-                    encoding = bytes(bytelist)
-            else:
-                encoding = bytelist
-
+            encoding = nx.assemble(string, address=addr)
+        except ValueError as e:
+            raise ArchError("Assembly failed: %s" % e) from e
+        if as_bytes:
+            return bytes(encoding)
         return encoding
 
     def disasm(self, bytestring, addr=0, thumb=False):
@@ -685,15 +711,31 @@ class Arch:
         return self.cs_arch is not None
 
     @property
-    def keystone_support(self):
+    def assembler_support(self):
         """
-        Whether the architecture is supported by the Keystone engine or not.
+        Whether the architecture is supported by the Nyxstone assembler or not.
+        Returns False if Nyxstone is not installed, even if the arch defines a triple.
 
-        :return: True if this Arch is supported by the Keystone engine, False otherwise.
+        :return: True if this Arch is supported by Nyxstone and Nyxstone is installed, False otherwise.
         :rtype:  bool
         """
 
-        return self.ks_arch is not None
+        return _Nyxstone is not None and self.nyxstone_triple is not None
+
+    @property
+    def nyxstone_support(self):
+        return self.assembler_support
+
+    @property
+    def keystone_support(self):
+        import warnings
+
+        warnings.warn(
+            "arch.keystone_support is deprecated, use arch.nyxstone_support or arch.assembler_support instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.assembler_support
 
     address_types: Tuple[type, ...] = (int,)
     function_address_types: Tuple[type, ...] = (int,)
@@ -743,10 +785,11 @@ class Arch:
     cs_mode = None
     _cs = None
 
-    # Keystone stuff
-    ks_arch = None
-    ks_mode = None
-    _ks = None
+    # Nyxstone stuff
+    nyxstone_triple = None
+    nyxstone_thumb_triple = None
+    _nx = None
+    _nx_thumb = None
 
     # Unicorn stuff
     uc_arch = None
