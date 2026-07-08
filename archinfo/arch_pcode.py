@@ -117,7 +117,10 @@ class ArchPcode(Arch):
         self.bp_offset = RegisterOffset(sp_offset)
         self.ret_offset = RegisterOffset(ret_offset)
         self.register_list = list(archinfo_regs.values())
-        self.initial_sp = (0x8000 << (self.bits - 16)) - 1
+        sp_bits = self.bits
+        if "sp" in archinfo_regs:
+            sp_bits = archinfo_regs["sp"].size * 8
+        self.initial_sp = (0x8000 << (sp_bits - 16)) - 1
         self.linux_name = ""  # FIXME
         self.triplet = ""  # FIXME
 

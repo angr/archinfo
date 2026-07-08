@@ -175,6 +175,7 @@ class Arch:
     instruction_endness = Endness.BE
     elf_tls: Optional[TLSArchInfo] = None
     dwarf_registers: List[str] = []
+    insn_word_size: int = 1
 
     def __init__(self, endness, instruction_endness=None):
         self.bytes = self.bits // self.byte_width
@@ -411,6 +412,8 @@ class Arch:
             fmt_size = "I"
         elif size == 2:
             fmt_size = "H"
+        elif size == 3:
+            fmt_size = "Z"  # special case for 24-bit architectures like AVR8
         elif size == 1:
             fmt_size = "B"
         else:
