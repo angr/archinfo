@@ -17,6 +17,11 @@ class TestArchPcode(unittest.TestCase):
         assert arch.instruction_endness == Endness.BE
         assert arch.bits == 32
 
+    def test_arch_with_narrow_stack_pointer(self):
+        arch = ArchPcode("8051:BE:16:default")
+        assert arch.registers["sp"][1] == 1
+        assert arch.initial_sp == 0x7F
+
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
             ArchPcode("invalid")

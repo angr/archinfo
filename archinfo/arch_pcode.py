@@ -120,7 +120,7 @@ class ArchPcode(Arch):
         sp_bits = self.bits
         if "sp" in archinfo_regs:
             sp_bits = archinfo_regs["sp"].size * 8
-        self.initial_sp = (0x8000 << (sp_bits - 16)) - 1
+        self.initial_sp = (1 << (sp_bits - 1)) - 1
         self.linux_name = ""  # FIXME
         self.triplet = ""  # FIXME
 
