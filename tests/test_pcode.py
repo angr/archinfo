@@ -32,6 +32,17 @@ class TestArchPcode(unittest.TestCase):
         assert arch.registers["pc"] == arch.registers["rip"]
         assert arch.ip_offset == arch.registers["rip"][0]
 
+    def test_arch_with_narrow_stack_pointer(self):
+        """The 8051's stack pointer is one byte wide, narrower than its 16-bit address space."""
+        arch = ArchPcode("8051:BE:16:default")
+        assert arch.registers["sp"][1] == 1
+        assert arch.initial_sp == 0x7F
+
+        # architectures with a stack pointer at least 16 bits wide keep the initial stack pointer they always had
+        assert ArchPcode("z80:LE:16:default").initial_sp == 0x7FFF
+        assert ArchPcode("68000:BE:32:default").initial_sp == 0x7FFFFFFF
+        assert ArchPcode("x86:LE:64:default").initial_sp == 0x7FFFFFFFFFFFFFFF
+
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
             ArchPcode("invalid")
