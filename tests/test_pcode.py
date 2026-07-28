@@ -23,7 +23,29 @@ class TestArchPcode(unittest.TestCase):
 
     def test_pickle(self):
         arch = ArchPcode("68000:BE:32:default")
-        pickle.dumps(arch)
+        assert pickle.loads(pickle.dumps(arch)).disasm(b"\x4e\x71") == "0x0:\tnop "
+
+        arch = ArchPcode("ARM:LE:32:v7")
+        assert pickle.loads(pickle.dumps(arch)).disasm(b"\x00\xbf", thumb=True) == "0x0:\tnop "
+
+    def test_disasm_without_thumb_mode(self):
+        arch = ArchPcode("x86:LE:16:Real Mode")
+        assert arch.disasm(b"") == ""
+        with self.assertRaisesRegex(TypeError, "bytestring must be bytes"):
+            arch.disasm(None)
+        with self.assertRaisesRegex(TypeError, "bytestring must be bytes"):
+            arch.disasm(bytearray())
+        assert arch.disasm(b"\x90", addr=0x100) == "0x100:\tNOP "
+        with self.assertLogs("archinfo.arch_pcode", level="WARNING") as logs:
+            assert arch.disasm(b"\x90", addr=0x100, thumb=True) == "0x100:\tNOP "
+        assert "without a TMode context variable" in logs.output[0]
+
+        arch = ArchPcode("ARM:LE:32:v4")
+        assert arch.disasm(b"\x00\x00\xa0\xe1", addr=0x100) == "0x100:\tmov r0,r0"
+
+    def test_disasm_thumb_mode(self):
+        arch = ArchPcode("ARM:LE:32:v7")
+        assert arch.disasm(b"\x00\xbf", addr=0x100, thumb=True) == "0x100:\tnop "
 
     def test_pcode_method_from_regular_arch(self):
         """Test that regular architectures can return ArchPcode instances via pcode() method"""
