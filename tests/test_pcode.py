@@ -12,6 +12,77 @@ except ImportError:
 
 @unittest.skipUnless(pypcode is not None, "pypcode not installed")
 class TestArchPcode(unittest.TestCase):
+    def test_x86_real_mode_abi_metadata(self):
+        language = pypcode.ArchLanguage.from_id("x86:LE:16:Real Mode")
+        assert language is not None
+        cspec = language.cspecs[("default", "default")]
+        data_organization = cspec.find("data_organization")
+        stack_pointer = cspec.find("stackpointer")
+        default_output = cspec.find("./default_proto/prototype/output/pentry/register")
+        assert data_organization is not None
+        assert stack_pointer is not None
+        assert default_output is not None
+        pointer_size_element = data_organization.find("pointer_size")
+        assert pointer_size_element is not None
+
+        arch = ArchPcode(language)
+        pointer_size = int(pointer_size_element.attrib["value"])
+        stack_pointer_name = stack_pointer.attrib["register"]
+        return_register_name = default_output.attrib["name"]
+
+        assert arch.bits == 16
+        assert arch.bytes == pointer_size == 2
+        assert stack_pointer_name == "SP"
+        assert arch.sp_offset == arch.registers[stack_pointer_name.lower()][0]
+        assert arch.registers[stack_pointer_name.lower()][1] == pointer_size
+        assert return_register_name == "AX"
+        assert arch.ret_offset == arch.registers[return_register_name.lower()][0]
+        assert arch.registers[return_register_name.lower()][1] == 2
+
+    def test_c_data_model_from_compiler_spec(self):
+        type_size_tags = {
+            "short": "short_size",
+            "int": "integer_size",
+            "long": "long_size",
+            "long long": "long_long_size",
+        }
+        cases = (
+            (
+                "x86:LE:16:Real Mode",
+                ("default", "default"),
+                {"short": 16, "int": 16, "long": 32, "long long": 32},
+            ),
+            (
+                "avr8:LE:16:default",
+                ("gcc", "gcc"),
+                {"short": 16, "int": 16, "long": 32, "long long": 64},
+            ),
+            (
+                "x86:LE:64:default",
+                ("gcc", "gcc"),
+                {"short": 16, "int": 32, "long": 64, "long long": 64},
+            ),
+        )
+
+        for language_id, compiler, expected_sizes in cases:
+            with self.subTest(language_id):
+                language = pypcode.ArchLanguage.from_id(language_id)
+                assert language is not None
+                data_organization = language.cspecs[compiler].find("data_organization")
+                assert data_organization is not None
+
+                spec_sizes = {
+                    c_type: int(data_organization.find(tag).attrib["value"]) * 8
+                    for c_type, tag in type_size_tags.items()
+                }
+                pointer_size = data_organization.find("pointer_size")
+                assert pointer_size is not None
+
+                arch = ArchPcode(language)
+                assert spec_sizes == expected_sizes
+                assert arch.sizeof == expected_sizes
+                assert int(pointer_size.attrib["value"]) * arch.byte_width == arch.bits
+
     def test_arch_68000(self):
         arch = ArchPcode("68000:BE:32:default")
         assert arch.instruction_endness == Endness.BE

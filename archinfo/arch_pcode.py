@@ -1,4 +1,5 @@
 import logging
+import xml.etree.ElementTree as ET
 from typing import Union
 
 from .arch import Arch, Endness, Register
@@ -38,11 +39,8 @@ class ArchPcode(Arch):
         self.bits = int(language.size)
         self.endness = {"little": Endness.LE, "big": Endness.BE}[language.endian]
         self.instruction_endness = self.endness
-        self.sizeof = (
-            {"short": 16, "int": 32, "long": 64, "long long": 64}
-            if self.bits == 64
-            else {"short": 16, "int": 32, "long": 32, "long long": 64}
-        )
+        cspec = self._select_cspec(language)
+        self.sizeof = self._get_c_type_sizes(cspec)
         self.elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
 
         # Build registers list
@@ -69,19 +67,7 @@ class ArchPcode(Arch):
 
         sp_offset = None
         ret_offset = RegisterOffset(0)
-        if len(language.cspecs):
-
-            def find_matching_cid(language, desired):
-                for cid in language.cspecs:
-                    if cid[0] == desired:
-                        return cid
-                return None
-
-            cspec_id = (
-                find_matching_cid(language, "default") or find_matching_cid(language, "gcc") or list(language.cspecs)[0]
-            )
-            cspec = language.cspecs[cspec_id]
-
+        if cspec is not None:
             # Get stack pointer register
             sp_tag = cspec.find("stackpointer")
             if sp_tag is not None:
@@ -141,6 +127,53 @@ class ArchPcode(Arch):
             self.branch_delay_slot = True
 
         super().__init__(endness=self.endness, instruction_endness=self.instruction_endness)
+
+    @staticmethod
+    def _select_cspec(language: "pypcode.ArchLanguage") -> ET.Element | None:
+        cspecs = language.cspecs
+        if not cspecs:
+            return None
+
+        for preferred_id in ("default", "gcc"):
+            for (compiler_id, _), cspec in cspecs.items():
+                if compiler_id == preferred_id:
+                    return cspec
+        return next(iter(cspecs.values()))
+
+    def _get_c_type_sizes(self, cspec: ET.Element | None) -> dict[str, int]:
+        sizes = (
+            {"short": 16, "int": 32, "long": 64, "long long": 64}
+            if self.bits == 64
+            else {"short": 16, "int": 32, "long": 32, "long long": 64}
+        )
+        if cspec is None:
+            return sizes
+
+        data_organization = cspec.find("data_organization")
+        if data_organization is None:
+            return sizes
+
+        size_tags = {
+            "short": "short_size",
+            "int": "integer_size",
+            "long": "long_size",
+            "long long": "long_long_size",
+        }
+        for c_type, tag in size_tags.items():
+            size_element = data_organization.find(tag)
+            if size_element is None or "value" not in size_element.attrib:
+                continue
+            try:
+                size = int(size_element.attrib["value"], 0)
+            except ValueError:
+                log.warning("Invalid %s value in compiler specification for %s", tag, self.name)
+                continue
+            if size <= 0:
+                log.warning("Non-positive %s value in compiler specification for %s", tag, self.name)
+                continue
+            sizes[c_type] = size * self.byte_width
+
+        return sizes
 
     def pcode_arch(self) -> "ArchPcode":
         """
