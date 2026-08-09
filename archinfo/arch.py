@@ -387,6 +387,10 @@ class Arch:
         """
         Produce a format string for use in python's ``struct`` module to decode a single word.
 
+        ``struct`` has integer format characters for 1, 2, 4 and 8 bytes only. Any other size, the
+        3-byte word of a 24-bit architecture included, raises ``ValueError`` and has to be assembled
+        from bytes by the caller.
+
         :param int size:    The size in bytes to pack/unpack. Defaults to wordsize
         :param bool signed: Whether the data should be extracted signed/unsigned. Default unsigned
         :param str endness: The endian to use in packing/unpacking. Defaults to memory endness
@@ -412,12 +416,10 @@ class Arch:
             fmt_size = "I"
         elif size == 2:
             fmt_size = "H"
-        elif size == 3:
-            fmt_size = "Z"  # special case for 24-bit architectures like AVR8
         elif size == 1:
             fmt_size = "B"
         else:
-            raise ValueError("Invalid size: Must be a integer power of 2 less than 16")
+            raise ValueError(f"Invalid size: struct has no format character for a {size}-byte integer")
 
         if signed:
             fmt_size = fmt_size.lower()
