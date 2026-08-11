@@ -17,6 +17,21 @@ class TestArchPcode(unittest.TestCase):
         assert arch.instruction_endness == Endness.BE
         assert arch.bits == 32
 
+    def test_arch_without_program_counter(self):
+        """Dalvik and the DATA languages declare no program counter, so archinfo reports none."""
+        for lang_id in ("Dalvik:LE:32:DEX_Nougat", "DATA:LE:64:default"):
+            arch = ArchPcode(lang_id)
+            assert arch.ip_offset is None
+            assert "ip" not in arch.registers
+            assert "pc" not in arch.registers
+
+    def test_arch_with_program_counter(self):
+        """A language that names its program counter keeps naming it, under pc and ip both."""
+        arch = ArchPcode("x86:LE:64:default")
+        assert arch.registers["ip"] == arch.registers["rip"]
+        assert arch.registers["pc"] == arch.registers["rip"]
+        assert arch.ip_offset == arch.registers["rip"][0]
+
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
             ArchPcode("invalid")

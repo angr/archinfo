@@ -1,10 +1,13 @@
 import logging
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from .arch import Arch, Endness, Register
 from .archerror import ArchError
 from .tls import TLSArchInfo
 from .types import RegisterOffset
+
+if TYPE_CHECKING:
+    import pypcode
 
 try:
     import pypcode
@@ -64,8 +67,7 @@ class ArchPcode(Arch):
                 archinfo_regs[pc_reg.lower()].alias_names = tuple(aliases)
 
         if pc_offset is None:
-            log.warning("Unknown program counter register offset?")
-            pc_offset = 0x80000000
+            log.debug("%s declares no program counter", self.name)
 
         sp_offset = None
         ret_offset = RegisterOffset(0)
@@ -112,7 +114,7 @@ class ArchPcode(Arch):
             sp_offset = 0x80000008
 
         self.instruction_alignment = 1
-        self.ip_offset = RegisterOffset(pc_offset)
+        self.ip_offset = None if pc_offset is None else RegisterOffset(pc_offset)
         self.sp_offset = RegisterOffset(sp_offset)
         self.bp_offset = RegisterOffset(sp_offset)
         self.ret_offset = RegisterOffset(ret_offset)
