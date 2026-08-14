@@ -2,7 +2,6 @@ import copy
 import logging
 import platform as _platform
 import re
-import struct as _struct
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Type, Union
 
 from archinfo.types import RegisterName, RegisterOffset
@@ -200,8 +199,9 @@ class Arch:
             if _keystone and self.ks_mode is not None:
                 self.ks_mode -= _keystone.KS_MODE_LITTLE_ENDIAN
                 self.ks_mode += _keystone.KS_MODE_BIG_ENDIAN
-            self.ret_instruction = reverse_ends(self.ret_instruction)
-            self.nop_instruction = reverse_ends(self.nop_instruction)
+            if self.instruction_endness == Endness.BE:
+                self.ret_instruction = reverse_ends(self.ret_instruction)
+                self.nop_instruction = reverse_ends(self.nop_instruction)
 
         if self.register_list and _pyvex is not None:
             (_, _), max_offset = max(_pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
@@ -929,11 +929,15 @@ def arch_from_id(ident: str, endness=Endness.ANY, bits="") -> Arch:
         return cls(endness)
 
 
-def reverse_ends(string):
-    count = (len(string) + 3) // 4
-    ise = "I" * count
-    string += b"\x00" * (count * 4 - len(string))
-    return _struct.pack(">" + ise, *_struct.unpack("<" + ise, string))
+def reverse_ends(string: bytes) -> bytes:
+    """
+    Swap the endness of every four-byte word in ``string``.
+
+    A trailing group of fewer than four bytes is reversed on its own, so the result always has the
+    same length as the input.
+    """
+
+    return b"".join(string[offset : offset + 4][::-1] for offset in range(0, len(string), 4))
 
 
 def get_host_arch():
