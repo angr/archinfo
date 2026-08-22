@@ -38,6 +38,22 @@ class TestArchPcode(unittest.TestCase):
         assert return_register_name == "AX"
         assert arch.ret_offset == arch.registers[return_register_name.lower()][0]
         assert arch.registers[return_register_name.lower()][1] == 2
+        assert arch.call_pushes_ret is True
+        assert arch.call_sp_fix == -2
+
+    def test_call_stack_metadata_from_compiler_spec(self):
+        cases = (
+            ("x86:LE:16:Protected Mode", True, -2),
+            ("x86:LE:32:default", True, -4),
+            ("68000:BE:32:default", True, -4),
+            ("ARM:LE:32:v7", False, 0),
+        )
+
+        for language_id, call_pushes_ret, call_sp_fix in cases:
+            with self.subTest(language_id):
+                arch = ArchPcode(language_id)
+                assert arch.call_pushes_ret is call_pushes_ret
+                assert arch.call_sp_fix == call_sp_fix
 
     def test_c_data_model_from_compiler_spec(self):
         type_size_tags = {

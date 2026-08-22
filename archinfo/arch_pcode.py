@@ -41,6 +41,9 @@ class ArchPcode(Arch):
         self.instruction_endness = self.endness
         cspec = self._select_cspec(language)
         self.sizeof = self._get_c_type_sizes(cspec)
+        call_stack_shift = self._get_call_stack_shift(cspec)
+        self.call_pushes_ret = call_stack_shift > 0
+        self.call_sp_fix = -call_stack_shift
         self.elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0)
 
         # Build registers list
@@ -174,6 +177,26 @@ class ArchPcode(Arch):
             sizes[c_type] = size * self.byte_width
 
         return sizes
+
+    def _get_call_stack_shift(self, cspec: ET.Element | None) -> int:
+        """Return the stack delta caused by a call from the compiler specification."""
+
+        if cspec is None:
+            return 0
+
+        prototype = cspec.find("./default_proto/prototype")
+        if prototype is None or "stackshift" not in prototype.attrib:
+            return 0
+
+        try:
+            stack_shift = int(prototype.attrib["stackshift"], 0)
+        except ValueError:
+            log.warning("Invalid stackshift value in compiler specification for %s", self.name)
+            return 0
+        if stack_shift < 0:
+            log.warning("Negative stackshift value in compiler specification for %s", self.name)
+            return 0
+        return stack_shift
 
     def pcode_arch(self) -> "ArchPcode":
         """
