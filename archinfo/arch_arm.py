@@ -50,16 +50,18 @@ class ArchARM(Arch):
     ARM architecture specific subclass
     """
 
-    def __init__(self, endness=Endness.LE):
-        instruction_endness = None
+    def __init__(self, endness=Endness.LE, instruction_endness=None):
+        if instruction_endness is None:
+            instruction_endness = Endness.LE if endness == Endness.LE else Endness.BE
         if endness == Endness.LE:
-            instruction_endness = Endness.LE
             self.pcode_id = "ARM:LE:32:v7"
+        elif instruction_endness == Endness.LE:
+            self.pcode_id = "ARM:LEBE:32:v7LEInstruction"
         else:
             self.pcode_id = "ARM:BE:32:v7"
 
         super().__init__(endness, instruction_endness=instruction_endness)
-        if endness == Endness.BE:
+        if instruction_endness == Endness.BE:
             self.function_prologs = {
                 # br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
                 rb"\xe5\x2d\xe0\x04",  # push {lr}
@@ -99,6 +101,15 @@ class ArchARM(Arch):
                 rb"\xe8\xbd[\x00-\xff]{2}\xe1\x2f\xff\x1e"  # pop {xxx}; bx lr
                 rb"\xe4\x9d\xe0\x04\xe1\x2f\xff\x1e"  # pop {xxx}; bx lr
             }
+        elif endness == Endness.BE:
+            # BE8 stores instruction words little-endian while data stays big-endian, so undo the
+            # byte-reversal Arch.__init__ applies to instruction encodings for a big-endian arch.
+            cls = type(self)
+            self.cs_mode = cls.cs_mode
+            self.ks_mode = cls.ks_mode
+            self.uc_mode = cls.uc_mode
+            self.ret_instruction = cls.ret_instruction
+            self.nop_instruction = cls.nop_instruction
 
     def __getstate__(self):
         self._cs = None

@@ -324,12 +324,17 @@ class Arch:
         return f"<Arch {self.name} ({self.memory_endness[-2:]})>"
 
     def __hash__(self):
-        return hash((self.name, self.bits, self.memory_endness))
+        return hash((self.name, self.bits, self.memory_endness, self.instruction_endness))
 
     def __eq__(self, other):
         if not isinstance(other, Arch):
             return False
-        return self.name == other.name and self.bits == other.bits and self.memory_endness == other.memory_endness
+        return (
+            self.name == other.name
+            and self.bits == other.bits
+            and self.memory_endness == other.memory_endness
+            and self.instruction_endness == other.instruction_endness
+        )
 
     def __ne__(self, other):
         return not self == other
