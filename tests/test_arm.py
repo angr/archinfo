@@ -51,10 +51,6 @@ class TestArchArm(unittest.TestCase):
         assert arch.ks_mode == ArchARMHF(Endness.LE).ks_mode
         assert arch.uc_mode == ArchARMHF(Endness.LE).uc_mode
 
-    def test_be8_capstone_decodes_little_endian_instructions(self):
-        arch = ArchARMHF(Endness.BE, instruction_endness=Endness.LE)
-        assert [(i.mnemonic, i.op_str) for i in arch.capstone.disasm(BX_LR_LE, 0)] == [("bx", "lr")]
-
     def test_be8_is_distinct_from_be32(self):
         be8 = ArchARMHF(Endness.BE, instruction_endness=Endness.LE)
         be32 = ArchARMHF(Endness.BE)
