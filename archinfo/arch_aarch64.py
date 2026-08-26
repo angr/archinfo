@@ -9,11 +9,6 @@ except ImportError:
     _capstone = None
 
 try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
     import unicorn as _unicorn
 except ImportError:
     _unicorn = None
@@ -25,10 +20,12 @@ class ArchAArch64(Arch):
         if endness == Endness.BE:
             self.pcode_id = "AARCH64:BE:64:v8A"
             self.ida_processor = "armb"
+            self.nyxstone_triple = "aarch64_be-linux-gnuabihf"
             self.function_prologs = set()
             self.function_epilogs = set()
         else:
             self.pcode_id = "AARCH64:LE:64:v8A"
+            self.nyxstone_triple = "aarch64-linux-gnuabihf"
 
     bits = 64
     vex_arch = "VexArchARM64"
@@ -53,9 +50,6 @@ class ArchAArch64(Arch):
         else:
             cs_arch = _capstone.CS_ARCH_ARM64
         cs_mode = _capstone.CS_MODE_LITTLE_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_ARM64
-        ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_ARM64 if _unicorn else None
     uc_mode = _unicorn.UC_MODE_LITTLE_ENDIAN if _unicorn else None
     uc_const = _unicorn.arm64_const if _unicorn else None

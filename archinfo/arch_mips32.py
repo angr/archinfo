@@ -6,10 +6,6 @@ try:
 except ImportError:
     _capstone = None
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
 
 try:
     import unicorn as _unicorn
@@ -24,6 +20,7 @@ class ArchMIPS32(Arch):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.nyxstone_triple = "mips-linux-gnu"
             self.pcode_id = "MIPS:BE:32:default"
             self.function_prologs = {
                 rb"\x27\xbd\xff[\x00-\xff]"  # addiu $sp, xxx
@@ -36,6 +33,7 @@ class ArchMIPS32(Arch):
             self.triplet = "mips-linux-gnu"
             self.linux_name = "mips"
         else:
+            self.nyxstone_triple = "mipsel-linux-gnu"
             self.pcode_id = "MIPS:LE:32:default"
 
     bits = 32
@@ -56,9 +54,6 @@ class ArchMIPS32(Arch):
     if _capstone:
         cs_arch = _capstone.CS_ARCH_MIPS
         cs_mode = _capstone.CS_MODE_32 + _capstone.CS_MODE_LITTLE_ENDIAN
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_MIPS
-        ks_mode = _keystone.KS_MODE_32 + _keystone.KS_MODE_LITTLE_ENDIAN
     uc_arch = _unicorn.UC_ARCH_MIPS if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_32 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.mips_const if _unicorn else None

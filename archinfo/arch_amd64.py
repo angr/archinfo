@@ -9,10 +9,6 @@ try:
 except ImportError:
     _capstone = None
 
-try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
 
 try:
     import unicorn as _unicorn
@@ -107,40 +103,6 @@ class ArchAMD64(Arch):
         else:
             self._cs.syntax = _capstone.CS_OPT_SYNTAX_INTEL
 
-    @property
-    def keystone_x86_syntax(self):
-        """
-        The current syntax Keystone uses for x86. It can be 'intel',
-        'at&t', 'nasm', 'masm', 'gas' or 'radix16'
-        """
-        return self._ks_x86_syntax
-
-    @keystone_x86_syntax.setter
-    def keystone_x86_syntax(self, new_syntax):
-        if new_syntax not in ("intel", "at&t", "nasm", "masm", "gas", "radix16"):
-            raise ArchError(
-                "Unsupported Keystone x86 syntax. It must be one of the following: "
-                '"intel", "at&t", "nasm", "masm", "gas" or "radix16".'
-            )
-
-        if new_syntax != self._ks_x86_syntax:
-            self._ks = None
-            self._ks_x86_syntax = new_syntax
-
-    def _configure_keystone(self):
-        if self._ks_x86_syntax == "at&t":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_ATT
-        elif self._ks_x86_syntax == "nasm":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_NASM
-        elif self._ks_x86_syntax == "masm":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_MASM
-        elif self._ks_x86_syntax == "gas":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_GAS
-        elif self._ks_x86_syntax == "radix16":
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_RADIX16
-        else:
-            self._ks.syntax = _keystone.KS_OPT_SYNTAX_INTEL
-
     bits = 64
     vex_arch = "VexArchAMD64"
     vex_endness = "VexEndnessLE"
@@ -166,10 +128,7 @@ class ArchAMD64(Arch):
         cs_arch = _capstone.CS_ARCH_X86
         cs_mode = _capstone.CS_MODE_64 + _capstone.CS_MODE_LITTLE_ENDIAN
     _cs_x86_syntax = None  # Set it to 'att' in order to use AT&T syntax for x86
-    if _keystone:
-        ks_arch = _keystone.KS_ARCH_X86
-        ks_mode = _keystone.KS_MODE_64 + _keystone.KS_MODE_LITTLE_ENDIAN
-    _ks_x86_syntax = None
+    nyxstone_triple = "x86_64-linux-gnu"
     uc_arch = _unicorn.UC_ARCH_X86 if _unicorn else None
     uc_mode = (_unicorn.UC_MODE_64 + _unicorn.UC_MODE_LITTLE_ENDIAN) if _unicorn else None
     uc_const = _unicorn.x86_const if _unicorn else None

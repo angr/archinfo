@@ -9,11 +9,6 @@ except ImportError:
     _capstone = None
 
 try:
-    import keystone as _keystone
-except ImportError:
-    _keystone = None
-
-try:
     import unicorn as _unicorn
     from unicorn import riscv_const
 except ImportError:
@@ -53,9 +48,7 @@ class ArchRISCV64(Arch):
     if _capstone and hasattr(_capstone, "CS_ARCH_RISCV"):
         cs_arch = _capstone.CS_ARCH_RISCV
         cs_mode = _capstone.CS_MODE_RISCV64 | _capstone.CS_MODE_RISCVC
-    # if _keystone:
-    #     ks_arch = _keystone.KS_ARCH_RISCV
-    #     ks_mode = _keystone.KS_MODE_LITTLE_ENDIAN
+    nyxstone_triple = "riscv64-linux-gnu"
     uc_arch = _unicorn.UC_ARCH_RISCV if _unicorn else None
     uc_mode = _unicorn.UC_MODE_RISCV64 if _unicorn else None
     uc_const = riscv_const if _unicorn else None
