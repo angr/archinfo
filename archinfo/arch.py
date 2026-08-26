@@ -190,18 +190,27 @@ class Arch:
             self.vex_archinfo = _pyvex.enums.default_vex_archinfo()
 
         if endness == Endness.BE:
+            # An architecture may store instruction words in the opposite order to its data, so the
+            # decoders and the instruction byte patterns follow instruction_endness rather than the
+            # memory endness. ARM BE8 is the case that differs; everywhere else the two agree.
+            # VEX carries one endness per guest and uses it both to fetch instructions and to
+            # tag the data accesses it emits, so a BE8 guest decodes correctly while its lifted
+            # loads and stores claim to be little-endian. Expressing both needs a VEX change.
             if self.vex_archinfo:
-                self.vex_archinfo["endness"] = _pyvex.enums.vex_endness_from_string("VexEndnessBE")
+                self.vex_archinfo["endness"] = _pyvex.enums.vex_endness_from_string(
+                    "VexEndnessBE" if self.instruction_endness == Endness.BE else "VexEndnessLE"
+                )
             self.memory_endness = Endness.BE
             self.register_endness = Endness.BE
-            if _capstone and self.cs_mode is not None:
-                self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
-                self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
-            if _keystone and self.ks_mode is not None:
-                self.ks_mode -= _keystone.KS_MODE_LITTLE_ENDIAN
-                self.ks_mode += _keystone.KS_MODE_BIG_ENDIAN
-            self.ret_instruction = reverse_ends(self.ret_instruction)
-            self.nop_instruction = reverse_ends(self.nop_instruction)
+            if self.instruction_endness == Endness.BE:
+                if _capstone and self.cs_mode is not None:
+                    self.cs_mode -= _capstone.CS_MODE_LITTLE_ENDIAN
+                    self.cs_mode += _capstone.CS_MODE_BIG_ENDIAN
+                if _keystone and self.ks_mode is not None:
+                    self.ks_mode -= _keystone.KS_MODE_LITTLE_ENDIAN
+                    self.ks_mode += _keystone.KS_MODE_BIG_ENDIAN
+                self.ret_instruction = reverse_ends(self.ret_instruction)
+                self.nop_instruction = reverse_ends(self.nop_instruction)
 
         if self.register_list and _pyvex is not None:
             (_, _), max_offset = max(_pyvex.vex_ffi.guest_offsets.items(), key=lambda x: x[1])
@@ -324,12 +333,17 @@ class Arch:
         return f"<Arch {self.name} ({self.memory_endness[-2:]})>"
 
     def __hash__(self):
-        return hash((self.name, self.bits, self.memory_endness))
+        return hash((self.name, self.bits, self.memory_endness, self.instruction_endness))
 
     def __eq__(self, other):
         if not isinstance(other, Arch):
             return False
-        return self.name == other.name and self.bits == other.bits and self.memory_endness == other.memory_endness
+        return (
+            self.name == other.name
+            and self.bits == other.bits
+            and self.memory_endness == other.memory_endness
+            and self.instruction_endness == other.instruction_endness
+        )
 
     def __ne__(self, other):
         return not self == other

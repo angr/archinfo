@@ -50,16 +50,20 @@ class ArchARM(Arch):
     ARM architecture specific subclass
     """
 
-    def __init__(self, endness=Endness.LE):
-        instruction_endness = None
+    def __init__(self, endness=Endness.LE, instruction_endness=None):
+        if instruction_endness is None:
+            instruction_endness = Endness.LE if endness == Endness.LE else Endness.BE
         if endness == Endness.LE:
-            instruction_endness = Endness.LE
             self.pcode_id = "ARM:LE:32:v7"
+        elif instruction_endness == Endness.LE:
+            # BE8: big-endian data with little-endian instruction words, ARMv6 onward. Ghidra calls
+            # this layout LEBE, and the ELF header marks it with EF_ARM_BE8.
+            self.pcode_id = "ARM:LEBE:32:v7LEInstruction"
         else:
             self.pcode_id = "ARM:BE:32:v7"
 
         super().__init__(endness, instruction_endness=instruction_endness)
-        if endness == Endness.BE:
+        if endness == Endness.BE and instruction_endness == Endness.BE:
             self.function_prologs = {
                 # br"\xe9\x2d[\x40-\x7f\xc0-\xff][\x00-\xff]", # stmfd sp!, {xxxxx, lr}
                 rb"\xe5\x2d\xe0\x04",  # push {lr}
