@@ -35,6 +35,18 @@ class TestArchMIPSN32(unittest.TestCase):
         assert ArchMIPSN32(Endness.LE).memory_endness == Endness.LE
         assert ArchMIPSN32(Endness.LE).struct_fmt() == "<I"
 
+    def test_argument_registers_stay_64_bit(self):
+        # bits == 32 is the pointer width. Anything that slots an argument into one of these
+        # registers has to take the width from the register file, not from bits: a consumer that
+        # divides bits by eight describes a0 as four bytes and, on big-endian, then writes a 32-bit
+        # argument into the sign-extension half that the callee never reads.
+        for endness in (Endness.BE, Endness.LE):
+            arch = ArchMIPSN32(endness)
+            assert arch.bytes == 4
+            for name in ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "v0", "v1"]:
+                assert arch.registers[name][1] == 8, name
+                assert arch.registers[name] == ArchMIPS64(endness).registers[name], name
+
     def test_c_types(self):
         arch = ArchMIPSN32(Endness.BE)
         assert arch.sizeof["long"] == 32

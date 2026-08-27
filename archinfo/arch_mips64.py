@@ -209,6 +209,13 @@ class ArchMIPSN32(ArchMIPS64):
     Picking ArchMIPS64 for these instead would decode correctly and then corrupt the object:
     CLE would stride the GOT by 8 rather than 4, read an 8-byte implicit addend out of a
     4-byte REL slot, and write 8 bytes back over the neighbouring word.
+
+    ``bits`` is therefore the width of a pointer here and nothing else. It is not the width of a
+    register, and a consumer that needs one -- to slot an argument into ``a0``, say -- has to read
+    the size out of the register file (``registers[name]`` and ``Register.size``) or state it
+    itself. n32 is the architecture that separates the two, so it is the one that catches a
+    consumer conflating them, and on a little-endian target it will not: the two disagree only
+    about which half of a 64-bit register a 32-bit value occupies.
     """
 
     def __init__(self, endness=Endness.BE):
