@@ -122,7 +122,9 @@ class ArchPcode(Arch):
         sp_bits = self.bits
         if "sp" in archinfo_regs:
             sp_bits = archinfo_regs["sp"].size * 8
-        self.initial_sp = (0x8000 << (sp_bits - 16)) - 1
+        # start the stack at the top of the lower half of the stack pointer's range. The stack pointer can be
+        # narrower than the address space; the 8051, for instance, has a one-byte SP on a 16-bit address space.
+        self.initial_sp = (1 << (sp_bits - 1)) - 1
         self.linux_name = ""  # FIXME
         self.triplet = ""  # FIXME
 
