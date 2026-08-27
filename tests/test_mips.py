@@ -6,6 +6,15 @@ import unittest
 from archinfo import ArchMIPS64, ArchMIPSN32
 from archinfo.arch import Endness
 
+try:
+    import pyvex
+except ImportError:
+    pyvex = None
+
+# archinfo declares no dependencies, so a bare install has no pyvex and Arch.__init__ leaves the
+# register file empty. Anything that reads arch.registers has to say so rather than KeyError.
+requires_pyvex = unittest.skipUnless(pyvex is not None, "the register file needs pyvex")
+
 
 class TestArchMIPSN32(unittest.TestCase):
     """
@@ -21,6 +30,7 @@ class TestArchMIPSN32(unittest.TestCase):
         # relocation slot; n32 relocation entries, GOT slots and pointers are all 4 bytes.
         assert arch.struct_fmt() == ">I"
 
+    @requires_pyvex
     def test_instruction_set_is_64_bit(self):
         arch = ArchMIPSN32(Endness.BE)
         assert arch.vex_arch == "VexArchMIPS64"
@@ -35,6 +45,7 @@ class TestArchMIPSN32(unittest.TestCase):
         assert ArchMIPSN32(Endness.LE).memory_endness == Endness.LE
         assert ArchMIPSN32(Endness.LE).struct_fmt() == "<I"
 
+    @requires_pyvex
     def test_argument_registers_stay_64_bit(self):
         # bits == 32 is the pointer width. Anything that slots an argument into one of these
         # registers has to take the width from the register file, not from bits: a consumer that
