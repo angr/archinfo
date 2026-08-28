@@ -38,6 +38,11 @@ try:
 except ImportError:
     _keystone = None
 
+try:
+    import pypcode as _pypcode
+except ImportError:
+    _pypcode = None
+
 
 class Register:
     """
@@ -874,9 +879,9 @@ def arch_from_id(ident: str, endness: str = Endness.ANY, bits: str | int = "") -
     A full sleigh language id, such as ``pa-risc:BE:32:default``, returns the ArchPcode for that language. It
     carries its own endness and width, so the ``endness`` and ``bits`` hints do not apply to it.
     """
-    if ":" in ident:
+    if _pypcode is not None and ":" in ident:
         # A language id names one language, so it answers before arch_id_map, whose regexes would otherwise
-        # claim ARM:LE:32:v7 for ArchARMEL. The import is delayed because arch_pcode imports this module.
+        # claim ARM:LE:32:v7 for ArchARMEL. arch_pcode imports this module, so it cannot be imported at the top.
         from .arch_pcode import ArchPcode  # pylint: disable=import-outside-toplevel
 
         with contextlib.suppress(ArchError):
