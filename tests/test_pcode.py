@@ -95,14 +95,6 @@ class TestArchPcode(unittest.TestCase):
         with self.assertRaises(ArchNotFound):
             arch_from_id("EM_PARISC", "be", 32)
 
-    def test_arch_from_id_without_pypcode(self):
-        # archinfo installed without the pcode extra has no language to reach, and answers exactly
-        # as it did before language ids were accepted at all.
-        with patch("archinfo.arch_pcode._has_pypcode", False):
-            assert arch_from_id("x86").name == "X86"
-            with self.assertRaises(ArchNotFound):
-                arch_from_id("pa-risc:BE:32:default")
-
     def test_pickle(self):
         arch = ArchPcode("68000:BE:32:default")
         pickle.dumps(arch)
@@ -200,6 +192,18 @@ class TestArchPcode(unittest.TestCase):
         with self.assertRaises(ArchError) as cm:
             s390x.pcode_arch()
         assert "does not have a pcode_arch defined" in str(cm.exception)
+
+
+class TestArchFromIdWithoutPypcode(unittest.TestCase):
+    def test_arch_from_id_without_pypcode(self):
+        # archinfo installed without the pcode extra has no language to reach, and answers exactly as it
+        # did before language ids were accepted at all. Each guard is exercised on its own: archinfo.arch
+        # skips the branch when pypcode is absent, and ArchPcode refuses to construct without it.
+        for target, absent in (("archinfo.arch._pypcode", None), ("archinfo.arch_pcode._has_pypcode", False)):
+            with patch(target, absent):
+                assert arch_from_id("x86").name == "X86"
+                with self.assertRaises(ArchNotFound):
+                    arch_from_id("pa-risc:BE:32:default")
 
 
 if __name__ == "__main__":
