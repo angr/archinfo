@@ -28,8 +28,14 @@ except ImportError:
 # TODO: which endianness should be default?
 
 
-def is_arm_arch(a):
-    return a.name.startswith("ARM")
+def is_arm_arch(a) -> bool:
+    """
+    Whether an architecture is one of archinfo's own ARM architectures, which carry the ARM/Thumb
+    interworking model: Thumb prologues, the itstate register, and the low bit of an address as the
+    mark of a Thumb instruction. A p-code ARM language carries none of them, because it selects its
+    instruction set through its SLEIGH language instead.
+    """
+    return isinstance(a, ArchARM)
 
 
 def get_real_address_if_arm(arch, addr):

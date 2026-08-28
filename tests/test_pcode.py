@@ -2,7 +2,18 @@
 import pickle
 import unittest
 
-from archinfo import ArchError, ArchPcode, ArchS390X, Endness, arch_from_id
+from archinfo import (
+    ArchARM,
+    ArchARMCortexM,
+    ArchARMEL,
+    ArchARMHF,
+    ArchError,
+    ArchPcode,
+    ArchS390X,
+    Endness,
+    arch_from_id,
+)
+from archinfo.arch_arm import is_arm_arch
 
 try:
     import pypcode
@@ -42,6 +53,15 @@ class TestArchPcode(unittest.TestCase):
         assert ArchPcode("z80:LE:16:default").initial_sp == 0x7FFF
         assert ArchPcode("68000:BE:32:default").initial_sp == 0x7FFFFFFF
         assert ArchPcode("x86:LE:64:default").initial_sp == 0x7FFFFFFFFFFFFFFF
+
+    def test_arm_language_is_not_an_archinfo_arm_arch(self):
+        # CFG recovery in angr guards its ARM/Thumb handling with is_arm_arch and then reads Thumb
+        # prologues, the itstate register and the ARM CFG option table, none of which a p-code ARM
+        # language has. See https://github.com/angr/angr/issues/4779.
+        for language in ("ARM:LE:32:v7", "ARM:BE:32:v7", "ARM:LE:32:Cortex", "ARM:LE:32:v8"):
+            assert not is_arm_arch(ArchPcode(language))
+        for arch in (ArchARM(), ArchARMEL(), ArchARMHF(), ArchARMCortexM()):
+            assert is_arm_arch(arch)
 
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
