@@ -65,7 +65,7 @@ class ArchS390X(Arch):
     if _keystone:
         ks_arch = _keystone.KS_ARCH_SYSTEMZ
         ks_mode = _keystone.KS_MODE_BIG_ENDIAN
-    ret_instruction = b"\x07\xf4"  # br %r14
+    ret_instruction = b"\xfe\x07"  # br %r14
     nop_instruction = b"\x07\x07"  # nopr %r7
     instruction_alignment = 2
     register_list = [
