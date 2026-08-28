@@ -221,10 +221,12 @@ class ArchMIPSN32(ArchMIPS64):
     def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
+            self.pcode_id = "MIPS:BE:64:64-32addr"
             self.triplet = "mips64-linux-gnuabin32"
             self.linux_name = "mipsn32"
             self.ida_name = "mips64b"
         else:
+            self.pcode_id = "MIPS:LE:64:64-32addr"
             self.triplet = "mips64el-linux-gnuabin32"
             self.linux_name = "mipsn32el"
 

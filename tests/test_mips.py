@@ -11,9 +11,15 @@ try:
 except ImportError:
     pyvex = None
 
+try:
+    import pypcode
+except ImportError:
+    pypcode = None
+
 # archinfo declares no dependencies, so a bare install has no pyvex and Arch.__init__ leaves the
 # register file empty. Anything that reads arch.registers has to say so rather than KeyError.
 requires_pyvex = unittest.skipUnless(pyvex is not None, "the register file needs pyvex")
+requires_pypcode = unittest.skipUnless(pypcode is not None, "resolving a language id needs pypcode")
 
 
 class TestArchMIPSN32(unittest.TestCase):
@@ -57,6 +63,18 @@ class TestArchMIPSN32(unittest.TestCase):
             for name in ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "v0", "v1"]:
                 assert arch.registers[name][1] == 8, name
                 assert arch.registers[name] == ArchMIPS64(endness).registers[name], name
+
+    def test_pcode_id_names_the_32_bit_address_language(self):
+        assert ArchMIPSN32(Endness.BE).pcode_id == "MIPS:BE:64:64-32addr"
+        assert ArchMIPSN32(Endness.LE).pcode_id == "MIPS:LE:64:64-32addr"
+        for endness in (Endness.BE, Endness.LE):
+            assert ArchMIPSN32(endness).pcode_id != ArchMIPS64(endness).pcode_id
+
+    @requires_pypcode
+    def test_pcode_id_resolves(self):
+        for endness in (Endness.BE, Endness.LE):
+            arch = ArchMIPSN32(endness)
+            assert arch.pcode_arch().pcode_id == arch.pcode_id
 
     def test_c_types(self):
         arch = ArchMIPSN32(Endness.BE)
