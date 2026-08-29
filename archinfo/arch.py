@@ -863,11 +863,12 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident: str, endness=Endness.ANY, bits="") -> Arch:
+def arch_from_id(ident: str, endness=Endness.ANY, bits: str | int = "") -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 
-    You may optionally provide the ``endness`` and ``bits`` parameters (strings) to help this function out.
+    You may optionally provide the ``endness`` and ``bits`` parameters to help this function out. ``bits`` is
+    either a number of bits or a string containing one, which is what an ELF class is.
     """
     if bits == 64 or (isinstance(bits, str) and "64" in bits):
         bits = 64
