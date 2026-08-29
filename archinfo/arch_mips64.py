@@ -198,24 +198,12 @@ class ArchMIPS64(Arch):
 
 class ArchMIPSN32(ArchMIPS64):
     """
-    The MIPS n32 ABI, and the older O64 ABI alongside it.
+    The MIPS n32 ABI and the older O64 ABI.
 
-    Both put a 64-bit instruction stream in an ELFCLASS32 container: the registers and the
-    instructions are those of ArchMIPS64, while pointers, GOT slots, relocation entries and
-    symbol table entries stay 32-bit. Every ELF structure an n32 object carries is an Elf32_*
-    one, so ``bits`` -- which is what decides how wide a word CLE reads and writes -- is 32,
-    and only the decoding side is inherited from the 64-bit architecture.
+    Both MIPS n32 and O64 use 64-bit instructions. The registers and the instructions are the same as in ArchMIPS64,
+    while pointers, GOT slots, relocation entries and symbol table entries are 32-bit.
 
-    Picking ArchMIPS64 for these instead would decode correctly and then corrupt the object:
-    CLE would stride the GOT by 8 rather than 4, read an 8-byte implicit addend out of a
-    4-byte REL slot, and write 8 bytes back over the neighbouring word.
-
-    ``bits`` is therefore the width of a pointer here and nothing else. It is not the width of a
-    register, and a consumer that needs one -- to slot an argument into ``a0``, say -- has to read
-    the size out of the register file (``registers[name]`` and ``Register.size``) or state it
-    itself. n32 is the architecture that separates the two, so it is the one that catches a
-    consumer conflating them, and on a little-endian target it will not: the two disagree only
-    about which half of a 64-bit register a 32-bit value occupies.
+    Every ELF structure an n32 object carries is an Elf32_*, so ArchMIPSN32.bits is 32.
     """
 
     def __init__(self, endness=Endness.BE):
