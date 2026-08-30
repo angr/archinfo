@@ -1,4 +1,3 @@
-import contextlib
 import copy
 import logging
 import platform as _platform
@@ -12,7 +11,6 @@ from .tls import TLSArchInfo
 from .types import Endness
 
 if TYPE_CHECKING:
-    # Typing only. arch_pcode imports this module, so its runtime import is delayed to each use site.
     from .arch_pcode import ArchPcode
 
 
@@ -38,11 +36,6 @@ try:
     import keystone as _keystone
 except ImportError:
     _keystone = None
-
-try:
-    import pypcode as _pypcode
-except ImportError:
-    _pypcode = None
 
 
 class Register:
@@ -876,18 +869,7 @@ def arch_from_id(ident: str, endness: str = Endness.ANY, bits: str | int = "") -
 
     You may optionally provide the ``endness`` and ``bits`` parameters to help this function out. ``bits`` is
     either a number of bits or a string containing one, which is what an ELF class is.
-
-    A full sleigh language id, such as ``pa-risc:BE:32:default``, returns the ArchPcode for that language. It
-    carries its own endness and width, so the ``endness`` and ``bits`` hints do not apply to it.
     """
-    if _pypcode is not None and ":" in ident:
-        # A language id names one language, so it answers before arch_id_map, whose regexes would otherwise
-        # claim ARM:LE:32:v7 for ArchARMEL. Delayed import to avoid circular dependency, as in Arch.pcode_arch.
-        from .arch_pcode import ArchPcode  # pylint: disable=import-outside-toplevel
-
-        with contextlib.suppress(ArchError):
-            return ArchPcode(ident)
-
     if bits == 64 or (isinstance(bits, str) and "64" in bits):
         bits = 64
     elif isinstance(bits, str) and "32" in bits:
