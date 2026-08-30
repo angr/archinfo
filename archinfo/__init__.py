@@ -7,16 +7,18 @@ It is useful for cross-architecture tools (such as pyvex).
 __version__ = "9.3.4.dev0"
 
 
+import contextlib
+
 from .arch import (
     Arch,
     ArchNotFound,
     Register,
     all_arches,
-    arch_from_id,
     get_host_arch,
     register_arch,
     reverse_ends,
 )
+from .arch import arch_from_id as _arch_from_id
 from .arch_aarch64 import ArchAArch64
 from .arch_amd64 import ArchAMD64
 from .arch_arm import ArchARM, ArchARMCortexM, ArchARMEL, ArchARMHF
@@ -63,3 +65,22 @@ __all__ = [
     "register_arch",
     "reverse_ends",
 ]
+
+
+def arch_from_id(ident: str, endness: str = Endness.ANY, bits: str | int = "") -> Arch:
+    """
+    Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
+
+    You may optionally provide the ``endness`` and ``bits`` parameters to help this function out. ``bits`` is
+    either a number of bits or a string containing one, which is what an ELF class is.
+
+    A full sleigh language id, such as ``pa-risc:BE:32:default``, returns the ArchPcode for that language. It
+    carries its own endness and width, so the ``endness`` and ``bits`` hints do not apply to it.
+    """
+    # A language id names one language, so it answers before the registered architectures, whose regexes
+    # would otherwise claim ARM:LE:32:v7 for ArchARMEL.
+    if ":" in ident:
+        with contextlib.suppress(ArchError):
+            return ArchPcode(ident)
+
+    return _arch_from_id(ident, endness, bits)

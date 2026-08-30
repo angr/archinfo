@@ -61,8 +61,8 @@ class TestArchPcode(unittest.TestCase):
         assert arch_from_id("Xtensa:BE:32:default", "le", 64).pcode_id == "Xtensa:BE:32:default"
 
     def test_arch_from_id_by_language_id_of_a_registered_arch(self):
-        # 74 of the 187 languages pypcode ships name a processor arch_id_map also matches, so an id
-        # has to answer before that map or naming one of them silently returns the VEX architecture.
+        # arch_id_map resolves 74 of the 187 language ids pypcode ships to a VEX architecture, so an id
+        # has to answer before that map or naming one of them silently returns that architecture.
         for language_id in ["ARM:LE:32:v7", "MIPS:BE:32:default", "PowerPC:BE:64:default", "x86:LE:16:Real Mode"]:
             arch = arch_from_id(language_id)
             assert isinstance(arch, ArchPcode)
@@ -196,14 +196,12 @@ class TestArchPcode(unittest.TestCase):
 
 class TestArchFromIdWithoutPypcode(unittest.TestCase):
     def test_arch_from_id_without_pypcode(self):
-        # archinfo installed without the pcode extra has no language to reach, and answers exactly as it
-        # did before language ids were accepted at all. Each guard is exercised on its own: archinfo.arch
-        # skips the branch when pypcode is absent, and ArchPcode refuses to construct without it.
-        for target, absent in (("archinfo.arch._pypcode", None), ("archinfo.arch_pcode._has_pypcode", False)):
-            with patch(target, absent):
-                assert arch_from_id("x86").name == "X86"
-                with self.assertRaises(ArchNotFound):
-                    arch_from_id("pa-risc:BE:32:default")
+        # archinfo installed without the pcode extra has no language to reach, so ArchPcode refuses to
+        # construct and arch_from_id answers exactly as it did before language ids were accepted at all.
+        with patch("archinfo.arch_pcode._has_pypcode", False):
+            assert arch_from_id("x86").name == "X86"
+            with self.assertRaises(ArchNotFound):
+                arch_from_id("pa-risc:BE:32:default")
 
 
 if __name__ == "__main__":
