@@ -1,6 +1,7 @@
 # pylint:disable=missing-class-docstring,no-self-use
 import pickle
 import unittest
+from unittest.mock import patch
 
 from archinfo import ArchError, ArchPcode, ArchS390X, Endness, arch_from_id
 
@@ -42,6 +43,13 @@ class TestArchPcode(unittest.TestCase):
         assert ArchPcode("z80:LE:16:default").initial_sp == 0x7FFF
         assert ArchPcode("68000:BE:32:default").initial_sp == 0x7FFFFFFF
         assert ArchPcode("x86:LE:64:default").initial_sp == 0x7FFFFFFFFFFFFFFF
+
+    def test_registers_without_pyvex(self):
+        """A p-code register file comes from pypcode, so archinfo still builds it with no pyvex installed."""
+        with patch("archinfo.arch._pyvex", None):
+            arch = ArchPcode("x86:LE:64:default")
+        assert arch.registers["ip"] == arch.registers["rip"]
+        assert arch.registers["sp"] == arch.registers["rsp"]
 
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
