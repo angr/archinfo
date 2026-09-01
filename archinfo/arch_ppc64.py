@@ -35,7 +35,7 @@ class ArchPPC64(Arch):
             self.function_epilogs = {
                 rb"[\x00-\xff]{2}\x03\xa6([\x00-\xff]{4}){0,6}\x4e\x80\x00\x20"  # mtlr reg; ... ; blr
             }
-            self.triplet = "powerpc-linux-gnu"
+            self.triplet = "powerpc64-linux-gnu"
         else:
             self.pcode_id = "PowerPC:LE:64:default"
         self.argument_register_positions = (

@@ -36,7 +36,7 @@ class ArchAArch64(Arch):
     qemu_name = "aarch64"
     ida_processor = "arm"
     linux_name = "aarch64"
-    triplet = "aarch64-linux-gnueabihf"
+    triplet = "aarch64-linux-gnu"
     max_inst_bytes = 4
     ret_offset = RegisterOffset(16)
     vex_conditional_helpers = True

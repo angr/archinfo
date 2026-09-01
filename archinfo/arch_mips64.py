@@ -26,7 +26,7 @@ class ArchMIPS64(Arch):
             self.pcode_id = "MIPS:BE:64:default"
             self.function_prologs = set()
             self.function_epilogs = set()
-            self.triplet = "mips64-linux-gnu"
+            self.triplet = "mips64-linux-gnuabi64"
             self.linux_name = "mips64"
             self.ida_name = "mips64b"
         else:
@@ -39,7 +39,7 @@ class ArchMIPS64(Arch):
     qemu_name = "mips64el"
     ida_processor = "mips64"
     linux_name = "mips64el"  # ???
-    triplet = "mips64el-linux-gnu"
+    triplet = "mips64el-linux-gnuabi64"
     max_inst_bytes = 4
     ret_offset = RegisterOffset(32)
     syscall_register_offset = 16
