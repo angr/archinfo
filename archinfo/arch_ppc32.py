@@ -24,7 +24,7 @@ except ImportError:
 
 
 class ArchPPC32(Arch):
-    def __init__(self, endness=Endness.LE):
+    def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
             self.pcode_id = "PowerPC:BE:32:default"
@@ -57,6 +57,7 @@ class ArchPPC32(Arch):
     bits = 32
     vex_arch = "VexArchPPC32"
     name = "PPC32"
+    default_endness = Endness.BE
     qemu_name = "ppc"
     ida_processor = "ppc"
     linux_name = "ppc750"  # ?
@@ -324,4 +325,5 @@ class ArchPPC32(Arch):
 
 
 register_arch([r".*p\w*pc.*be"], 32, Endness.BE, ArchPPC32)
+register_arch([r".*p\w*pc\d*[-_]?(?:el|le)($|[^a-z])"], 32, Endness.LE, ArchPPC32)
 register_arch([r".*p\w*pc.*"], 32, Endness.ANY, ArchPPC32)
