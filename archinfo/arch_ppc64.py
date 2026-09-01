@@ -23,7 +23,7 @@ except ImportError:
 
 
 class ArchPPC64(Arch):
-    def __init__(self, endness=Endness.LE):
+    def __init__(self, endness=Endness.BE):
         super().__init__(endness)
         if endness == Endness.BE:
             self.pcode_id = "PowerPC:BE:64:default"
@@ -83,6 +83,7 @@ class ArchPPC64(Arch):
     bits = 64
     vex_arch = "VexArchPPC64"
     name = "PPC64"
+    default_endness = Endness.BE
     qemu_name = "ppc64"
     ida_processor = "ppc64"
     triplet = "powerpc64le-linux-gnu"
@@ -400,4 +401,5 @@ class ArchPPC64(Arch):
 
 
 register_arch([r".*p\w*pc.*be"], 64, Endness.BE, ArchPPC64)
+register_arch([r".*p\w*pc\d*[-_]?(?:el|le)($|[^a-z])"], 64, Endness.LE, ArchPPC64)
 register_arch([r".*p\w*pc.*"], 64, Endness.ANY, ArchPPC64)
