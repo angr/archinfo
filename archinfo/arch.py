@@ -863,7 +863,7 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident: str, endness=Endness.ANY, bits: str | int = "") -> Arch:
+def arch_from_id(ident: str, endness: str = Endness.ANY, bits: str | int = "") -> Arch:
     """
     Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
 
