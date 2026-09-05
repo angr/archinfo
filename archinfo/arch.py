@@ -817,14 +817,14 @@ def _append_arch_unique(my_arch: Arch) -> bool:
     return True
 
 
-def register_arch(regexes: List[str], bits: int, endness: Endness, my_arch: Type[Arch]):
+def register_arch(regexes: List[Union[str, re.Pattern]], bits: int, endness: Endness, my_arch: Type[Arch]):
     """
     Register a new architecture.
     Architectures are loaded by their string name using ``arch_from_id()``, and
     this defines the mapping it uses to figure it out.
     Takes a list of regular expressions, and an Arch class as input.
 
-    :param regexes: List of regular expressions (str or SRE_Pattern)
+    :param regexes: List of regular expressions (str or re.Pattern)
     :type regexes: list
     :param bits: The canonical "bits" of this architecture, ex. 32 or 64
     :type bits: int
@@ -837,7 +837,7 @@ def register_arch(regexes: List[str], bits: int, endness: Endness, my_arch: Type
     if not isinstance(regexes, list):
         raise TypeError("regexes must be a list")
     for rx in regexes:
-        if not isinstance(rx, str) and not isinstance(rx, re._pattern_type):
+        if not isinstance(rx, str) and not isinstance(rx, re.Pattern):
             raise TypeError("Each regex must be a string or compiled regular expression")
         try:
             re.compile(rx)
