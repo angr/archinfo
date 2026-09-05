@@ -1,6 +1,5 @@
 import copy
 import logging
-import platform as _platform
 import re
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Type, Union
 
@@ -863,73 +862,6 @@ class ArchNotFound(Exception):
     pass
 
 
-def arch_from_id(ident: str, endness: str = Endness.ANY, bits: str | int = "") -> Arch:
-    """
-    Take our best guess at the arch referred to by the given identifier, and return an instance of its class.
-
-    You may optionally provide the ``endness`` and ``bits`` parameters to help this function out. ``bits`` is
-    either a number of bits or a string containing one, which is what an ELF class is.
-    """
-    if bits == 64 or (isinstance(bits, str) and "64" in bits):
-        bits = 64
-    elif isinstance(bits, str) and "32" in bits:
-        bits = 32
-    elif not bits and "64" in ident:
-        bits = 64
-    elif not bits and "32" in ident:
-        bits = 32
-
-    endness = endness.lower()
-    if "lit" in endness:
-        endness = Endness.LE
-    elif "big" in endness:
-        endness = Endness.BE
-    elif "lsb" in endness:
-        endness = Endness.LE
-    elif "msb" in endness:
-        endness = Endness.BE
-    elif "le" in endness:
-        endness = Endness.LE
-    elif "be" in endness:
-        endness = Endness.BE
-    elif "l" in endness:
-        endness = Endness.UNSURE
-    elif "b" in endness:
-        endness = Endness.UNSURE
-    else:
-        endness = Endness.UNSURE
-    ident = ident.lower()
-    cls = None
-    aendness = None
-    for arxs, abits, aendness, acls in arch_id_map:
-        found_it = False
-        for rx in arxs:
-            if re.search(rx, ident):
-                found_it = True
-                break
-        if not found_it:
-            continue
-        if bits and bits != abits:
-            continue
-        if aendness == Endness.ANY or endness == aendness or endness == Endness.UNSURE:
-            cls = acls
-            break
-    if not cls:
-        raise ArchNotFound(
-            f"Can't find architecture info for architecture {ident} with {repr(bits)} bits and {endness} endness"
-        )
-    if endness == Endness.UNSURE:
-        if aendness == Endness.ANY:
-            # We really don't care, use default
-            return cls(cls.default_endness)
-        else:
-            # We're expecting the ident to pick the endness.
-            # ex. 'armeb' means obviously this is Iend_BE
-            return cls(aendness)
-    else:
-        return cls(endness)
-
-
 def reverse_ends(string: bytes) -> bytes:
     """
     Swap the endness of every four-byte word in ``string``.
@@ -939,10 +871,3 @@ def reverse_ends(string: bytes) -> bytes:
     """
 
     return b"".join(string[offset : offset + 4][::-1] for offset in range(0, len(string), 4))
-
-
-def get_host_arch():
-    """
-    Return the arch of the machine we are currently running on.
-    """
-    return arch_from_id(_platform.machine())
