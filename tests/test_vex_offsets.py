@@ -83,7 +83,9 @@ def check_arch(arch, table):
             if subname.lower() in href:
                 seen_header_names.add(subname.lower())
                 if reg.vex_offset + suboff != href[subname.lower()]:
-                    mismatches.append((f"{reg.name}.{subname}", subname, reg.vex_offset + suboff, href[subname.lower()]))
+                    mismatches.append(
+                        (f"{reg.name}.{subname}", subname, reg.vex_offset + suboff, href[subname.lower()])
+                    )
                 else:
                     matched += 1
 
