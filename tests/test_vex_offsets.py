@@ -138,7 +138,7 @@ def test_vex_offsets():
     assert run_check(header) == 0
 
 
-if __name__ == "__main__":
+def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--header", default=None, help="path to libvex_guest_offsets.h")
     parser.add_argument("-v", "--verbose", action="store_true", help="list archinfo-only and header-only registers")
@@ -146,8 +146,12 @@ if __name__ == "__main__":
     header = args.header or find_default_header()
     if header is None:
         print("error: cannot locate libvex_guest_offsets.h; pass --header", file=sys.stderr)
-        sys.exit(2)
+        return 2
     print(f"header: {header}")
     n = run_check(header, verbose=args.verbose)
     print(f"total mismatches: {n}")
-    sys.exit(0 if n == 0 else 1)
+    return 0 if n == 0 else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
