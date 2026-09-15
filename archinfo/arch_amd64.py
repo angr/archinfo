@@ -32,7 +32,7 @@ _NATIVE_FUNCTION_PROLOGS = {
 # every function prolog can potentially be prefixed with endbr64
 _endbr64 = b"\xf3\x0f\x1e\xfa"
 _prefixed = {(_endbr64 + prolog) for prolog in _NATIVE_FUNCTION_PROLOGS}
-_FUNCTION_PROLOGS = _prefixed | _NATIVE_FUNCTION_PROLOGS
+_FUNCTION_PROLOGS = _prefixed | _NATIVE_FUNCTION_PROLOGS | {_endbr64}
 
 
 class ArchAMD64(Arch):
