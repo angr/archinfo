@@ -27,6 +27,9 @@ Homepage = "https://api.angr.io/projects/archinfo/en/latest/"
 Repository = "https://github.com/angr/archinfo"
 
 [project.optional-dependencies]
+capstone = [
+    "capstone>=6.0.0a1",
+]
 pcode = [
     "pypcode~=4.0",
 ]
