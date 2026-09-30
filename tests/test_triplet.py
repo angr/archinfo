@@ -8,11 +8,10 @@ from archinfo.arch import Endness, all_arches
 
 # Arch.triplet is substituted into the directory names library_search_path builds, and cle
 # searches those for a target's shared libraries, so it has to be the multiarch tuple for the
-# architecture reporting it. Seven pairs are left unpinned. ArchAArch64, ArchARM and
-# ArchARMHF at big-endian, ArchPPC32 at little-endian and ArchRISCV64 at big-endian each
-# report the tuple of the opposite endness, and ArchARMCortexM at either endness reports
-# arm-none-eabi, a bare-metal triplet rather than a multiarch tuple. What those should
-# report instead is a wider question than this file settles.
+# architecture reporting it. Six pairs are left unpinned. ArchAArch64, ArchARM, ArchARMHF and
+# ArchRISCV64 at big-endian each report the tuple of the opposite endness, and ArchARMCortexM
+# at either endness reports arm-none-eabi, a bare-metal triplet rather than a multiarch tuple.
+# What those should report instead is a wider question than this file settles.
 EXPECTED = {
     ("ArchAArch64", Endness.LE): "aarch64-linux-gnu",
     ("ArchAMD64", Endness.LE): "x86_64-linux-gnu",
@@ -25,6 +24,7 @@ EXPECTED = {
     ("ArchMIPSN32", Endness.BE): "mips64-linux-gnuabin32",
     ("ArchMIPSN32", Endness.LE): "mips64el-linux-gnuabin32",
     ("ArchPPC32", Endness.BE): "powerpc-linux-gnu",
+    ("ArchPPC32", Endness.LE): "powerpcle-linux-gnu",
     ("ArchPPC64", Endness.BE): "powerpc64-linux-gnu",
     ("ArchPPC64", Endness.LE): "powerpc64le-linux-gnu",
     ("ArchRISCV64", Endness.LE): "riscv64-linux-gnu",
