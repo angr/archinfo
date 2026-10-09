@@ -397,7 +397,7 @@ class ArchAArch64(Arch):
         Register(name="cmlen", size=8),
         Register(name="nraddr", size=8),
         Register(name="ip_at_syscall", size=8, artificial=True),
-        Register(name="fpcr", size=4, floating_point=True, default_value=(initial_sp, True, "global")),
+        Register(name="fpcr", size=8, floating_point=True, default_value=(initial_sp, True, "global")),
     ]
 
     dynamic_tag_translation = {
