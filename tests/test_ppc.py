@@ -87,6 +87,17 @@ class TestPPCEndnessIdentifiers(unittest.TestCase):
             assert parameter.default == cls.default_endness, cls.__name__
             assert cls().memory_endness == Endness.BE, cls.__name__
 
+    def test_the_triplet_names_the_same_architecture_it_came_from(self):
+        # The triplet is an identifier for the architecture reporting it, so feeding it back
+        # to arch_from_id has to return the same class and the same endness.
+        for cls in (ArchPPC32, ArchPPC64):
+            for endness in (Endness.BE, Endness.LE):
+                arch = cls(endness)
+                assert arch.triplet is not None, cls.__name__
+                back = arch_from_id(arch.triplet)
+                assert type(back) is cls, arch.triplet
+                assert back.memory_endness == endness, arch.triplet
+
 
 if __name__ == "__main__":
     unittest.main()

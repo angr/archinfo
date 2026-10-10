@@ -38,6 +38,7 @@ class ArchPPC32(Arch):
             }
         else:
             self.pcode_id = "PowerPC:LE:32:default"
+            self.triplet = "powerpcle-linux-gnu"
 
         self.argument_register_positions = (
             {
