@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import unittest
 
-from archinfo import ArchMIPS64, ArchMIPSN32
-from archinfo.arch import Endness
+import archinfo
+from archinfo import ArchMIPS32, ArchMIPS64, ArchMIPSN32, all_arches, arch_from_id
+from archinfo.arch import Arch, Endness
 
 try:
     import pyvex
@@ -80,6 +81,54 @@ class TestArchMIPSN32(unittest.TestCase):
         arch = ArchMIPSN32(Endness.BE)
         assert arch.sizeof["long"] == 32
         assert arch.sizeof["long long"] == 64
+
+
+class TestArchLookupByName(unittest.TestCase):
+    """
+    arch_from_id has to hand back the architecture whose name it was given.
+    """
+
+    def test_mipsn32_is_registered(self):
+        assert ArchMIPSN32 in {type(arch) for arch in all_arches}
+
+    def test_mipsn32_resolves_from_its_own_name(self):
+        # A caller that round-trips an architecture through its name -- angr's SimLibrary does
+        # exactly this to canonicalise the keys of its default calling-convention table -- used to
+        # get ArchMIPS32 back, which has neither the same register file nor the same instruction
+        # width. The n32 conventions then landed on the MIPS32 key and overwrote it.
+        assert type(arch_from_id(ArchMIPSN32.name)) is ArchMIPSN32
+        assert arch_from_id(ArchMIPSN32.name).name == ArchMIPSN32.name
+
+    def test_every_named_arch_resolves_from_its_own_name(self):
+        # The control for the case above: every other architecture archinfo exports already
+        # round-trips, so a failure here is about the one that does not rather than about
+        # arch_from_id being unable to resolve anything.
+        for attr in archinfo.__all__:
+            cls = getattr(archinfo, attr)
+            if not isinstance(cls, type) or not issubclass(cls, Arch):
+                continue
+            name = getattr(cls, "name", None)
+            if name is None:  # Arch and ArchPcode carry no fixed name
+                continue
+            assert arch_from_id(name).name == name, attr
+
+    def test_o32_identifiers_are_untouched(self):
+        # ArchMIPS32's catch-all now declines the n32 spellings. It still has to claim every
+        # other MIPS identifier it claimed before, in the endness it claimed it in.
+        for ident in ("mips", "mips32", "MIPS32"):
+            assert type(arch_from_id(ident)) is ArchMIPS32, ident
+        for ident in ("mipsel", "mipsle"):
+            assert type(arch_from_id(ident)) is ArchMIPS32, ident
+            assert arch_from_id(ident).memory_endness == Endness.LE, ident
+        for ident in ("mips64", "MIPS64"):
+            assert type(arch_from_id(ident)) is ArchMIPS64, ident
+        assert arch_from_id("mips64el").memory_endness == Endness.LE
+
+    def test_n32_identifiers_carry_their_endness(self):
+        assert arch_from_id("mipsn32").memory_endness == Endness.BE
+        for ident in ("mipsn32el", "mipsn32le"):
+            assert type(arch_from_id(ident)) is ArchMIPSN32, ident
+            assert arch_from_id(ident).memory_endness == Endness.LE, ident
 
 
 if __name__ == "__main__":
