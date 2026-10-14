@@ -22,6 +22,10 @@ except ImportError:
 class ArchAArch64(Arch):
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
+        if _unicorn is not None:
+            unicorn_sp = _unicorn.arm64_const.UC_ARM64_REG_SP
+            self.uc_regs["xsp"] = unicorn_sp
+            self.vex_to_unicorn_map[self.sp_offset] = (unicorn_sp, self.bytes)
         if endness == Endness.BE:
             self.pcode_id = "AARCH64:BE:64:v8A"
             self.ida_processor = "armb"
