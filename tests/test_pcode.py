@@ -47,6 +47,13 @@ class TestArchPcode(unittest.TestCase):
         with self.assertRaises(ArchError):
             ArchPcode("invalid")
 
+    def test_struct_fmt_24bit(self):
+        # struct has no format character for the 3-byte word of a 24-bit architecture
+        arch = ArchPcode("HCS-12:BE:24:default")
+        assert arch.bits == 24
+        with self.assertRaises(ValueError):
+            arch.struct_fmt()
+
     def test_pickle(self):
         arch = ArchPcode("68000:BE:32:default")
         pickle.dumps(arch)
