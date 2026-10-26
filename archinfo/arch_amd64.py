@@ -64,7 +64,7 @@ class ArchAMD64(Arch):
         )
 
         # Register blacklist
-        reg_blacklist = ("fs", "gs")
+        reg_blacklist = ("fs", "gs", "cr8")
         if self.reg_blacklist is not None and self.reg_blacklist_offsets is not None:
             for register in self.register_list:
                 if register.name in reg_blacklist:
