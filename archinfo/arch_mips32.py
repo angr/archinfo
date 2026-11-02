@@ -284,4 +284,6 @@ class ArchMIPS32(Arch):
 
 
 register_arch([r"mipsel|mipsle"], 32, Endness.LE, ArchMIPS32)
-register_arch([r".*mips.*"], 32, "any", ArchMIPS32)
+# The n32 ABI is a 32-bit identifier too, but it is ArchMIPSN32, which arch_mips64.py registers.
+# Leave those identifiers to it rather than swallowing them here.
+register_arch([r"(?!.*n32).*mips.*"], 32, "any", ArchMIPS32)
