@@ -118,6 +118,7 @@ class Arch:
 
     :ivar str name: The name of the arch
     :ivar int bits: The number of bits in a word
+    :ivar int memory_address_bits: The number of bits in the flattened memory-address space
     :ivar str vex_arch: The VEX enum name used to identify this arch
     :ivar str qemu_name: The name used by QEMU to identify this arch
     :ivar str ida_processor: The processor string used by IDA to identify this arch
@@ -322,6 +323,11 @@ class Arch:
 
     def __repr__(self):
         return f"<Arch {self.name} ({self.memory_endness[-2:]})>"
+
+    @property
+    def memory_address_bits(self) -> int:
+        """Width of the flattened memory-address space."""
+        return self.bits if self._memory_address_bits is None else self._memory_address_bits
 
     def __hash__(self):
         return hash((self.name, self.bits, self.memory_endness))
@@ -728,6 +734,7 @@ class Arch:
 
     # memory stuff
     bits: int
+    _memory_address_bits: int | None = None
     memory_endness = Endness.LE
     default_endness = Endness.LE
     register_endness = Endness.LE
