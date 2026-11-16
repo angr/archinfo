@@ -39,6 +39,11 @@ class ArchPcode(Arch):
         self.pcode_id = language.id
         self.description = language.description
         self.bits = int(language.size)
+        segmented_address = language.pspec.find("segmented_address") if language.pspec is not None else None
+        if segmented_address is not None and segmented_address.attrib.get("type") == "real":
+            # A real-mode x86 linear address is segment * 16 + offset, so it spans 20 bits even though both
+            # components and the architecture's pointers are 16 bits wide.
+            self._memory_address_bits = 20
         self.endness = {"little": Endness.LE, "big": Endness.BE}[language.endian]
         self.instruction_endness = self.endness
         self.sizeof = (
