@@ -43,6 +43,19 @@ class TestArchPcode(unittest.TestCase):
         assert ArchPcode("68000:BE:32:default").initial_sp == 0x7FFFFFFF
         assert ArchPcode("x86:LE:64:default").initial_sp == 0x7FFFFFFFFFFFFFFF
 
+    def test_arch_with_wider_memory_address_space(self):
+        """Real-mode x86 flattens two 16-bit address components into a 20-bit linear address."""
+        real_mode = ArchPcode("x86:LE:16:Real Mode")
+        assert real_mode.bits == 16
+        assert real_mode.memory_address_bits == 20
+
+        # Other segmented and narrow architectures keep their declared pointer width unless their architecture
+        # metadata describes a wider flattened address space.
+        protected_mode = ArchPcode("x86:LE:16:Protected Mode")
+        avr = ArchPcode("avr8:LE:16:default")
+        assert protected_mode.memory_address_bits == protected_mode.bits == 16
+        assert avr.memory_address_bits == avr.bits == 16
+
     def test_arch_bad_langid(self):
         with self.assertRaises(ArchError):
             ArchPcode("invalid")
