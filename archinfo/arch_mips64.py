@@ -231,3 +231,8 @@ class ArchMIPSN32(ArchMIPS64):
 
 register_arch([r".*mipsel.*|.*mips64el|.*mipsel64"], 64, Endness.LE, ArchMIPS64)
 register_arch([r".*mips64.*|.*mips.*"], 64, Endness.ANY, ArchMIPS64)
+# n32 keeps the 64-bit registers and narrows the pointer, so it registers as a 32-bit
+# architecture. The rules above are 64-bit and never claim an n32 identifier, and ArchMIPS32's
+# 32-bit catch-all declines them, so these come last and still get the match.
+register_arch([r".*mips[-_]?n32(el|le).*"], 32, Endness.LE, ArchMIPSN32)
+register_arch([r".*mips[-_]?n32.*"], 32, Endness.ANY, ArchMIPSN32)
